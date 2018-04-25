@@ -1,0 +1,24 @@
+[INFO  - 2018-03-29T06:20:06.591Z] GhostDriver - Main - running on port 12697
+[INFO  - 2018-03-29T06:20:11.010Z] Session [3c080e40-3319-11e8-9ca0-8b0894994519] - page.settings - {"XSSAuditingEnabled":false,"javascriptCanCloseWindows":true,"javascriptCanOpenWindows":true,"javascriptEnabled":true,"loadImages":true,"localToRemoteUrlAccessEnabled":false,"userAgent":"MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0","webSecurityEnabled":true}
+[INFO  - 2018-03-29T06:20:11.011Z] Session [3c080e40-3319-11e8-9ca0-8b0894994519] - page.customHeaders:  - {}
+[INFO  - 2018-03-29T06:20:11.011Z] Session [3c080e40-3319-11e8-9ca0-8b0894994519] - Session.negotiatedCapabilities - {"browserName":"phantomjs","version":"2.1.1","driverName":"ghostdriver","driverVersion":"1.2.0","platform":"windows-10-32bit","javascriptEnabled":true,"takesScreenshot":true,"handlesAlerts":false,"databaseEnabled":false,"locationContextEnabled":false,"applicationCacheEnabled":false,"browserConnectionEnabled":false,"cssSelectorsEnabled":true,"webStorageEnabled":false,"rotatable":false,"acceptSslCerts":false,"nativeEvents":true,"proxy":{"proxyType":"direct"},"phantomjs.page.settings.userAgent":"MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0"}
+[INFO  - 2018-03-29T06:20:11.012Z] SessionManagerReqHand - _postNewSessionCommand - New Session Created: 3c080e40-3319-11e8-9ca0-8b0894994519
+[ERROR - 2018-03-29T06:20:16.874Z] Session [3c080e40-3319-11e8-9ca0-8b0894994519] - page.onError - msg: TypeError: null is not an object (evaluating 'dmSlot')
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2018-03-29T06:20:16.874Z] Session [3c080e40-3319-11e8-9ca0-8b0894994519] - page.onError - stack:
+  global code (http://js.idgdmg.com.cn/b/smz012ac20171204.html:1)
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2018-03-29T06:20:58.284Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1522304458220
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2018-03-29T06:21:00.956Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1522304460931
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2018-03-29T06:21:04.451Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1522304464397
+
+  phantomjs://platform/console++.js:263 in error
+[ERROR - 2018-03-29T06:21:06.640Z] WebElementLocator - _handleLocateCommand - Element(s) NOT Found: GAVE UP. Search Stop Time: 1522304466606
+
+  phantomjs://platform/console++.js:263 in error

@@ -1,0 +1,1069 @@
+1514387356597	geckodriver	INFO	geckodriver 0.19.1
+1514387356608	geckodriver	INFO	Listening on 127.0.0.1:6887
+1514387358127	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.wBYOWcl9BCn3"
+1514387359323	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 17536, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 17536, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514387361668	Marionette	INFO	Listening on port 6893
+1514387361784	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514387361878	Marionette	DEBUG	Register listener.js for window 4294967297
+1514387361973	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514387362574	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514387362575	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514387368153	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514387388082	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 3168, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 3168, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 13772, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+errors will be ignored for this session
+1514425591592	Marionette	DEBUG	Register listener.js for window 4294967297
+[Parent 5872, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 5872, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 15424, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1514425869510	geckodriver	INFO	geckodriver 0.19.1
+1514425869522	geckodriver	INFO	Listening on 127.0.0.1:10387
+1514425871516	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.qxE6tHnNa9Q2"
+1514425872464	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 16292, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 18424, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514425874687	Marionette	INFO	Listening on port 10395
+1514425875147	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514425875238	Marionette	DEBUG	Register listener.js for window 4294967297
+[Parent 16292, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 16292, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 16300, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14700, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1514425945070	geckodriver	INFO	geckodriver 0.19.1
+1514425945082	geckodriver	INFO	Listening on 127.0.0.1:10544
+1514425946990	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.JBSeiO9r9Y6G"
+1514425947780	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 2236, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 2236, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514425950068	Marionette	INFO	Listening on port 10552
+1514425950130	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514425950223	Marionette	DEBUG	Register listener.js for window 4294967297
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 17552, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 18704, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 16772, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 3816, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1514426015051	geckodriver	INFO	geckodriver 0.19.1
+1514426015066	geckodriver	INFO	Listening on 127.0.0.1:10714
+1514426016966	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.Jpdqzf7bPvN4"
+1514426017687	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12928, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514426020167	Marionette	INFO	Listening on port 10724
+1514426020614	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514426020740	Marionette	DEBUG	Register listener.js for window 4294967297
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 544, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 544, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1514426163997	geckodriver	INFO	geckodriver 0.19.1
+1514426164008	geckodriver	INFO	Listening on 127.0.0.1:11022
+1514426166198	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.aQ4R04AqYH3J"
+1514426167679	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 20412, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 8568, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514426170525	Marionette	INFO	Listening on port 11033
+1514426171664	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514426171793	Marionette	DEBUG	Register listener.js for window 4294967297
+1514426171812	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514426172223	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514426172223	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514426177421	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514426183578	Marionette	DEBUG	Register listener.js for window 4294967329
+1514426183668	Marionette	DEBUG	Register listener.js for window 4294967332
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript error: http://jr.smzdm.com/vplan/, line 2306: ReferenceError: adBlockStatus is not defined
+1514426186906	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967336"
+1514426186906	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967329"
+1514426197236	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+[Parent 20412, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11260, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 11260, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1514426998916	geckodriver	INFO	geckodriver 0.19.1
+1514426998929	geckodriver	INFO	Listening on 127.0.0.1:12675
+1514427000833	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.e3Qb1HqSLiuO"
+1514427002132	Marionette	INFO	Enabled via --marionette
+1514427004583	Marionette	INFO	Listening on port 12689
+1514427004964	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514427005048	Marionette	DEBUG	Register listener.js for window 4294967297
+1514427005081	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514427005599	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514427005599	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514427013498	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514427018706	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967331"
+1514427020423	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967335"
+1514427035438	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 10560, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 2060, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11416, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+/common/ipc_channel_win.cc, line 346
+1514428878031	Marionette	INFO	Listening on port 8311
+1514428878431	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514428878593	Marionette	DEBUG	Register listener.js for window 4294967297
+1514428878676	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514428879905	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514428879906	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514428888720	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514428893662	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967335"
+1514428893665	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967337"
+1514428895309	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+[Parent 2188, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x42000E,name=PHttpChannel::Msg_DeletingChannel) Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 16116, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514429004912	Marionette	INFO	Listening on port 9758
+1514429005364	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514429005474	Marionette	DEBUG	Register listener.js for window 4294967297
+1514429005505	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514429006747	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514429006747	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514429015798	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514429021031	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967329"
+1514429022695	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 10796, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 10796, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 15496, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 18424, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+ionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967327"
+1514429081851	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 8960, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+AppData\Local\openvr\openvrpaths.vrpath
+[Child 7636, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 7636, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514429779669	Marionette	INFO	Listening on port 12763
+1514429780717	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514429780857	Marionette	DEBUG	Register listener.js for window 4294967297
+1514429780896	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514429781533	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514429781534	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514429786244	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514429809686	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 4652, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 4652, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/1514430007025	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 6912, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514430009948	Marionette	INFO	Listening on port 13477
+1514430010108	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514430010199	Marionette	DEBUG	Register listener.js for window 4294967297
+1514430010260	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514430010758	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514430010758	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514430016252	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514430020802	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967330"
+1514430035206	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+1514430095697	geckodriver	INFO	geckodriver 0.19.1
+1514430095708	geckodriver	INFO	Listening on 127.0.0.1:13887
+1514430097756	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.1c85IasQNDcm"
+1514430098649	Marionette	INFO	Enabled via --marionette
+1514430101320	Marionette	INFO	Listening on port 13897
+1514430101445	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514430101647	Marionette	DEBUG	Register listener.js for window 4294967297
+1514430102005	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514430102623	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514430102623	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514430107520	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514430114595	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967329"
+1514430134350	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 19252, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 19252, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 7548, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 1892, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 1892, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+out:blank"
+1514430178704	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514430183396	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967327"
+1514430198154	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+[Parent 5312, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 4072, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 3120, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1514961151320	geckodriver	INFO	geckodriver 0.19.1
+1514961151333	geckodriver	INFO	Listening on 127.0.0.1:13837
+1514961152969	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.uzdnM5wnddH7"
+1514961154167	Marionette	INFO	Enabled via --marionette
+1514961156814	Marionette	INFO	Listening on port 13848
+1514961157102	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514961157234	Marionette	DEBUG	Register listener.js for window 4294967297
+1514961157266	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514961158950	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514961158950	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514961164328	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514961168463	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967331"
+1514961183998	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 16436, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 16436, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/buil1514961384991	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11828, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514961387768	Marionette	INFO	Listening on port 14511
+1514961387829	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514961387914	Marionette	DEBUG	Register listener.js for window 4294967297
+1514961387947	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514961389502	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514961389503	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514961396356	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514961418383	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 25192, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 17908, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+ome/common/ipc_channel_win.cc, line 346
+[Child 6948, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514961804043	Marionette	INFO	Listening on port 1487
+1514961804259	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514961804357	Marionette	DEBUG	Register listener.js for window 4294967297
+1514961804418	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514961804870	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514961804871	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514961810220	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514961811908	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967303"
+1514961811909	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967307"
+1514961811909	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967312"
+1514961811910	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967301"
+1514961811911	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967320"
+1514961811913	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967314"
+1514961811913	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967305"
+1514961811915	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967317"
+1514961811915	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967308"
+1514961811916	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967297"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 12416, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 12416, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 7288, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1514961825954	geckodriver	INFO	geckodriver 0.19.1
+1514961825963	geckodriver	INFO	Listening on 127.0.0.1:1702
+1514961827812	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.ztICuZMDgbEf"
+1514961828743	Marionette	INFO	Enabled via --marionette
+1514961831028	Marionette	INFO	Listening on port 1710
+1514961831428	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514961831494	Marionette	DEBUG	Register listener.js for window 4294967297
+1514961831515	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514961832076	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514961832076	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514961836628	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514961839968	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967324"
+1514961842329	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 15984, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 24492, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 7436, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514961976067	Marionette	INFO	Listening on port 2042
+1514961976101	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514961976176	Marionette	DEBUG	Register listener.js for window 4294967297
+1514961976203	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514961976993	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514961976994	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514961982076	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514961987813	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 14024, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+ionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 25328, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514962056304	Marionette	INFO	Listening on port 2278
+1514962056761	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514962056897	Marionette	DEBUG	Register listener.js for window 4294967297
+1514962056928	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514962057549	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514962057549	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514962063109	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514962067170	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967326"
+1514962070031	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 22644, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 22644, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 10632, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+56, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514962423478	Marionette	INFO	Listening on port 2978
+1514962423710	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514962423792	Marionette	DEBUG	Register listener.js for window 4294967297
+1514962423816	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514962424430	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514962424431	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514962428831	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514962450430	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+[Parent 18600, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 18600, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 9988, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+ld 24668, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1514962547283	Marionette	INFO	Listening on port 3313
+1514962547606	Marionette	WARN	TLS certificate errors will be ignored for this session
+1514962547692	Marionette	DEBUG	Register listener.js for window 4294967297
+1514962547720	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1514962548210	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1514962548210	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1514962552992	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514962574406	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 12216, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 12216, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 25848, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 4144, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 4144, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+e	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1514964250915	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967328"
+1514964267307	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+1515077518827	geckodriver	INFO	geckodriver 0.19.1
+1515077518846	geckodriver	INFO	Listening on 127.0.0.1:12731
+1515077520342	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.MceYJfjbhNg3"
+1515077523269	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11252, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Parent][MessageChannel] Error: (msgtype=0x240052,name=PContent::Msg_ProvideAnonymousTemporaryFile) Closed channel: cannot send/recv
+
+1515077528249	Marionette	INFO	Listening on port 12743
+1515077528697	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515077528845	Marionette	DEBUG	Register listener.js for window 4294967297
+1515077528906	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515077533448	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515077533448	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515077543561	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515077547820	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967331"
+1515077561227	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 11008, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 11008, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 24496, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1515078389399	geckodriver	INFO	geckodriver 0.19.1
+1515078389413	geckodriver	INFO	Listening on 127.0.0.1:14513
+1515078391375	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.oH9TLV16W8vu"
+1515078392415	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 19596, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 25424, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1515078394806	Marionette	INFO	Listening on port 14523
+1515078395024	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515078395144	Marionette	DEBUG	Register listener.js for window 4294967297
+1515078395372	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515078396408	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515078396409	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515078401878	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515078408065	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967331"
+1515078419538	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+[Parent 19596, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 10640, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 18768, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+rome/common/ipc_channel_win.cc, line 346
+1515078974800	Marionette	INFO	Listening on port 1663
+1515078975214	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515078975336	Marionette	DEBUG	Register listener.js for window 4294967297
+1515078975586	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515078976800	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515078976800	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515078983360	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515079004844	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 19880, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1515079061156	geckodriver	INFO	geckodriver 0.19.1
+1515079061173	geckodriver	INFO	Listening on 127.0.0.1:2209
+1515079063114	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.5W9GzqOncvop"
+1515079064153	Marionette	INFO	Enabled via --marionette
+1515079066470	Marionette	INFO	Listening on port 2222
+1515079066750	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515079066854	Marionette	DEBUG	Register listener.js for window 4294967297
+1515079067089	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515079067592	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515079067593	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515079073575	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515079076407	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967326"
+1515079094686	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 8572, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 19712, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1515133271105	geckodriver	INFO	geckodriver 0.19.1
+1515133271121	geckodriver	INFO	Listening on 127.0.0.1:13410
+1515133273001	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.IWc3fs8MCXin"
+1515133274358	Marionette	INFO	Enabled via --marionette
+1515133276772	Marionette	INFO	Listening on port 13420
+1515133277138	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515133277222	Marionette	DEBUG	Register listener.js for window 4294967297
+1515133277384	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515133278169	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515133278169	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515133283871	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515133324592	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 25648, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+ppData\Local\openvr\openvrpaths.vrpath
+[Child 12248, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1515133471091	Marionette	INFO	Listening on port 13865
+1515133471307	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515133471395	Marionette	DEBUG	Register listener.js for window 4294967297
+1515133471525	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515133472130	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515133472131	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515133482375	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967328"
+1515133488113	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515133506442	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 8092, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[GPU 28252, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+ror: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1515133557368	Marionette	INFO	Listening on port 14147
+1515133557849	addons.xpi	WARN	Exception running bootstrap method shutdown on activity-stream@mozilla.org: [Exception... "Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIObserverService.removeObserver]"  nsresult: "0x80004005 (NS_ERROR_FAILURE)"  location: "JS frame :: resource://activity-stream/lib/SnippetsFeed.jsm :: uninit :: line 123"  data: no] Stack trace: uninit()@resource://activity-stream/lib/SnippetsFeed.jsm:123 < onAction()@resource://activity-stream/lib/SnippetsFeed.jsm:138 < _middleware/</<()@resource://activity-stream/lib/Store.jsm:52 < Store/this[method]()@resource://activity-stream/lib/Store.jsm:31 < uninit()@resource://activity-stream/lib/Store.jsm:151 < uninit()@resource://activity-stream/lib/ActivityStream.jsm:266 < uninit()@resource://gre/modules/addons/XPIProvider.jsm -> jar:file:///C:/Program%20Files/Mozilla%20Firefox/browser/features/activity-stream@mozilla.org.xpi!/bootstrap.js:80 < shutdown()@resource://gre/modules/addons/XPIProvider.jsm -> jar:file:///C:/Program%20Files/Mozilla%20Firefox/browser/features/activity-stream@mozilla.org.xpi!/bootstrap.js:196 < callBootstrapMethod()@resource://gre/modules/addons/XPIProvider.jsm:4509 < observe()@resource://gre/modules/addons/XPIProvider.jsm:2281
+1515133557899	Marionette	WARN	TLS certificate errors will be ignored for this session
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 21784, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 21784, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1515669807761	geckodriver	INFO	geckodriver 0.19.1
+1515669807770	geckodriver	INFO	Listening on 127.0.0.1:8860
+1515669810436	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.o2PhjHRUQ9Rk"
+1515669811546	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 19500, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1515669813933	Marionette	INFO	Listening on port 8872
+1515669814073	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515669814185	Marionette	DEBUG	Register listener.js for window 4294967297
+1515669814443	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515669815266	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515669815266	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515669820542	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515669824887	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967331"
+1515669827676	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967335"
+1515669843914	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+1515669844136	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/"
+1515669844666	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/"
+1515669844685	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/"
+1515669844861	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967303"
+1515669844862	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967315"
+1515669844869	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967307"
+1515669844869	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967317"
+1515669844869	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967301"
+1515669844870	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967325"
+1515669844871	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967333"
+1515669844872	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967312"
+1515669844873	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967305"
+1515669844874	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967324"
+1515669844874	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967329"
+1515669844875	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967320"
+1515669844876	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967309"
+1515669846196	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p6/"
+1515669849458	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p6/"
+1515669849773	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p6/"
+1515669850515	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p6/"
+1515669850530	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p6/"
+1515669850686	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967345"
+1515669850693	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967365"
+1515669850694	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967371"
+1515669850695	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967347"
+1515669850696	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967362"
+1515669850696	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967338"
+1515669850698	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967349"
+1515669850701	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967374"
+1515669850702	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967379"
+1515669850703	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967352"
+1515669850705	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967340"
+1515669850706	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967356"
+1515669850707	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967369"
+1515669850707	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967376"
+1515669850708	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967359"
+1515669850708	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967342"
+1515669852052	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p9/"
+1515669854298	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p9/"
+1515669854572	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p9/"
+1515669855151	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p9/"
+1515669855164	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p9/"
+1515669855325	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967386"
+1515669855327	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967399"
+1515669855329	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967407"
+1515669855330	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967388"
+1515669855330	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967389"
+1515669855330	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967384"
+1515669855331	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967403"
+1515669855332	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967410"
+1515669855334	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967394"
+1515669855334	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967392"
+1515669855339	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967413"
+1515669855339	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967415"
+1515669855340	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967401"
+1515669855340	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967395"
+1515669856921	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p12/"
+1515669858883	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p12/"
+1515669859181	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p12/"
+1515669859759	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p12/"
+1515669859791	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p12/"
+1515669860010	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967422"
+1515669860020	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967436"
+1515669860021	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967437"
+1515669860022	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967438"
+1515669860023	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967424"
+1515669860031	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967428"
+1515669860033	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967420"
+1515669860035	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967439"
+1515669860036	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967447"
+1515669860037	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967430"
+1515669860037	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967426"
+1515669860039	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967450"
+1515669860040	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967452"
+1515669860040	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967444"
+1515669860040	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967431"
+1515669861331	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p15/"
+1515669862651	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967490"
+1515669862931	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p15/"
+1515669863150	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p15/"
+1515669863736	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p15/"
+1515669863766	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p15/"
+1515669863938	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967461"
+1515669863939	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967475"
+1515669863939	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967480"
+1515669863940	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967463"
+1515669863940	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967467"
+1515669863940	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967459"
+1515669863941	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967481"
+1515669863942	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967488"
+1515669863944	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967469"
+1515669863945	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967464"
+1515669863946	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967486"
+1515669863946	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967477"
+1515669863947	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967470"
+1515669865304	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p18/"
+1515669866421	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p18/"
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PLayerTransaction::Msg_ReleaseLayer Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 18640, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 16856, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 6844, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1515669908980	geckodriver	INFO	geckodriver 0.19.1
+1515669908989	geckodriver	INFO	Listening on 127.0.0.1:9151
+1515669912048	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.YjkgA9Tgexjr"
+1515669912825	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 12796, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 12796, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1515669915915	Marionette	INFO	Listening on port 9161
+1515669916223	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515669916307	Marionette	DEBUG	Register listener.js for window 4294967297
+1515669916485	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515669917072	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515669917073	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515669922229	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515669925829	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967332"
+1515669942194	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+1515669944346	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/"
+1515669944914	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/"
+1515669944927	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/"
+1515669945213	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967303"
+1515669945213	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967320"
+1515669945214	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967310"
+1515669945214	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967315"
+1515669945214	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967301"
+1515669945215	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967324"
+1515669945215	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967313"
+1515669945216	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967304"
+1515669945217	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967329"
+1515669945219	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967318"
+1515669945220	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967308"
+1515669946495	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p6/"
+1515669948257	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p6/"
+1515669950547	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p6/"
+1515669951343	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p6/"
+1515669951399	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p6/"
+1515669951675	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967337"
+1515669951676	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967351"
+1515669951677	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967359"
+1515669951677	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967339"
+1515669951677	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967343"
+1515669951678	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967335"
+1515669951678	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967353"
+1515669951679	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967345"
+1515669951680	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967340"
+1515669951680	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967362"
+1515669951680	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967355"
+1515669951681	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967346"
+1515669952944	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p11/"
+1515669958794	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p11/"
+1515669960913	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p11/"
+1515669961457	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p11/"
+1515669961469	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p11/"
+1515669961659	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967369"
+1515669961659	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967383"
+1515669961660	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967391"
+1515669961660	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967371"
+1515669961661	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967375"
+1515669961661	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967367"
+1515669961662	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967385"
+1515669961662	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967377"
+1515669961662	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967372"
+1515669961663	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967395"
+1515669961663	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967397"
+1515669961663	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967387"
+1515669961664	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967378"
+1515669963479	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p16/"
+1515669965293	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p16/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 10364, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 3696, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 18396, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1515669994266	geckodriver	INFO	geckodriver 0.19.1
+1515669994276	geckodriver	INFO	Listening on 127.0.0.1:9389
+1515669997291	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.aCE3eYd2ExZO"
+1515669998539	Marionette	INFO	Enabled via --marionette
+1515670000973	Marionette	INFO	Listening on port 9399
+1515670001415	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515670001496	Marionette	DEBUG	Register listener.js for window 4294967297
+1515670001657	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515670002061	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515670002061	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515670007041	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515670010001	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967327"
+1515670027114	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+1515670027178	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/"
+1515670027336	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/"
+1515670027349	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/"
+1515670027584	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967303"
+1515670027586	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967314"
+1515670027595	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967308"
+1515670027600	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967317"
+1515670027604	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967301"
+1515670027605	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967316"
+1515670027608	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967304"
+1515670027609	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967325"
+1515670027609	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967321"
+1515670027609	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967309"
+1515670029226	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p6/"
+1515670029976	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967355"
+1515670030049	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967357"
+1515670030279	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p6/"
+1515670030420	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p6/"
+1515670030934	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p6/"
+1515670030943	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p6/"
+1515670031130	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967332"
+1515670031130	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967351"
+1515670031131	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967334"
+1515670031131	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967338"
+1515670031133	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967330"
+1515670031136	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967347"
+1515670031137	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967359"
+1515670031138	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967340"
+1515670031138	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967335"
+1515670031139	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967353"
+1515670031140	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967346"
+1515670031141	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967341"
+1515670032577	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p9/"
+1515670033836	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p9/"
+1515670033971	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p9/"
+1515670034493	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p9/"
+1515670034532	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p9/"
+1515670034788	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967366"
+1515670034788	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967368"
+1515670034790	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967372"
+1515670034790	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967364"
+1515670034790	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967374"
+1515670034791	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967369"
+1515670034791	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967381"
+1515670034792	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967383"
+1515670034792	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967378"
+1515670034793	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967375"
+1515670036076	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p12/"
+1515670036616	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967410"
+1515670037144	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p12/"
+1515670037274	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p12/"
+1515670037775	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p12/"
+1515670037786	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p12/"
+1515670037940	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967390"
+1515670037942	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967392"
+1515670037942	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967393"
+1515670037943	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967388"
+1515670037943	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967405"
+1515670037944	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967412"
+1515670037945	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967398"
+1515670037946	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967396"
+1515670037947	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967408"
+1515670037948	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967403"
+1515670037948	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967399"
+1515670039349	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p15/"
+1515670041431	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p15/"
+1515670041586	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p15/"
+1515670042123	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p15/"
+1515670042204	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p15/"
+1515670042424	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967419"
+1515670042424	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967421"
+1515670042425	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967422"
+1515670042425	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967417"
+1515670042426	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967427"
+1515670042426	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967425"
+1515670042426	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967434"
+1515670042427	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967436"
+1515670042428	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967431"
+1515670042432	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967428"
+1515670043686	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p18/"
+1515670044349	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p18/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 24: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 9: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 218: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 148: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 38: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 100: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 21: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 24: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 9: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 218: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 148: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 38: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 100: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 21: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript error: https://hm.baidu.com/h.js?9b7ac3d38f30fe89ff0b8a0546904e58, line 33: TypeError: a[1] is undefined
+JavaScript warning: https://wq.360buyimg.com/js/version/201712/allinonemin/wq.vue2.engine.all.20171227155815.js, line 403: unreachable code after return statement
+JavaScript error: https://cookiemapping.wrating.com/link.html, line 3: NS_ERROR_FAILURE: 
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 24: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 9: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 218: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 148: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 38: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 100: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 21: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 24: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 9: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 218: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 148: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 38: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 100: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 21: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 24: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 9: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 218: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 148: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 38: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 100: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??node-min.js,anim-min.js,anim/base-min.js,anim/timer-min.js,anim/transition-min.js,overlay-min.js,component/container-min.js,component/control-min.js,component/manager-min.js,xtemplate/runtime-min.js,component/extension/shim-min.js,component/extension/align-min.js,component/extension/content-xtpl-min.js,component/extension/content-render-min.js,xtemplate-min.js,xtemplate/compiler-min.js?t=1.js, line 21: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript error: https://cookiemapping.wrating.com/link.html, line 3: NS_ERROR_FAILURE: 
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 24: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 9: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 218: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 148: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 38: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 100: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+JavaScript warning: https://g.alicdn.com/kissy/k/1.4.2/??xtemplate-min.js,xtemplate/compiler-min.js?t=1_2013072520131122.js, line 21: Using //@ to indicate sourceURL pragmas is deprecated. Use //# instead
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 8212, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 15624, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+1515998068617	geckodriver	INFO	geckodriver 0.19.1
+1515998068626	geckodriver	INFO	Listening on 127.0.0.1:1336
+1515998071245	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.3aW0vVIf1A3x"
+1515998072422	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 20164, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1515998074313	Marionette	INFO	Listening on port 1347
+1515998074380	Marionette	WARN	TLS certificate errors will be ignored for this session
+1515998074452	Marionette	DEBUG	Register listener.js for window 4294967297
+1515998074481	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1515998075603	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1515998075604	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1515998081221	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/"
+1515998087264	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967333"
+1515998088231	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967337"
+1515998100644	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/"
+1515998101282	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/"
+1515998101992	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/"
+1515998102051	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/"
+1515998102180	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967303"
+1515998102181	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967331"
+1515998102181	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967307"
+1515998102181	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967317"
+1515998102182	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967301"
+1515998102183	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967312"
+1515998102184	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967305"
+1515998102184	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967329"
+1515998102185	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967320"
+1515998102185	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967308"
+1515998102185	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967327"
+1515998102185	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967335"
+1515998102185	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967323"
+1515998102185	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967313"
+1515998105897	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p2/"
+1515998106072	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967363"
+1515998106855	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p2/"
+1515998107173	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p2/"
+1515998107933	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p2/"
+1515998107969	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p2/"
+1515998108110	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967342"
+1515998108110	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967344"
+1515998108112	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967345"
+1515998108113	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967340"
+1515998108114	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967350"
+1515998108114	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967348"
+1515998108114	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967354"
+1515998108115	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967351"
+1515998108115	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967361"
+1515998108115	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967358"
+1515998108115	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967356"
+1515998109791	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p3/"
+1515998111090	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967398"
+1515998111862	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967402"
+1515998113026	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p3/"
+1515998113511	Marionette	DEBUG	Received DOM event "beforeunload" for "https://www.smzdm.com/p3/"
+1515998114429	Marionette	DEBUG	Received DOM event "pagehide" for "https://www.smzdm.com/p3/"
+1515998114443	Marionette	DEBUG	Received DOM event "unload" for "https://www.smzdm.com/p3/"
+1515998114555	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967368"
+1515998114555	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967390"
+1515998114555	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967400"
+1515998114556	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967370"
+1515998114556	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967371"
+1515998114556	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967366"
+1515998114557	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967376"
+1515998114557	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967374"
+1515998114558	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967386"
+1515998114561	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967380"
+1515998114562	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967377"
+1515998114562	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967394"
+1515998114563	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967396"
+1515998114563	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967388"
+1515998114563	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967381"
+1515998118671	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.smzdm.com/p4/"
+1515998121152	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967436"
+1515998121948	Marionette	DEBUG	Received observer notification "outer-window-destroyed" for "4294967440"
+1515998123026	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.smzdm.com/p4/"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 2052, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 2052, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 11560, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 13904, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 13904, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1515998616593	addons.productaddons	WARN	Failed downloading via XHR, status: 0, reason: error
+1515998616599	addons.productaddons	WARN	Failed downloading via XHR, status: 0, reason: error
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1516020737495	geckodriver	INFO	geckodriver 0.19.1
+1516020737507	geckodriver	INFO	Listening on 127.0.0.1:7628
+1516020740083	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.zVhjlGf6YHHu"
+1516020741397	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 6380, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1516020743714	Marionette	INFO	Listening on port 7643
+1516020744242	Marionette	WARN	TLS certificate errors will be ignored for this session
+1516020744410	Marionette	DEBUG	Register listener.js for window 4294967297
+1516020744459	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1516020746501	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1516020746502	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1516020748559	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.kaishiba.com/project/more.html"
+1516020749101	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.kaishiba.com/project/more.html"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Parent 5380, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Parent 5380, Gecko_IOThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 16976, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+1516020803680	geckodriver	INFO	geckodriver 0.19.1
+1516020803688	geckodriver	INFO	Listening on 127.0.0.1:7987
+1516020806724	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.6GwyYQhCYptT"
+1516020807344	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+[Child 19768, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+[Child 19768, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+1516020809115	Marionette	INFO	Listening on port 7999
+1516020809834	Marionette	WARN	TLS certificate errors will be ignored for this session
+1516020809899	Marionette	DEBUG	Register listener.js for window 4294967297
+1516020810077	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1516020811783	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1516020811783	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1516020812459	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://www.kaishiba.com/project/more.html"
+1516020814689	Marionette	DEBUG	Received DOM event "pageshow" for "https://www.kaishiba.com/project/more.html"
+1522232069511	geckodriver	INFO	geckodriver 0.19.1
+1522232069525	geckodriver	INFO	Listening on 127.0.0.1:10907
+1522232072200	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-mari1522232073381	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-profile" "C:\\Users\\scott\\AppData\\Local\\Temp\\rust_mozprofile.GSlHvpuGAbQy"
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+1522232074526	Marionette	INFO	Enabled via --marionette
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\openvr\openvrpaths.vrpath
+1522232076801	Marionette	INFO	Listening on port 10937
+Unable to read VR Path Registry from C:\Users\scott\AppData\Local\open1522232116843	addons.productaddons	WARN	Failed downloading via XHR, status: 0, reason: error
+[Child 12400, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
+.cc, line 346
+[Child 8972, Chrome_ChildThread] WARNING: pipe error: 109: file z:/build/build/src/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 346
+*** UTM:SVC TimerManager:registerTimer called after profile-before-change notification. Ignoring timer registration for id: telemetry_modules_ping
+
+###!!! [Child][MessageChannel::SendAndWait] Error: Channel error: cannot send/recv
+
