@@ -60,8 +60,9 @@ def print_result1(result):
 
     for r in result:
         show = r.xpath('./h5/a/@href')
-        if show is not None:
-            print(show)
+
+        #if show is not " ":
+        print(show)
     return
 
 
@@ -73,9 +74,7 @@ if __name__ == '__main__':
     d.addCallback(print_result1)
     d.addCallback(all_jobs_done)
     print('all job have started!')
-    for i in range(1000):
-        if i == 100 :
-            reactor.run()
-        if i % 10 ==0:
-            print(i)
+
+    reactor.run()
+
 
