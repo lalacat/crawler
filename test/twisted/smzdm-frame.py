@@ -19,14 +19,36 @@ def read_url(request):
                      "/div[@class='feed-main-con']/ul[@id='feed-main-list']")[0].xpath('./li')
     return ul
 
-def print_web(ul):
+def print_web(ul,id):
+    print("=========================>>>%d webs"%id)
     for r in ul:
         show = r.xpath('./h5/a/@href')
         if show is not None:
             print(show)
     return
 
+def stop_task(_):
+    reactor.stop()
+
+
 @inlineCallbacks
 def spider_web(url,id):
     print("start %d job"%id)
     d = Deferred()
+    reactor.callLater(1,d.callback,request(url))
+
+    result = yield d
+
+    returnValue(result)
+
+
+
+if __name__ == '__main__':
+
+    i = 0
+    for url in urls:
+        d = spider_web(url, i)
+        #d.addCallback(read_url)
+        #d.addCallback(print_web,i)
+
+    reactor.run()
