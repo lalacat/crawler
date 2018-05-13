@@ -10,7 +10,7 @@ def response(we):
 
 @defer.inlineCallbacks
 def task():
-    url = "https://www.baidu.com"
+    url = "https://www.smzdm.com"
     print(url)
     d1 = getPage(url.encode('utf-8'))
     d1.addCallback(response)
@@ -32,11 +32,11 @@ def done(*args,**kwargs):
     reactor.stop()
 
 li = []
-for i in range(1):
+for i in range(10):
     d = task()
     li.append(d)
 #d = task()
-#dd = defer.DeferredList([d,])
-#dd.addBoth(done)
+dd = defer.DeferredList(li)
+dd.addBoth(done)
 
 reactor.run()
