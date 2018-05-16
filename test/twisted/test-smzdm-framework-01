@@ -1,41 +1,16 @@
-import requests
-import time
-from lxml import etree
-from lxml.html import soupparser
-"""
-测试动态页面的信息提取
-Request URL: https://www.smzdm.com/homepage/json_more?timesort=152630225039&p=2
-由固定地址+时间戳+页码构成
-提取的数据包括：
-article_id：文章编码 （可以去重）
-article_title：文章标题
-article_price：价格
-article_mall：购买商场
-article_pic：商品图片
-article_link：购买界面
-article_url：什么值得买商品界面
-article_channel_class：文章标签（好价，好文，原创等等）
-top_category:商品类别
-"""
+from twisted.web.client import getPage
+from twisted.internet import reactor,defer
+from twisted.internet.defer import inlineCallbacks,Deferred,returnValue
+from test.public_api.web import get_need_datas,print_result
+
+url = 'https://www.smzdm.com/homepage/json_more?p='
 headers = { 'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'
             ,'content-type':"application/json"}
-url = 'https://www.smzdm.com/homepage/json_more?p='
-
-
-#读网页
-def get_url(url):
-    webpage = requests.get(url,headers=headers)
-    webpage.encoding = 'utf-8'
-    # 返回的数据是json格式的，数据类型是dicts
-    #其中键data对应的是该页面所有的商品数据，值是list类型
-    datas = webpage.json()
-    return datas['data']
-
 
 def get_need_datas(datas):
     datas_list = list()
     print(type(datas))
-    for d in datas:
+    for d in datas.decode("utf-8"):
 
         result = dict()
         #Python 3.X 里不包含 has_key() 函数，被 __contains__(key) 替代:
@@ -76,36 +51,29 @@ def print_result(datas_list,url):
         for p,d in d_l.items():
             print(p,d)
     print("==============================")
+    return
 
 
-if __name__ == "__main__":
-    total = list()
-    for i in range(10):
+@inlineCallbacks
+def read_url(url):
+    print("begin find page")
+    d = getPage(url.encode('utf-8'),headers=headers)
+    print(d)
+    d.addCallback(get_need_datas)
+    d.addCallback(print_result,url)
+
+    yield d
+
+
+if __name__ == '__main__':
+    result = list()
+    for i in range(1):
         i = str(i)
-        u = url+i
+        u = url + i
         print(u)
+        d = read_url(u)
+        result.append(d)
 
-        g_w = get_url(u)
-        gnd = get_need_datas(g_w)
-        print_result(gnd,u)
-
-
-
-
-
-'''
-datas = result['data']
-
-print(type(datas))
-print(len(datas))
-print(type(datas[0]))
-print(len(datas[0]))
-
-for k,v in datas[0].items():
-    print("%s:%s"%(k,v))
-
-
-value = datas[0]["article_content_all"]
-print(value)
-'''
-
+    dd = defer.DeferredList(result)
+    dd.addBoth(lambda _:reactor.stop())
+    reactor.run()
