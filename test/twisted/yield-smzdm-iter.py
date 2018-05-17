@@ -1,13 +1,16 @@
 from twisted.internet.defer import inlineCallbacks,Deferred,returnValue
 from twisted.internet import reactor,defer,task
 from twisted.web.client import getPage
+from twisted.web.http_headers import Headers
 from lxml import etree
 
-urls = {1:"https://www.smzdm.com/p2/",
-       2:"https://www.smzdm.com/p4/" ,
-        3:"https://www.smzdm.com/p5/"}
-header = { 'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'
-            ,'content-type':"application/json"}
+urls = {1:"https://www.smzdm.com/p2/" ,
+        2:"https://www.smzdm.com/p4/" ,
+        3:"https://www.smzdm.com/p5/" ,
+        4:"https://www.smzdm.com/homepage/json_more?p=0"}
+
+header = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
+                  'content-type':["application/json"]})
 
 def read_url(request):
     #print(request.decode('utf-8'))
@@ -22,18 +25,17 @@ def print_web(ul,id):
         show = r.xpath('./h5/a/@href')
         if show is not None:
             print(show)
-    #return
+    return
+
 
 @inlineCallbacks
 def spider_web(url,id):
     print("start %d job"%id)
-    d = getPage(url.encode('utf-8'))
+    d = getPage(url.encode('utf-8'),headers=header)
     print(d)
     d.addCallback(read_url)
     d.addCallback(print_web,id)
     yield d
-
-
 
 li = []
 for id,url in urls.items():

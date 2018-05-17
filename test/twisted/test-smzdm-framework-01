@@ -57,7 +57,7 @@ def print_result(datas_list,url):
 @inlineCallbacks
 def read_url(url):
     print("begin find page")
-    d = getPage(url.encode('utf-8'),headers=headers)
+    d = getPage(url.encode('utf-8'))
     print(d)
     d.addCallback(get_need_datas)
     d.addCallback(print_result,url)
