@@ -2,16 +2,18 @@ from twisted.web.client import getPage
 from twisted.internet import reactor,defer
 from twisted.internet.defer import inlineCallbacks,Deferred,returnValue
 from test.public_api.web import get_need_datas,print_result
-
+import json
 url = 'https://www.smzdm.com/homepage/json_more?p='
 headers = { 'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'
             ,'content-type':"application/json"}
 
 def get_need_datas(datas):
     datas_list = list()
-    print(type(datas))
-    for d in datas.decode("utf-8"):
-
+    temp = json.loads(datas)
+    print(type(temp))
+    print(temp)
+    #print()
+    for d in temp:
         result = dict()
         #Python 3.X 里不包含 has_key() 函数，被 __contains__(key) 替代:
         #标签是：z-tag-zixun 没有article_price，article_link，top_category
@@ -67,7 +69,7 @@ def read_url(url):
 
 if __name__ == '__main__':
     result = list()
-    for i in range(1):
+    for i in range(2):
         i = str(i)
         u = url + i
         print(u)
