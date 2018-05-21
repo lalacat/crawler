@@ -6,7 +6,7 @@ from twisted.web.iweb import IAgent
 
 
 class WebClientContextFactory(ClientContextFactory):
-    def getContext(self, hostname, port):
+    def getContext(self, hostname):
         print(hostname)
         return ClientContextFactory.getContext(self)
 
@@ -21,10 +21,10 @@ def print_web(result):
     print(result)
 
 
-#contextFactory = WebClientContextFactory()
-agent = IAgent(reactor)
+contextFactory = WebClientContextFactory()
+agent = Agent(reactor,WebClientContextFactory)
 url = b"https://www.smzdm.com"
-d = agent.request('GET',url,headers=headers)
+d = agent.request(b'GET',url,headers=headers)
 d.addCallback(print_web)
 d.addBoth(lambda _: reactor.stop())
 reactor.run()

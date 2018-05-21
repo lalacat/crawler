@@ -20,9 +20,8 @@ def print_web(result):
 
 @defer.inlineCallbacks
 def request_web():
-    contextFactory = WebClientContextFactory()
-    agent = IAgent(reactor)
-    url = b'https://www.baidu.com'
+    agent = Agent(reactor)
+    url = b'http://www.baidu.com'
     print(type(url))
     try:
         result = yield agent.request('GET', url,headers, None)
