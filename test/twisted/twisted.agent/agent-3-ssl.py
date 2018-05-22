@@ -9,7 +9,7 @@ class WebClientContextFactory(ClientContextFactory):
 
 def display(response):
     print("Received response")
-    print(response)
+    print(response.body)
 def display_err(response):
     print(response)
     traceback.print_stack()
@@ -17,7 +17,7 @@ def display_err(response):
 def main():
     contextFactory = WebClientContextFactory()
     agent = Agent(reactor, contextFactory)
-    d = agent.request("POST", b"https://example.com/")
+    d = agent.request(b"GET", b"https://www.smzdm.com/")
 
     d.addCallbacks(display, display_err)
     d.addCallback(lambda ignored: reactor.stop())

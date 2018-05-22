@@ -13,8 +13,8 @@ class OneHostnameWorkaroundPolicy(object):
     def __init__(self):
         self._normalPolicy = BrowserLikePolicyForHTTPS()
     def creatorForNetloc(self, hostname, port):
-        if hostname == b"wrong.host.badssl.com":
-            hostname = b"badssl.com"
+        print(hostname)
+        print(port)
         return self._normalPolicy.creatorForNetloc(hostname, port)
 
 @react

@@ -10,10 +10,21 @@ headers = { 'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/2
 def get_need_datas(datas):
     datas_list = list()
     temp = json.loads(datas)
-    print(type(temp))
-    print(temp)
+    #print(type(temp))
+    #print(temp)
     #print()
-    for d in temp:
+    print(type(temp["data"]))
+    produce = temp["data"]
+    print(type(produce[0]))
+
+    for k in produce:
+
+        #print(k)
+        pass
+    '''
+    '''
+
+    for d in produce:
         result = dict()
         #Python 3.X 里不包含 has_key() 函数，被 __contains__(key) 替代:
         #标签是：z-tag-zixun 没有article_price，article_link，top_category
@@ -44,6 +55,7 @@ def get_need_datas(datas):
             if d.__contains__("top_category"):
                 result["top_category"] = d["top_category"]
             datas_list.append(result)
+
     return datas_list
 
 
@@ -69,7 +81,7 @@ def read_url(url):
 
 if __name__ == '__main__':
     result = list()
-    for i in range(2):
+    for i in range(1):
         i = str(i)
         u = url + i
         print(u)
