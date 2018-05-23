@@ -7,6 +7,9 @@ from twisted.web.iweb import IBodyProducer
 from twisted.internet.protocol import Protocol
 from pprint import pformat
 import json
+import codecs
+headers = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
+                  'content-type':["application/json"]})
 
 
 class WebClientContextFactory(ClientContextFactory):
@@ -16,55 +19,50 @@ class WebClientContextFactory(ClientContextFactory):
     def getContext(self, hostname, port):
         return ClientContextFactory.getContext(self)
 
-
-headers = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
-                  'content-type':["application/json"]})
-
-
-
-
 def cbRequest(response):
 
     print('Response version:', response.version)
     print('Response headers:')
     print(pformat(list(response.headers.getAllRawHeaders())))
-    ''''''
+
     print('Response code:', response.code)
     print('Response phrase:', response.phrase)
+    ''''''
     finished = defer.Deferred()
-    response.deliverBody(BeginningPrinter(finished))
+    datas = response.deliverBody(BeginningPrinter(finished))
     return finished
     #d = readBody(response)
     #d.addCallback(print_web)
     #return d
 
 def print_web(result):
-    #print(result)
+    print("finish")
+    print(result)
     pass
+    return
 
 
 @implementer(IBodyProducer)
 class BeginningPrinter(Protocol):
     def __init__(self, finished):
         self.finished = finished
+        #用来保存传输的数据，当数据完整后可以使用json转换为python对象
+        self.result = bytes()
 
     def dataReceived(self, datas):
         '''
-        :param bytes:
-        :return:
+        直接传输的数据datas为bytes类型的，不加解码转化为str类型是带有转义符号'\':(\'\\u5929\\u732b\\u7cbe\\u9009\')
+        datas进行了decode("utf-8")解码后，数据变成了('\u5929\u732b\u7cbe\u9009'),此时解码后的数据类型是str
+        因为传输的datas并不是一次性传输完的，所以不能直接使用json转换，而是当数据全部传输完毕后，使用json.loads()
+        这时候就不涉及到转码和转义字符的问题了。
         '''
-        #if self.remaining:
-        #display = json.load(datas)
-        print(type(datas))
-        display = datas.decode("utf-8")
-
-        print('Some data received:')
-        #print(display)
-
+        self.result += datas
 
     def connectionLost(self, reason):
         print('Finished receiving body:', reason.getErrorMessage())
+        r = json.loads(self.result)
         self.finished.callback(None)
+
 
 url = 'https://www.smzdm.com/homepage/json_more?p='
 contextFactory = WebClientContextFactory()

@@ -8,6 +8,7 @@ headers = { 'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/2
             ,'content-type':"application/json"}
 
 def get_need_datas(datas):
+    print(datas)
     datas_list = list()
     temp = json.loads(datas)
     #print(type(temp))
