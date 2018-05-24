@@ -29,11 +29,12 @@ def get_url(url):
     # 返回的数据是json格式的，数据类型是dicts
     #其中键data对应的是该页面所有的商品数据，值是list类型
     datas = webpage.json()
-    return datas['data']
+    return datas
 
 
 def get_need_datas(datas):
     datas_list = list()
+    datas = datas['data']
     print(type(datas))
     for d in datas:
 
