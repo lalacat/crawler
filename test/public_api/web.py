@@ -1,6 +1,13 @@
-def get_need_datas(datas):
+import time,json
+from twisted.internet import reactor
+
+def get_need_datas(web_body):
     datas_list = list()
-    print(type(datas))
+    if isinstance(web_body,bytes):
+        web_body = json.loads(web_body)
+    if isinstance(web_body,dict):
+        if web_body.__contains__("data"):
+            datas = web_body['data']
     for d in datas:
 
         result = dict()
@@ -40,6 +47,13 @@ def print_result(datas_list,url):
     print("页面 :%s 有 %d 件商品"%(url,len(datas_list)))
     for d_l in datas_list:
         for p,d in d_l.items():
-            print(p,d)
+           # print(p,d)
+            pass
     print("==============================")
     return
+
+
+def end_crawl(_, t_begin):
+    t_end = time.time()
+    print(t_end - t_begin)
+    reactor.stop()
