@@ -2,6 +2,7 @@ import time,json
 from twisted.internet import reactor
 
 def get_need_datas(web_body):
+    print("get_need_datas")
     datas_list = list()
     if isinstance(web_body,bytes):
         web_body = json.loads(web_body)
