@@ -24,6 +24,7 @@ class HtttpRespose(object):
 
 def print1(data):
     print("print1")
+    print(type(data))
     print(data)
     return "return from print1"
 
@@ -40,8 +41,8 @@ if __name__ == "__main__":
     d1.addCallback(print2)
     r = Request("request",d1)
     rep = HtttpRespose("content",r)
-    #r.get_print()
+    result = r.parse.callback(rep)
+    print(type(result))
 
-    reactor.callWhenRunning(d1.callback,"a")
-    reactor.run()
+
 

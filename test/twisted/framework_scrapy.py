@@ -4,6 +4,7 @@ from twisted.internet import defer
 
 class Requset(object):
     def __init__(self,url,callback):
+        print("requset-->",url)
         self.url = url
         self.callback = callback
 
@@ -21,25 +22,33 @@ class Spider(object):
     def start_requests(self):
         start_url = ["https://www.baidu.com","https://www.bing.com",]
         for url in start_url:
-            yield Requset(url,self.parse)
-
+            yield Requset(url,"aa")
+    '''
+    
+    
     def parse(self,response):
         print("---------response--------->",response)
         yield Requset('http://www.cnblogs.com',callback=self.parse)
+    '''
 
 
 import queue
 Q = queue.Queue()
 
 class Engine(object):
+
     def __ini__(self):
         self._close = None
         self.max = 5
-        self.crawlling = []
+        self.crawlling = list()
 
     def get_response_callback(self,content,request):
         self.crawlling.remove(request)
         rep = HttpResponse(content,request)
+        print(rep.content)
+        '''
+        
+        
         result = request.callback(rep)
 
         import types
@@ -47,6 +56,7 @@ class Engine(object):
             for rep in result:
                 print(rep)
                 Q.put(rep)
+        '''
 
     def _next_request(self):
         print('----->request',self.crawlling,Q.qsize())
@@ -74,14 +84,17 @@ class Engine(object):
         while True:
             try:
                 request = next(start_requests)
+                print(request)
                 Q.put(request)
-            except StopAsyncIteration as e:
+            except StopIteration as e:
                 break
 
+        print(Q.qsize())
         reactor.callLater(0,self._next_request)
 
         self._close = defer.Deferred()
         yield self._close
+
 
 spider = Spider()
 _active = set()
