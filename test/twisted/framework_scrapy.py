@@ -22,31 +22,31 @@ class Spider(object):
     def start_requests(self):
         start_url = ["https://www.baidu.com","https://www.bing.com",]
         for url in start_url:
-            yield Requset(url,"aa")
-    '''
+            yield Requset(url,self.parse)
+
     
     
     def parse(self,response):
         print("---------response--------->",response)
         yield Requset('http://www.cnblogs.com',callback=self.parse)
-    '''
+
 
 
 import queue
 Q = queue.Queue()
 
 class Engine(object):
-
+    crawlling = list()
+    max = 5
     def __ini__(self):
         self._close = None
-        self.max = 5
-        self.crawlling = list()
+
 
     def get_response_callback(self,content,request):
         self.crawlling.remove(request)
         rep = HttpResponse(content,request)
-        print(rep.content)
-        '''
+        #print(rep.content)
+
         
         
         result = request.callback(rep)
@@ -54,12 +54,12 @@ class Engine(object):
         import types
         if isinstance(result,types.GeneratorType):
             for rep in result:
-                print(rep)
+                #print(rep)
                 Q.put(rep)
-        '''
+
 
     def _next_request(self):
-        print('----->request',self.crawlling,Q.qsize())
+        print('----->request',Q.qsize())
         if Q.qsize() == 0 and len(self.crawlling) == 0:
             self._close.callback(None)
             return

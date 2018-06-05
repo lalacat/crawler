@@ -1,4 +1,5 @@
 from twisted.internet import defer,reactor
+import time
 '''
 测试callback（）方法的用法
 实现不同defer数据的传送
@@ -20,6 +21,7 @@ class HtttpRespose(object):
         self.content = content
         self.requset = request
         self.url = request.url
+
 
 
 def print1(data):
