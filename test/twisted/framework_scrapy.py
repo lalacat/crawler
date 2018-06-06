@@ -25,7 +25,7 @@ class Spider(object):
             yield Requset(url,self.parse)
 
     
-    
+
     def parse(self,response):
         print("---------response--------->",response)
         yield Requset('http://www.cnblogs.com',callback=self.parse)
@@ -73,7 +73,7 @@ class Engine(object):
                 #当页面下载完之后，会立即调用回调函数get_response_callback
                 d.addCallback(self.get_response_callback,req)
 
-                d.addCallback(lambda _:reactor.callLater(0,self._next_request))
+                #d.addCallback(lambda _:reactor.callLater(0,self._next_request))
             except Exception as e :
                 print(e)
                 return

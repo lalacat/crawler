@@ -23,6 +23,22 @@ class HtttpRespose(object):
         self.url = request.url
 
 
+def parse_test(context):
+    print('parse_test')
+    i = 1
+    for i in range(10):
+        time.sleep(1)
+        i += 1
+    return i
+
+
+@defer.inlineCallbacks
+def parse_web(context):
+    test = "parse_test"
+    d = defer.Deferred()
+    d.addCallback(parse_test)
+    reactor.callLater(0,d.callback,context)
+    yield d
 
 def print1(data):
     print("print1")
