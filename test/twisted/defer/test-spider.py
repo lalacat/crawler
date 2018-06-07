@@ -1,22 +1,21 @@
 from twisted.internet import reactor
 from twisted.web.client import getPage
 from twisted.internet import defer
-import time
+import time,queue
+
 
 class Request(object):
     def __init__(self,url,parse):
         self.url = url
         self.parse = parse
-       # self.parse.addCallback(self.get_print)
-
-    def get_print(self):
-        print("callback")
-        self.parse.callback(self.url)
 
 
 class Spider1(object):
     name = "task1"
     url = 'https://www.smzdm.com/homepage/json_more?p='
+
+    def __init__(self):
+        self.q = queue.Queue()
 
     def start_requests(self):
         start_url = list()
@@ -27,19 +26,23 @@ class Spider1(object):
             start_url.append(u)
 
         for url in start_url:
-            print(url)
-            yield Request(url,self.parse)
+            yield Request(url,self._parse)
 
-    def parse(self,response):
-        print("---------response--------->",response)
-        d = defer.Deferred()
-        #return d
-        #yield Request('http://www.cnblogs.com',callback=self.parse)
-
+    def _parse(self,context, url):
+        print('parse1', url)
+        i = 1
+        for i in range(1):
+            # time.sleep(1)
+            i += 1
+            # print(i)
+        return i
 
 class Spider2(object):
     name = "task2"
     url = 'https://www.smzdm.com/homepage/json_more?p='
+
+    def __init__(self):
+        self.q = queue.Queue()
 
     def start_requests(self):
         start_url = list()
@@ -49,18 +52,83 @@ class Spider2(object):
             start_url.append(u)
 
         for url in start_url:
-            print(url)
-            yield Request(url,self.parse)
+            #print(url)
+            yield Request(url,self._parse)
 
-    def parse(self,response):
-        print("---------response--------->",response)
-        d = defer.Deferred()
+    def _parse(self,context, url):
+        print('parse2', url)
+        i = 1
+        for i in range(1):
+            # time.sleep(1)
+            i += 1
+            # print(i)
+        return i
+
+
+
+class Spider3(object):
+    name = "task3"
+    url = 'https://www.smzdm.com/homepage/json_more?p='
+
+    def __init__(self):
+        self.q = queue.Queue()
+
+    def start_requests(self):
+        start_url = list()
+        for i in range(10,15):
+            i = str(i)
+            u = self.url + i
+            start_url.append(u)
+
+        for url in start_url:
+            #print(url)
+            yield Request(url,self._parse)
+
+    def _parse(self,context, url):
+        print('parse3', url)
+        i = 1
+        for i in range(1):
+            # time.sleep(1)
+            i += 1
+            # print(i)
+        return i
+
+
+
+class Spider4(object):
+    name = "task4"
+    url = 'https://www.smzdm.com/homepage/json_more?p='
+
+    def __init__(self):
+        self.q = queue.Queue()
+
+    def start_requests(self):
+        start_url = list()
+        for i in range(15,20):
+            i = str(i)
+            u = self.url + i
+            start_url.append(u)
+
+        for url in start_url:
+            yield Request(url,self._parse)
+
+    def _parse(self,context, url):
+        print('parse4', url)
+        i = 1
+        for i in range(1):
+            # time.sleep(1)
+            i += 1
+            # print(i)
+        return i
+
+
+
 
 def parse_test(context,url):
     print('parse_test',url)
     i = 1
     for i in range(1):
-        time.sleep(1)
+        #time.sleep(1)
         i += 1
         #print(i)
     return i
@@ -78,75 +146,86 @@ class HttpRespose(object):
         self.content = context
         self.request = request
         self.url = request.url
-        self.text = parse_test(context,self.url)
+        self.text = request.parse(context,self.url)
         #print(self.text)
 
 
 
 def get_response_callback(content,request):
     print("get_response_callback")
-
     web_response = HttpRespose(content,request)
+
     #print("content:",content)
 
 
-def next_request(name):
-    print(name)
-    print(Q.qsize())
-    if Q.qsize() == 0 :
-        print("task end")
-        pass
+class engine(object):
 
-    while Q.qsize() != 0:
+    def __init__(self):
+        self.close = None
+        self.Q = None
+
+    @defer.inlineCallbacks
+    def crawl(self,spider,Q):
+        self.Q = Q
+        #print(spider.name)
+        start_request = iter(spider.start_requests())
+        while True:
+            try:
+                request = next(start_request)
+                Q.put(request)
+            except StopIteration as e:
+                break
+
+        reactor.callLater(0,self.next_request,spider.name)
+        self.close = defer.Deferred()
+        yield self.close
+
+    def next_request(self,name):
+        print(name+':'+"next_request"+": 1")
+        print(str(self.Q.qsize())+": 2")
+        if self.Q.qsize() == 0 :
+            print("task end")
+            self.close.callback(None)
+            return
+
+       # while Q.qsize() != 0:
         # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
-        req = Q.get(block=0)
-        print(req)
-        print(req.url)
+        req = self.Q.get(block=0)
+       #print(req.url)
         d = getPage(req.url.encode('utf-8'))
         d.addCallback(get_response_callback,req)
+
+        d.addCallback(lambda _:reactor.callLater(0,self.next_request,name))
 
 
 spider1 = Spider1()
 spider2 = Spider2()
+spider3 = Spider3()
+spider4 = Spider4()
 task_list = list()
 
+close = None
 
 
-#@defer.inlineCallbacks
-def crawl(spider):
-    print(spider.name)
-    start_request = iter(spider.start_requests())
-    while True:
-        try:
-            request = next(start_request)
-            #print(request)
-            Q.put(request)
-        except StopIteration as e:
-            break
+engine1 = engine()
+engine2 = engine()
+engine3 = engine()
+engine4 = engine()
 
-    reactor.callLater(0,next_request,spider.name)
-    #close = defer.Deferred()
-    #yield close
+task1 = engine1.crawl(spider1,spider1.q)
+task2 = engine2.crawl(spider2,spider2.q)
+task3 = engine3.crawl(spider3,spider3.q)
+task4 = engine4.crawl(spider4,spider4.q)
 
 
-
-import queue
-Q = queue.Queue()
-#task1 = crawl(spider1)
-crawl(spider1)
-#task2 = crawl(spider2)
+task_list.append(task1)
+task_list.append(task2)
+task_list.append(task3)
+task_list.append(task4)
 
 
-#task_list.append(task1)
-#task_list.append(task2)
-
-#dd = defer.DeferredList(task_list)
-
-
-#print(Q.qsize())
-
-
-#dd.addCallback(lambda _:reactor.stop())
+dd = defer.DeferredList(task_list)
+dd.addCallback(lambda _:reactor.stop())
 reactor.run()
 
 
