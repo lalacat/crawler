@@ -13,7 +13,6 @@ class WebClientContextFactory(ClientContextFactory):
     '''
     用来实现https网页的访问验证
     '''
-
     def getContext(self, hostname, port):
         return ClientContextFactory.getContext(self)
 

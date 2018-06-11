@@ -16,6 +16,7 @@ class Spider1(object):
 
     def __init__(self):
         self.q = queue.Queue()
+        self.num = 0
 
     def start_requests(self):
         start_url = list()
@@ -80,6 +81,7 @@ class Spider3(object):
             u = self.url + i
             start_url.append(u)
 
+
         for url in start_url:
             #print(url)
             yield Request(url,self._parse)
@@ -123,7 +125,7 @@ class Spider4(object):
 
 
 
-
+'''
 def parse_test(context,url):
     print('parse_test',url)
     i = 1
@@ -132,30 +134,29 @@ def parse_test(context,url):
         i += 1
         #print(i)
     return i
-
-
+    
 @defer.inlineCallbacks
-def parse_web(context,url):
-    test = "parse_test"
-    d = defer.Deferred()
-    d.addCallback(parse_test,url)
-    yield d
+    def parse_web(context,url):
+        test = "parse_test"
+        d = defer.Deferred()
+        d.addCallback(parse_test,url)
+        yield d
+
+'''
+
 
 class HttpRespose(object):
+
     def __init__(self,context,request):
         self.content = context
         self.request = request
         self.url = request.url
         self.text = request.parse(context,self.url)
-        #print(self.text)
-
 
 
 def get_response_callback(content,request):
     print("get_response_callback")
     web_response = HttpRespose(content,request)
-
-    #print("content:",content)
 
 
 class engine(object):
@@ -183,49 +184,47 @@ class engine(object):
     def next_request(self,name):
         print(name+':'+"next_request"+": 1")
         print(str(self.Q.qsize())+": 2")
-        if self.Q.qsize() == 0 :
-            print("task end")
-            self.close.callback(None)
-            return
+        try:
+            if self.Q.qsize() == 0 :
+                print("task end")
+                self.close.callback(None)
+                return
 
-       # while Q.qsize() != 0:
-        # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
-        req = self.Q.get(block=0)
-       #print(req.url)
-        d = getPage(req.url.encode('utf-8'))
-        d.addCallback(get_response_callback,req)
+           # while Q.qsize() != 0:
+            # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
+            req = self.Q.get(block=0)
+            d = getPage(req.url.encode('utf-8'))
+            d.addCallback(get_response_callback,req)
+            d.addCallback(lambda _:reactor.callLater(0,self.next_request,name))
 
-        d.addCallback(lambda _:reactor.callLater(0,self.next_request,name))
-
-
-spider1 = Spider1()
-spider2 = Spider2()
-spider3 = Spider3()
-spider4 = Spider4()
-task_list = list()
-
-close = None
+        except Exception as e :
+            print(e)
 
 
-engine1 = engine()
-engine2 = engine()
-engine3 = engine()
-engine4 = engine()
+if __name__ == "__main"():
+    spider1 = Spider1()
+    spider2 = Spider2()
+    spider3 = Spider3()
+    spider4 = Spider4()
+    task_list = list()
 
-task1 = engine1.crawl(spider1,spider1.q)
-task2 = engine2.crawl(spider2,spider2.q)
-task3 = engine3.crawl(spider3,spider3.q)
-task4 = engine4.crawl(spider4,spider4.q)
+    engine1 = engine()
+    engine2 = engine()
+    engine3 = engine()
+    engine4 = engine()
 
+    task1 = engine1.crawl(spider1,spider1.q)
+    task2 = engine2.crawl(spider2,spider2.q)
+    task3 = engine3.crawl(spider3,spider3.q)
+    task4 = engine4.crawl(spider4,spider4.q)
 
-task_list.append(task1)
-task_list.append(task2)
-task_list.append(task3)
-task_list.append(task4)
+    task_list.append(task1)
+    task_list.append(task2)
+    task_list.append(task3)
+    task_list.append(task4)
 
-
-dd = defer.DeferredList(task_list)
-dd.addCallback(lambda _:reactor.stop())
-reactor.run()
+    dd = defer.DeferredList(task_list)
+    dd.addCallback(lambda _:reactor.stop())
+    reactor.run()
 
 
