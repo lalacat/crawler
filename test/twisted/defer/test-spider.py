@@ -26,6 +26,11 @@ class Spider1(object):
             u = self.url + i
             start_url.append(u)
 
+        self. num = start_url.__len__()
+        print(start_url.count())
+        print(start_url.__len__())
+
+
         for url in start_url:
             yield Request(url,self._parse)
 
