@@ -14,22 +14,13 @@ headers = {'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20
 
 
 
-def insert_mongoDb(result,db_coll):
-    if isinstance(result,list):
-        for post in result:
-            try:
-                db_coll.insert_one(post)
-            except Exception as e :
-                print(e)
-        print("MongoDb update Finish")
 
-    return result
 
 @inlineCallbacks
-def read_url(url,db_coll):
+def read_url(url,db_coll,db):
     d = getPage(url.encode('utf-8'))
     d.addCallback(get_need_datas)
-    d.addCallback(insert_mongoDb,db_coll)
+    d.addCallback(db.insert_mongoDb,db_coll)
     d.addCallback(print_result,url)
     yield d
 
@@ -64,7 +55,7 @@ if __name__ == '__main__':
     for i in range(10):
         i = str(i)
         u = url + i
-        d = read_url(u,db_coll)
+        d = read_url(u,db_coll,db)
         result.append(d)
 
     dd = defer.DeferredList(result)

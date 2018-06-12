@@ -99,3 +99,14 @@ class MongoDb(object):
         if self.db != None :
             return self.db[self.collection_name]
 
+
+    def insert_mongoDb(self,result, db_coll):
+        if isinstance(result, list):
+            for post in result:
+                try:
+                    db_coll.insert_one(post)
+                except Exception as e:
+                    print(e)
+            print("MongoDb update Finish")
+
+        return result
