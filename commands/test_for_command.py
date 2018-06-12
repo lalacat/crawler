@@ -5,6 +5,8 @@ import sys,os
 from exceptions import UsageError
 from setting import BaseSettings
 import optparse
+
+
 def import_command(path):
     """
     导入指定目录下的包
@@ -118,6 +120,7 @@ def _run_print_help(parser, func, *a, **kw):
 
 def run(argv):
     commands = import_command("commands")
+
     dict_command = get_command_dict(commands)
     parser = optparse.OptionParser(prog="Command", formatter=optparse.TitledHelpFormatter(), \
                                    conflict_handler='resolve')
@@ -164,6 +167,7 @@ if __name__ == '__main__':
     """
     os.chdir("..")
     path = os.getcwd()
+    print(path)
     sys.path.append(path)
     from commands import BaseCommand
     run([" ","test_command3","-l"])

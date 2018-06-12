@@ -1,0 +1,2 @@
+class BaseSpide(object):
+    pass
