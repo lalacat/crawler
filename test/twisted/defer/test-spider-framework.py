@@ -3,6 +3,11 @@ from twisted.web.client import getPage
 from twisted.internet import defer
 import time
 from queue import Queue
+from pkgutil import iter_modules
+import sys,os
+import inspect
+from test.spider import BaseSpider
+from importlib import import_module
 
 class Spider1(object):
     name = "task1"
@@ -20,8 +25,6 @@ class Spider1(object):
             u = self.url + i
             start_url.append(u)
 
-        #self. num = start_url.__len__()
-        #print(start_url.count())
 
         for url in start_url:
             yield Request(url,self._parse)
@@ -36,10 +39,7 @@ class Spider1(object):
         return i
 
 
-class Request(object):
-    def __init__(self,url,parse):
-        self.url = url
-        self.parse = parse
+
 
 
 class HttpResponse(object):
@@ -54,12 +54,14 @@ class Scheduler(object):
     """
     任务调度器
     """
-    def __init__(self):
+    def __init__(self,name):
         self.q = Queue()
+        self.name = name
 
     def open(self):
-        print("open")
-        pass
+        print("%s 已载入" %self.name)
+
+
 
     def next_request(self):
         try:
@@ -116,10 +118,10 @@ class ExecutionEngine(object):
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
-
-        self.scheduler = Scheduler()
+        self.scheduler = Scheduler(spider.name)
         yield self.scheduler.open()
         start_requests = iter(spider.start_requests())
+        print(start_requests)
         while True:
             print("读取网站")
             try:
@@ -128,6 +130,8 @@ class ExecutionEngine(object):
             except StopIteration as e:
                 print("读取网站失败")
                 break
+            except Exception as e :
+                print(e)
             self.scheduler.enqueue_request(req)
         reactor.callLater(0,self._next_request,spider.name)
 
@@ -144,32 +148,134 @@ class Crawler(object):
     def _create_engine(self):
         return ExecutionEngine()
 
-    def _create_spider(self,spider_cls_path):
-        """
-        :param spider_cls_path:  spider.chouti.ChoutiSpider
-        :return:
-        """
-        module_path,cls_name = spider_cls_path.rsplit('.',maxsplit=1)
-        import importlib
-        m = importlib.import_module(module_path)
-        cls = getattr(m,cls_name)
-        return cls()
+    def _create_spider(self,spider):
+
+        return spider()
 
     @defer.inlineCallbacks
-    def crawl(self):
+    def crawl(self,spider):
         engine = self._create_engine()
-        #spider = self._create_spider(spider_cls_path)
-        spider = Spider1()
+        spider = self._create_spider(spider)
         print(spider)
 
         yield engine.open_spider(spider)
         yield engine.start()
 
 
+class CrawlerProcess(object):
+    """
+    开启事件循环
+    """
+    def __init__(self):
+        self._active = set()
+
+    def crawl(self,spider):
+        """
+        :param spider_cls_path:
+        :return:
+        """
+        crawler = Crawler()
+        d = crawler.crawl(spider)
+        self._active.add(d)
+
+    def start(self):
+        dd = defer.DeferredList(self._active)
+        dd.addBoth(lambda _:reactor.stop())
+        reactor.run()
+
+
+class Spider(object):
+    def __init__(self,projectName,path="spider"):
+        self.projectName = projectName
+        self.path = path
+
+    def _spider_module_path(self):
+        '''
+        将爬虫包附加到系统路径中，只有在系统路径中，模块导入才能被识别到
+        :param projectName: 项目名称
+        '''
+
+        # 获取文件当前路径
+        curent_path = os.getcwd()
+        try:
+            # 找到项目的根目录的绝对地址，并将工作目录切换到根目录下
+            root_direction = curent_path.split(self.projectName)[0] + self.projectName
+            # 获取根目录下所有的子文件夹
+            listdir = os.listdir(root_direction)
+            for l in listdir:
+                if l == 'test':
+                    temp = os.path.join(root_direction, l)
+                    os.chdir(temp)
+
+            sys.path.append(os.getcwd())
+        except FileNotFoundError as e:
+            print("项目名称错误")
+
+        '''
+        #先判断是否有爬虫包的存在
+        #存在的话就直接导入包
+        #不存在的话就创建一个爬虫包
+        if not dirlist.__contains__("spider"):
+            os.mkdir("spider")
+
+        '''
+    def _import_spider(self):
+
+        # 导入爬虫包
+        spider = import_module(self.path)
+
+        spiders = list()
+        spiders.append(spider)
+
+        if hasattr(spider, "__path__"):
+            print(spider.__path__)
+
+            for _, subpath, ispkg in iter_modules(spider.__path__):
+                # 取得模块的绝对路径
+                fullpath = self.path + "." + subpath
+
+                # 判断是模块包还是模块
+                if ispkg:
+                    # 是模块包的话重新调用本方法将模块包下的所以模块都导入
+                    spiders += self.import_spider(self,fullpath)
+                else:
+                    # 是模块的话就直接导入到结果中
+                    submod = import_module(fullpath)
+                    spiders.append(submod)
+        else:
+            print("路径不对，脚本放在根目录下")
+        return spiders
+
+    def _get_spider(self):
+        self._spider_module_path()
+        spiders = self._import_spider()
+
+        for c in spiders:
+            for obj in vars(c).values():
+                """
+                vars（）实现返回对象object的属性和属性值的字典对象
+                要过滤出obj是类的信息，其中类的信息包括，模块导入其他模块的类的信息，模块中的父类，模块中所有定义的类
+                因此，条件过滤分别是：
+                1.判断obj的类型为class
+                2.判断是否继承父类，因此命令包中__init__文件中定义的就是整个包中所需要的父类
+                3.判断类是否为模块本身定义的类还是导入其他模块的类(感觉第二个条件包含此条件了有些多余)
+                4.剔除父类
+                """
+                if inspect.isclass(obj) and \
+                        issubclass(obj, BaseSpider) and \
+                        obj.__module__ == c.__name__ and \
+                        not obj == BaseSpider:
+                    yield obj
+
+
+class Commond(object):
+    def run(self):
+        crawl_process = CrawlerProcess()
+        spider = Spider("crawler")
+        for spider_cls_path in spider._get_spider():
+            crawl_process.crawl(spider_cls_path)
+        crawl_process.start()
 
 if __name__ == "__main__":
-    crawl = Crawler()
-    d = crawl.crawl()
-    dd = defer.DeferredList([d,])
-    dd.addBoth(lambda _:reactor.stop())
-    reactor.run()
+    cmd = Commond()
+    cmd.run()

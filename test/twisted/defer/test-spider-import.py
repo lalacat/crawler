@@ -1,9 +1,12 @@
 from importlib import import_module
 from pkgutil import iter_modules
 import sys,os
+import inspect
+from test.spider import BaseSpider
 
 def import_spider(path):
 
+    #导入爬虫包
     spiders = []
 
     spider = import_module(path)
@@ -29,15 +32,28 @@ def import_spider(path):
     return spiders
 
 
-def find_spider_moudle(projectName):
+def spider_module_path(projectName):
+    '''
+    将爬虫包附加到系统路径中，只有在系统路径中，模块导入才能被识别到
+    :param projectName: 项目名称
+    '''
+
 
     #获取文件当前路径
     curent_path = os.getcwd()
-    # 找到项目的根目录的绝对地址，并将工作目录切换到根目录下
-    root_direction = curent_path.split(projectName)[0]+projectName
-    os.chdir(root_direction)
-    #获取根目录下所有的子文件夹
-    dirlist = os.listdir(path)
+    try:
+        # 找到项目的根目录的绝对地址，并将工作目录切换到根目录下
+        root_direction = curent_path.split(projectName)[0]+projectName
+        # 获取根目录下所有的子文件夹
+        listdir = os.listdir(root_direction)
+        for l in listdir:
+            if l == 'test':
+                temp = os.path.join(root_direction, l)
+                os.chdir(temp)
+
+        sys.path.append(os.getcwd())
+    except FileNotFoundError as e :
+        print("项目名称错误")
 
     '''
     #先判断是否有爬虫包的存在
@@ -49,47 +65,37 @@ def find_spider_moudle(projectName):
     '''
 
 
+def get_spider_dict(spiders):
+    dict_spider= {}
+    for c in get_spider(spiders):
+        dict_spider[c.__module__.split(".")[-1]] = c()
 
-'''
-find_spider = False
+    return dict_spider
+
+def get_spider(spiders):
+    for c in spiders:
+        for obj in vars(c).values():
+            """
+            vars（）实现返回对象object的属性和属性值的字典对象
+            要过滤出obj是类的信息，其中类的信息包括，模块导入其他模块的类的信息，模块中的父类，模块中所有定义的类
+            因此，条件过滤分别是：
+            1.判断obj的类型为class
+            2.判断是否继承父类，因此命令包中__init__文件中定义的就是整个包中所需要的父类
+            3.判断类是否为模块本身定义的类还是导入其他模块的类(感觉第二个条件包含此条件了有些多余)
+            4.剔除父类
+            """
+            if inspect.isclass(obj) and \
+                    issubclass(obj, BaseSpider) and \
+                    obj.__module__ == c.__name__ and \
+                    not obj == BaseSpider :
+                yield obj
 
 
-while not find_spider:
+spider_module_path("crawler")
+s = import_spider("spider")
 
-    find_spider = True
-    try:
-        s = import_spider("spider")
-    except ModuleNotFoundError as e :
-        print("目录路径不对，将文件放在爬虫文件同级目录下")
-        find_spider = False
-        os.chdir("..")
-        path = os.getcwd()
-        sys.path.append(path)
-print(type(s))
-'''
-
-path = os.getcwd()
-print(path)
-root_direction = path.split("crawler")[0] + "crawler"
-os.chdir(root_direction)
-# 获取根目录下所有的子文件夹
-
-list = os.listdir(root_direction)
-if not list.__contains__("spider"):
-    os.mkdir("spider")
-print(os.getcwd())
-
-for l in list:
-
-    if l == 'test':
-        temp = os.path.join(root_direction, l)
-        os.chdir(temp)
-
-print(temp)
-
-flag = os.path.exists("spider")
-if flag:
-    sys.path.append(temp)
-    s = import_spider("spider")
-
-print(s)
+for i in get_spider(s):
+    a = i()
+    print(type(a))
+    print(i.__name__)
+    print(i.__module__)

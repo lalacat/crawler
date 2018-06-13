@@ -1,5 +1,7 @@
+from test.spider import BaseSpider
 
-class Spider2(object):
+
+class Spider2(BaseSpider):
     name = "task2"
     url = 'https://www.smzdm.com/homepage/json_more?p='
 
@@ -10,19 +12,15 @@ class Spider2(object):
     def start_requests(self):
         start_url = list()
 
-        for i in range(5):
+        for i in range(10,20):
             i = str(i)
             u = self.url + i
             start_url.append(u)
 
         self. num = start_url.__len__()
-        print(start_url.count())
-        print(start_url.__len__())
-
 
         for url in start_url:
-            pass
-            #yield Request(url,self._parse)
+            yield BaseSpider.Request(url,self._parse)
 
     def _parse(self,context, url):
         print('parse1', url)
