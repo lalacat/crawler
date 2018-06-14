@@ -9,37 +9,6 @@ import inspect
 from test.spider import BaseSpider
 from importlib import import_module
 
-class Spider1(object):
-    name = "task1"
-    url = 'https://www.smzdm.com/homepage/json_more?p='
-
-    def __init__(self):
-        self.q = Queue()
-        self.num = 0
-
-    def start_requests(self):
-        start_url = list()
-
-        for i in range(5):
-            i = str(i)
-            u = self.url + i
-            start_url.append(u)
-
-
-        for url in start_url:
-            yield Request(url,self._parse)
-
-    def _parse(self,context, url):
-        print('parse1', url)
-        i = 1
-        for i in range(1):
-            # time.sleep(1)
-            i += 1
-            # print(i)
-        return i
-
-
-
 
 
 class HttpResponse(object):
@@ -92,16 +61,17 @@ class ExecutionEngine(object):
     def get_response_callback(self,content, request):
         print("get_response_callback")
         web_response = HttpResponse(content, request)
+        return web_response.text
 
     def print_web(self,content):
         print("get content")
 
     def _next_request(self,name):
-        print(name+':'+"next_request"+": 1")
-        print(str(self.scheduler.qsize())+": 2")
+        #print(name+':'+"next_request"+": 1")
+        print("%s 还剩下%d个网页"%(name,self.scheduler.qsize()))
         try:
             if self.scheduler.qsize() == 0 :
-                print("task end")
+                print("%s end"%name)
                 self._close.callback(None)
                 return
 
@@ -109,8 +79,8 @@ class ExecutionEngine(object):
             req = self.scheduler.next_request()
             print(req.url)
             d = getPage(req.url.encode('utf-8'))
-            #d.addCallback(self.print_web)
             d.addCallback(self.get_response_callback,req)
+            #d.addCallback(self.print_web)
             d.addCallback(lambda _:reactor.callLater(0,self._next_request,name))
 
         except Exception as e:

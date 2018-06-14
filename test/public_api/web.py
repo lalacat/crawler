@@ -6,9 +6,13 @@ def get_need_datas(web_body):
     datas_list = list()
     if isinstance(web_body,bytes):
         web_body = json.loads(web_body)
+    else:
+        print("data type is json")
     if isinstance(web_body,dict):
         if web_body.__contains__("data"):
             datas = web_body['data']
+    else:
+        print("data type is not dict")
     for d in datas:
 
         result = dict()
@@ -50,10 +54,10 @@ def print_result(datas_list,url):
     print("页面 :%s 有 %d 件商品"%(url,len(datas_list)))
     for d_l in datas_list:
         for p,d in d_l.items():
-           # print(p,d)
+            print(p,d)
             pass
     print("==============================")
-    return
+
 
 
 def end_crawl(_, t_begin):

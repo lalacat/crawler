@@ -1,5 +1,6 @@
-from test.spider import BaseSpider
-
+from test.spider import BaseSpider,Request
+from test.public_api.web import get_need_datas,print_result
+from twisted.internet.defer import inlineCallbacks
 
 class Spider1(BaseSpider):
     name = "task1"
@@ -20,13 +21,13 @@ class Spider1(BaseSpider):
         self. num = start_url.__len__()
 
         for url in start_url:
-            yield BaseSpider.Request(url,self._parse)
+            yield Request(url,self._parse)
 
     def _parse(self,context, url):
-        print('parse1', url)
-        i = 1
-        for i in range(1):
-            # time.sleep(1)
-            i += 1
-            # print(i)
-        return i
+        print("解析网页：", url)
+        try:
+            list = get_need_datas(context)
+            print_result(list,url)
+        except Exception as e:
+            print(e)
+        return list
