@@ -1,7 +1,8 @@
 from test.spider import BaseSpider,Request
+from test.public_api.web import get_need_datas,print_result
 
 
-class Spider2():
+class Spider2(BaseSpider):
     name = "task2"
     url = 'https://www.smzdm.com/homepage/json_more?p='
 
@@ -23,10 +24,11 @@ class Spider2():
             yield Request(url,self._parse)
 
     def _parse(self,context, url):
-        print('parse1', url)
-        i = 1
-        for i in range(1):
-            # time.sleep(1)
-            i += 1
-            # print(i)
-        return i
+        print("解析网页：", url)
+        try:
+            list = get_need_datas(context)
+            #print_result(list,url)
+            list.append({"url":url})
+        except Exception as e:
+            print(e)
+        return list

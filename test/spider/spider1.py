@@ -27,7 +27,8 @@ class Spider1(BaseSpider):
         print("解析网页：", url)
         try:
             list = get_need_datas(context)
-            print_result(list,url)
+            #print_result(list,url)
+            list.append({"url":url})
         except Exception as e:
             print(e)
         return list

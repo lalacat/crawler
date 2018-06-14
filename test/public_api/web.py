@@ -90,27 +90,35 @@ class MongoDb(object):
         #表名称
         self.collection_name = collection_name
 
+    def __new__(cls, *args, **kwargs):
+
+        if not hasattr(cls,"instance"):
+            cls.instance = super(MongoDb,cls).__new__(cls)
+        return cls.instance
+
     def _connectDb(self):
         #连接到数据库
-        try :
-            self.client = pymongo.MongoClient(self.db_url)
-            self.db = self.client[self.db_name]
-        except Exception as e :
-            print(e)
-
+        if self.client is None:
+            print("数据库连上")
+            try :
+                self.client = pymongo.MongoClient(self.db_url)
+                self.db = self.client[self.db_name]
+            except Exception as e :
+                print(e)
+        else :
+            print("%s已连接"%self.db_name)
     def _getCollection(self):
 
         if self.db != None :
             return self.db[self.collection_name]
 
-
-    def insert_mongoDb(self,result, db_coll):
+    def insert_mongoDb(self,result):
         if isinstance(result, list):
             for post in result:
                 try:
-                    db_coll.insert_one(post)
+                    self.collection_name.insert_one(post)
                 except Exception as e:
                     print(e)
             print("MongoDb update Finish")
 
-        return result
+        #return result

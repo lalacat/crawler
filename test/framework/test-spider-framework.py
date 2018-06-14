@@ -5,10 +5,10 @@ import time
 from queue import Queue
 from pkgutil import iter_modules
 import sys,os
-import inspect
+import inspect,pymongo
 from test.spider import BaseSpider
 from importlib import import_module
-
+from test.public_api.web import MongoDb
 
 
 class HttpResponse(object):
@@ -51,10 +51,12 @@ class ExecutionEngine(object):
     """
     引擎：所有调度
     """
+
     def __init__(self):
         print("引擎初始化")
         self._close = None
         self.scheduler = None
+
         #self.max = 5
         #self.crawlling = []
 
@@ -63,8 +65,31 @@ class ExecutionEngine(object):
         web_response = HttpResponse(content, request)
         return web_response.text
 
-    def print_web(self,content):
-        print("get content")
+    def insert_data(self,content):
+        print("开始写入",type(content))
+        mongo_url = "127.0.0.1:27017"
+
+        # 连接到mongodb，如果参数不填，默认为“localhost:27017”
+        client = pymongo.MongoClient(mongo_url)
+
+        # 连接到数据库myDatabase
+        DATABASE = "Twisted_Database"
+        db = client[DATABASE]
+
+        # 连接到集合(表):myDatabase.myCollection
+        COLLECTION = "getPage_Collection"
+        db_coll = db[COLLECTION]
+        try:
+            if isinstance(content, list):
+                for post in content:
+                    try:
+                        db_coll.insert_one(post)
+                    except Exception as e:
+                        print(e)
+                print("MongoDb update Finish")
+        except Exception as e :
+            print(e)
+        return
 
     def _next_request(self,name):
         #print(name+':'+"next_request"+": 1")
@@ -79,8 +104,10 @@ class ExecutionEngine(object):
             req = self.scheduler.next_request()
             print(req.url)
             d = getPage(req.url.encode('utf-8'))
-            d.addCallback(self.get_response_callback,req)
+            #d.addCallback(self.get_response_callback,req)
             #d.addCallback(self.print_web)
+            d.addCallback(req.parse,req.url)
+            d.addCallback(self.insert_data)
             d.addCallback(lambda _:reactor.callLater(0,self._next_request,name))
 
         except Exception as e:
@@ -239,6 +266,8 @@ class Spider(object):
 
 
 class Commond(object):
+    def __init__(self):
+        pass
     def run(self):
         crawl_process = CrawlerProcess()
         spider = Spider("crawler")
