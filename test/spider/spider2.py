@@ -13,7 +13,7 @@ class Spider2(BaseSpider):
     def start_requests(self):
         start_url = list()
 
-        for i in range(10,20):
+        for i in range(200,400):
             i = str(i)
             u = self.url + i
             start_url.append(u)

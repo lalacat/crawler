@@ -92,7 +92,6 @@ class ExecutionEngine(object):
         return
 
     def _next_request(self,name):
-        #print(name+':'+"next_request"+": 1")
         print("%s 还剩下%d个网页"%(name,self.scheduler.qsize()))
         try:
             if self.scheduler.qsize() == 0 :
@@ -102,7 +101,7 @@ class ExecutionEngine(object):
 
             # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
             req = self.scheduler.next_request()
-            print(req.url)
+            #print(req.url)
             d = getPage(req.url.encode('utf-8'))
             #d.addCallback(self.get_response_callback,req)
             #d.addCallback(self.print_web)
@@ -276,5 +275,8 @@ class Commond(object):
         crawl_process.start()
 
 if __name__ == "__main__":
+    start = time.clock()
     cmd = Commond()
     cmd.run()
+    end = time.clock()
+    print("运行时间%3.2f"%(end-start))

@@ -1,9 +1,9 @@
 from test.spider import BaseSpider,Request
 from test.public_api.web import get_need_datas,print_result
-from twisted.internet.defer import inlineCallbacks
 
-class Spider1(BaseSpider):
-    name = "task1"
+
+class Spider6(BaseSpider):
+    name = "task6"
     url = 'https://www.smzdm.com/homepage/json_more?p='
 
     def __init__(self):
@@ -13,7 +13,7 @@ class Spider1(BaseSpider):
     def start_requests(self):
         start_url = list()
 
-        for i in range(200):
+        for i in range(1000,1200):
             i = str(i)
             u = self.url + i
             start_url.append(u)
