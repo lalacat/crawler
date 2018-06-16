@@ -273,7 +273,7 @@ class Commond(object):
     def run(self):
         crawl_process = CrawlerProcess()
         spider = Spider("crawler")
-
+        db = MongoDb("127.0.0.1:27017",)
         for spider_cls_path in spider._get_spider():
             crawl_process.crawl(spider_cls_path)
         crawl_process.start()

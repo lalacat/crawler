@@ -82,13 +82,13 @@ class MongoDb(object):
     db_coll = db[COLLECTION]
     '''
 
-    def __init__(self,db_url,db_name,collection_name):
+    def __init__(self,db_ur,l,db_name):
         # mongodb服务的地址和端口号
         self.db_url = db_url
         #数据库的名称
         self.db_name = db_name
         #表名称
-        self.collection_name = collection_name
+        self.collection_name = None
 
     def __new__(cls, *args, **kwargs):
 
