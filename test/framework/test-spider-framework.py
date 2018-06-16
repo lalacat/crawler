@@ -19,6 +19,7 @@ class HttpResponse(object):
         self.url = request.url
         self.text = request.parse(context,self.url)
 
+
 class Scheduler(object):
     """
     任务调度器
@@ -30,12 +31,9 @@ class Scheduler(object):
     def open(self):
         print("%s 已载入" %self.name)
 
-
-
     def next_request(self):
         try:
             req = self.q.get(block=False)
-
         except Exception as e:
             req = None
         return req
@@ -91,7 +89,12 @@ class ExecutionEngine(object):
             print(e)
         return
 
-    def _next_request(self,name):
+    def _next_request(self,name="default_task",collection_name=None):
+        '''
+
+        :param kargs: name ,
+        :return:
+        '''
         print("%s 还剩下%d个网页"%(name,self.scheduler.qsize()))
         try:
             if self.scheduler.qsize() == 0 :
@@ -270,6 +273,7 @@ class Commond(object):
     def run(self):
         crawl_process = CrawlerProcess()
         spider = Spider("crawler")
+
         for spider_cls_path in spider._get_spider():
             crawl_process.crawl(spider_cls_path)
         crawl_process.start()
