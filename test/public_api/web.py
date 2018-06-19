@@ -82,20 +82,20 @@ class MongoDb(object):
     db_coll = db[COLLECTION]
     '''
 
-    def __init__(self,db_ur,l,db_name):
+    def __init__(self,db_url,db_name):
         # mongodb服务的地址和端口号
         self.db_url = db_url
         #数据库的名称
         self.db_name = db_name
         #表名称
         self.collection_name = None
-
+    '''
     def __new__(cls, *args, **kwargs):
-
+        #单例模式，限制对象生成的次数
         if not hasattr(cls,"instance"):
             cls.instance = super(MongoDb,cls).__new__(cls)
         return cls.instance
-
+    '''
     def _connectDb(self):
         #连接到数据库
         if self.client is None:
@@ -120,5 +120,6 @@ class MongoDb(object):
                 except Exception as e:
                     print(e)
             print("MongoDb update Finish")
-
+        else:
+            print(type(result)+"数据类型不对，传入list类型数据")
         #return result

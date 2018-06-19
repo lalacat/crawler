@@ -148,13 +148,17 @@ class Crawler(object):
         return ExecutionEngine()
 
     def _create_spider(self,spider):
-
         return spider()
 
+    def _create_db(self,db_url,db_name):
+        return MongoDb(db_url,db_name)
+
     @defer.inlineCallbacks
-    def crawl(self,spider):
+    def crawl(self,spider,db=None):
         engine = self._create_engine()
         spider = self._create_spider(spider)
+        db = self._create_db("127.0.0.1:27017","Twisted_Database")
+        db._connectDb()
         print(spider)
 
         yield engine.open_spider(spider)
@@ -273,7 +277,7 @@ class Commond(object):
     def run(self):
         crawl_process = CrawlerProcess()
         spider = Spider("crawler")
-        db = MongoDb("127.0.0.1:27017",)
+
         for spider_cls_path in spider._get_spider():
             crawl_process.crawl(spider_cls_path)
         crawl_process.start()
