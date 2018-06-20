@@ -96,7 +96,7 @@ class MongoDb(object):
             cls.instance = super(MongoDb,cls).__new__(cls)
         return cls.instance
     '''
-    def _connectDb(self):
+    def connectDb(self):
         #连接到数据库
         if self.client is None:
             print("数据库连上")

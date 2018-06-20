@@ -154,13 +154,15 @@ class Crawler(object):
         return MongoDb(db_url,db_name)
 
     @defer.inlineCallbacks
-    def crawl(self,spider,db=None):
+    def crawl(self,spider,db_url="127.0.0.1:27017",db_name="Twisted_Database"):
         engine = self._create_engine()
         spider = self._create_spider(spider)
-        db = self._create_db("127.0.0.1:27017","Twisted_Database")
-        db._connectDb()
+        db = self._create_db(db_url,db_name)
+        db.collection_name = spider.name
+
         print(spider)
 
+        yield db.connectDb()
         yield engine.open_spider(spider)
         yield engine.start()
 
