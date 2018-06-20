@@ -242,6 +242,7 @@ class Spider(object):
                 if inspect.isclass(obj) and \
                         issubclass(obj, BaseSpider) and \
                         obj.__module__ == c.__name__ and \
+                        getattr(obj,'name', None) and \
                         not obj == BaseSpider:
                     yield obj
 
