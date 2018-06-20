@@ -1,14 +1,11 @@
-from twisted.internet import reactor
+import sys,os,time,inspect
+from twisted.internet import reactor,defer
 from twisted.web.client import getPage
-from twisted.internet import defer
-import time
 from queue import Queue
 from pkgutil import iter_modules
-import sys,os
-import inspect,pymongo
-from test.spider import BaseSpider
 from importlib import import_module
 from test.public_api.web import MongoDb
+from test.spider import BaseSpider
 
 
 class HttpResponse(object):
@@ -29,7 +26,7 @@ class Scheduler(object):
         self.name = name
 
     def open(self):
-        print("%s 已载入" %self.name)
+        print("爬虫：%s 已载入" %self.name)
 
     def next_request(self):
         try:
@@ -51,88 +48,62 @@ class ExecutionEngine(object):
     """
 
     def __init__(self):
-        print("引擎初始化")
+        #print("引擎初始化")
         self._close = None
         self.scheduler = None
-
         #self.max = 5
         #self.crawlling = []
 
-    def get_response_callback(self,content, request):
+    @staticmethod
+    def get_response_callback(content, request):
         print("get_response_callback")
         web_response = HttpResponse(content, request)
         return web_response.text
 
-    def insert_data(self,content):
-        print("开始写入",type(content))
-        mongo_url = "127.0.0.1:27017"
+    def _next_request(self,spider_name="default_task",db=None):
 
-        # 连接到mongodb，如果参数不填，默认为“localhost:27017”
-        client = pymongo.MongoClient(mongo_url)
-
-        # 连接到数据库myDatabase
-        DATABASE = "Twisted_Database"
-        db = client[DATABASE]
-
-        # 连接到集合(表):myDatabase.myCollection
-        COLLECTION = "getPage_Collection"
-        db_coll = db[COLLECTION]
-        try:
-            if isinstance(content, list):
-                for post in content:
-                    try:
-                        db_coll.insert_one(post)
-                    except Exception as e:
-                        print(e)
-                print("MongoDb update Finish")
-        except Exception as e :
-            print(e)
-        return
-
-    def _next_request(self,name="default_task",collection_name=None):
         '''
-
         :param kargs: name ,
         :return:
         '''
-        print("%s 还剩下%d个网页"%(name,self.scheduler.qsize()))
+        if self.scheduler.qsize() != 0 :
+            print("爬虫：%s 还剩下%d个网页"%(spider_name,self.scheduler.qsize()))
+
         try:
             if self.scheduler.qsize() == 0 :
-                print("%s end"%name)
+                print("爬虫 %s end"%spider_name)
                 self._close.callback(None)
                 return
 
             # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
             req = self.scheduler.next_request()
-            #print(req.url)
+
             d = getPage(req.url.encode('utf-8'))
-            #d.addCallback(self.get_response_callback,req)
-            #d.addCallback(self.print_web)
+            # d.addCallback(self.get_response_callback,req)
+            # d.addCallback(self.print_web)
             d.addCallback(req.parse,req.url)
-            d.addCallback(self.insert_data)
-            d.addCallback(lambda _:reactor.callLater(0,self._next_request,name))
+            d.addCallback(db.insert_mongoDb)
+            d.addCallback(lambda _:reactor.callLater(0,self._next_request,spider_name,db))
 
         except Exception as e:
             print(e)
 
     @defer.inlineCallbacks
-    def open_spider(self,spider):
+    def open_spider(self,spider,db=None):
         self.scheduler = Scheduler(spider.name)
         yield self.scheduler.open()
         start_requests = iter(spider.start_requests())
-        print(start_requests)
         while True:
-            print("读取网站")
             try:
                 req = next(start_requests)
-                print(req)
+                print("读取网站:%s"%req.url)
             except StopIteration as e:
-                print("读取网站失败")
+                print("网站读取完毕")
                 break
             except Exception as e :
                 print(e)
             self.scheduler.enqueue_request(req)
-        reactor.callLater(0,self._next_request,spider.name)
+        reactor.callLater(0,self._next_request,spider.name,db)
 
     @defer.inlineCallbacks
     def start(self):
@@ -145,12 +116,15 @@ class Crawler(object):
     用户封装调度器以及引擎的...
     """
     def _create_engine(self):
+        print("爬虫引擎已创建")
         return ExecutionEngine()
 
     def _create_spider(self,spider):
+        print("爬虫：%s 已创建" %spider.name)
         return spider()
 
     def _create_db(self,db_url,db_name):
+        print("数据库已创建")
         return MongoDb(db_url,db_name)
 
     @defer.inlineCallbacks
@@ -160,10 +134,9 @@ class Crawler(object):
         db = self._create_db(db_url,db_name)
         db.collection_name = spider.name
 
-        print(spider)
 
         yield db.connectDb()
-        yield engine.open_spider(spider)
+        yield engine.open_spider(spider,db)
         yield engine.start()
 
 
@@ -276,13 +249,14 @@ class Spider(object):
 class Commond(object):
     def __init__(self):
         pass
+
     def run(self):
         crawl_process = CrawlerProcess()
         spider = Spider("crawler")
-
         for spider_cls_path in spider._get_spider():
             crawl_process.crawl(spider_cls_path)
         crawl_process.start()
+
 
 if __name__ == "__main__":
     start = time.clock()

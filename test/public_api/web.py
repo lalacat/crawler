@@ -58,8 +58,6 @@ def print_result(datas_list,url):
             pass
     print("==============================")
 
-
-
 def end_crawl(_, t_begin):
     t_end = time.time()
     print(t_end - t_begin)
@@ -89,6 +87,14 @@ class MongoDb(object):
         self.db_name = db_name
         #表名称
         self.collection_name = None
+
+        print('正在连接数据库')
+        #连接到数据库
+        try :
+            self.client = pymongo.MongoClient(self.db_url)
+            self.dcolls = self.client[self.db_name]
+        except Exception as e :
+            print(e)
     '''
     def __new__(cls, *args, **kwargs):
         #单例模式，限制对象生成的次数
@@ -97,26 +103,18 @@ class MongoDb(object):
         return cls.instance
     '''
     def connectDb(self):
-        #连接到数据库
-        if self.client is None:
-            print("数据库连上")
-            try :
-                self.client = pymongo.MongoClient(self.db_url)
-                self.db = self.client[self.db_name]
-            except Exception as e :
-                print(e)
-        else :
-            print("%s已连接"%self.db_name)
-    def _getCollection(self):
+        pass
 
-        if self.db != None :
-            return self.db[self.collection_name]
+    def _getCollection(self):
+        if self.dcolls != None :
+            return self.dcolls[self.collection_name]
 
     def insert_mongoDb(self,result):
+        print("开始写入到表%s"%self.collection_name)
         if isinstance(result, list):
             for post in result:
                 try:
-                    self.collection_name.insert_one(post)
+                    self.dcolls[self.collection_name].insert_one(post)
                 except Exception as e:
                     print(e)
             print("MongoDb update Finish")

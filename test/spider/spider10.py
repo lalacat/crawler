@@ -13,7 +13,7 @@ class Spider10(BaseSpider):
     def start_requests(self):
         start_url = list()
 
-        for i in range(1800,2000):
+        for i in range(180,200):
             i = str(i)
             u = self.url + i
             start_url.append(u)
@@ -28,7 +28,7 @@ class Spider10(BaseSpider):
         try:
             list = get_need_datas(context)
             #print_result(list,url)
-            list.append({"url":url})
+            #list.append({"url":url})
         except Exception as e:
             print(e)
         return list
