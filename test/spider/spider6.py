@@ -1,5 +1,5 @@
 from test.spider import BaseSpider,Request
-from test.public_api.web import get_need_datas,print_result
+from test.public_api.web import get_smzdm_datas,print_smzdm_result
 
 
 class Spider6(BaseSpider):
@@ -26,8 +26,8 @@ class Spider6(BaseSpider):
     def _parse(self,context, url):
         print("解析网页：", url)
         try:
-            list = get_need_datas(context)
-            #print_result(list,url)
+            list = get_smzdm_datas(context)
+            #print_smzdm_result(list,url)
             list.append({"url":url})
         except Exception as e:
             print(e)

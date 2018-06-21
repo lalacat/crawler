@@ -1,7 +1,7 @@
 import time,json,pymongo
 from twisted.internet import reactor
 
-def get_need_datas(web_body):
+def get_smzdm_datas(web_body):
     #print("get_need_datas")
     datas_list = list()
     if isinstance(web_body,bytes):
@@ -50,7 +50,7 @@ def get_need_datas(web_body):
     return datas_list
 
 
-def print_result(datas_list,url):
+def print_smzdm_result(datas_list,url):
     print("页面 :%s 有 %d 件商品"%(url,len(datas_list)))
     for d_l in datas_list:
         for p,d in d_l.items():
