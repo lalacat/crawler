@@ -5,7 +5,7 @@ from queue import Queue
 from pkgutil import iter_modules
 from importlib import import_module
 from test.public_api.web import MongoDb
-from test.spider import BaseSpider
+from test.spider import BaseSpider,BaseQylSpider
 
 
 class HttpResponse(object):
@@ -128,9 +128,22 @@ class Crawler(object):
         return MongoDb(db_url,db_name)
 
     @defer.inlineCallbacks
-    def crawl(self,spider,db_url="127.0.0.1:27017",db_name="Twisted_Database"):
+    def crawl(self,spider):
         engine = self._create_engine()
         spider = self._create_spider(spider)
+        try:
+            # 判断爬虫是否有专用的数据库，数据库的地址，名称在爬虫类中定义
+            if hasattr(spider,"db_url"):
+                db_url = spider.db_url
+            else:
+                db_url = "127.0.0.1:27017"
+            if hasattr(spider,"db_name"):
+                db_name = spider.db_name
+            else:
+                db_name = "Twisted_Database"
+        except Exception as e :
+            print(e)
+
         db = self._create_db(db_url,db_name)
         db.collection_name = spider.name
 
@@ -240,7 +253,7 @@ class Spider(object):
                 4.剔除父类
                 """
                 if inspect.isclass(obj) and \
-                        issubclass(obj, BaseSpider) and \
+                        issubclass(obj, BaseQylSpider) and \
                         obj.__module__ == c.__name__ and \
                         getattr(obj,'name', None) and \
                         not obj == BaseSpider:
