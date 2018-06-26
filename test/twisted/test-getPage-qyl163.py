@@ -19,8 +19,8 @@ def print_qyl163_content(lis,url):
         result["title"] = l.a.get("titile")
         result["img"] = l.a.div.img.get("src")
         print(result["href"])
-        child_web = getPage(result["href"].encode("utf-8"))
-        child_web.addCallBack(lambda _:print("child page"))
+  #      child_web = getPage(result["href"].encode("utf-8"))
+ #       child_web.addCallBack(lambda _:print("child page"))
         #esult["video"]= child_web.addCallback()
         #print(img)
 

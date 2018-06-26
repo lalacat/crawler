@@ -147,7 +147,6 @@ class Crawler(object):
         db = self._create_db(db_url,db_name)
         db.collection_name = spider.name
 
-
         yield db.connectDb()
         yield engine.open_spider(spider,db)
         yield engine.start()
