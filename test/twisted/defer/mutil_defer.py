@@ -1,4 +1,5 @@
 from twisted.internet import reactor,defer
+from twisted.internet.defer import returnValue,Deferred,DeferredList
 from twisted.web.client import getPage
 import requests
 
@@ -18,15 +19,12 @@ def get_child_web(content):
     except Exception as e:
         print(e)
 
+@defer.inlineCallbacks
+def get_child():
+    print("get_child")
 
-def get_child(url):
-    print("get_child",url)
+    yield getPage(b"http://httpbin.org/get")
 
-    d = getPage(url)
-
-    d.addCallback(print_child_web)
-    d.addCallback(lambda _:reactor.stop())
-    d.callback("stop")
 
 
 @defer.inlineCallbacks
@@ -38,27 +36,27 @@ def get_page(url):
     yield d
 
 
+
+
 def print_child(content):
     print("print_child")
 
-    d = second_defer(content)
+    d = second_defer()
     d.addCallback(print_web)
-    #d.addCallback(lambda _: reactor.stop())
-    #print(d)
+    #d.result
+    #d.addCallback(print_web)
+
+    d.addCallback(lambda _: reactor.stop())
 
 @defer.inlineCallbacks
-def second_defer(content):
+def second_defer():
     print('first callback')
-    #yield getPage(b"http://httpbin.org/get")
+    result = yield getPage(b"http://httpbin.org/get")
+    returnValue(result)
 
-    d = defer.Deferred()
-    reactor.callLater(2, d.callback, 2)
-    result = yield d # yielded deferreds will pause the generator
-    print(result)
-    defer.returnValue(result)
 
 if __name__ == '__main__':
     d = get_page("https://www.baidu.com/")
-    dd = defer.DeferredList([d,])
-    dd.addBoth(lambda _: reactor.stop())
+    dd = DeferredList([d,])
+    #dd.addBoth(lambda _: reactor.stop())
     reactor.run()

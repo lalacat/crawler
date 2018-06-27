@@ -18,11 +18,19 @@ def print_qyl163_content(lis,url):
         result["href"] = "http://www.qyl63.com" + href_temp
         result["title"] = l.a.get("titile")
         result["img"] = l.a.div.img.get("src")
-        print(result["href"])
-  #      child_web = getPage(result["href"].encode("utf-8"))
- #       child_web.addCallBack(lambda _:print("child page"))
-        #esult["video"]= child_web.addCallback()
-        #print(img)
+        #print(result["href"])
+        child_web = second_defer("http://httpbin.org/get")
+ #       child_web.addCallBack(print_web)
+
+
+
+@defer.inlineCallbacks
+def second_defer(url):
+    print('first callback')
+   #print(url)
+    result = yield getPage(url.encode("utf-8"))
+    print("result",result)
+    returnValue(result)
 
 
 def get_qyl163_content(content):
@@ -51,7 +59,8 @@ def read_url(url):
     d = getPage(url.encode('utf-8'))
 
     #d.addCallback(print_web)
-    d.addCallback(get_qyl163_content)
+    d.addCallbacks(get_qyl163_content,print_web)
+    #d.addErrorback(print_web)
     d.addCallback(print_qyl163_content,url)
 
     yield d
@@ -80,7 +89,8 @@ if __name__ == '__main__':
     url = "http://www.qyl63.com/recent"
 
     d = read_url(url)
-    d.addCallback(lambda _:reactor.stop())
+    #d.addCallback(lambda _:reactor.stop())
+
     reactor.run()
     end =time.clock()
     print("运行时间%3.2f"%(end-start))
