@@ -3,7 +3,7 @@ from twisted.internet import reactor, defer
 from twisted.internet.ssl import ClientContextFactory
 from twisted.web.http_headers import Headers
 import time
-from test.public_api.web import get_need_datas, print_result, end_crawl
+from test.public_api.web import get_smzdm_datas, print_smzdm_result, end_crawl
 
 headers = Headers({'User-Agent': ['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
                    'content-type': ["application/json"]})
@@ -27,8 +27,8 @@ def cbRequest(response,url):
     '''
 
     d = readBody(response)
-    d.addCallback(get_need_datas)
-    d.addCallback(print_result,url)
+    d.addCallback(get_smzdm_datas)
+    d.addCallback(print_smzdm_result,url)
     return d
 
 

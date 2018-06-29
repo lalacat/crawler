@@ -56,7 +56,10 @@ def second_defer():
 
 
 if __name__ == '__main__':
+    d = defer.Deferred()
+
     d = get_page("https://www.baidu.com/")
     dd = DeferredList([d,])
+
     #dd.addBoth(lambda _: reactor.stop())
     reactor.run()
