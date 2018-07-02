@@ -28,8 +28,8 @@ def inner_defer(content):
 
 '''
 outer_d = getPage(b'https://www.baidu.com')
-outer_d.addCallback(print_web)
+outer_d.addCallback(outer_print)
 outer_d.addCallback(inner_defer)
-outer_d.addCallback(print_web)
+outer_d.addCallback(outer_print)
 outer_d.addCallback(lambda _:reactor.stop())
 reactor.run()

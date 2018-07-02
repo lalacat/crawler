@@ -7,32 +7,10 @@ from twisted.internet.ssl import ClientContextFactory
 
 
 
-class WebClientContextFactory(ClientContextFactory):
-    '''
-    用来实现https网页的访问验证
-    '''
-    def getContext(self, hostname, port):
-        return ClientContextFactory.getContext(self)
 
-
-def cbRequest(response,url):
-    '''
-    print('Response version:', response.version)
-    print('Response headers:')
-    print(pformat(list(response.headers.getAllRawHeaders())))
-    print('Response code:', response.code)
-    print('Response phrase:', response.phrase)
-    '''
-
-    d = readBody(response)
-    #d.addCallback(get_smzdm_datas)
-    #d.addCallback(print_smzdm_result,url)
-    return d
 
 
 url = 'https://www.smzdm.com/homepage/json_more?p='
-contextFactory = WebClientContextFactory()
-
 
 class Requset(object):
     def __init__(self, url, parse):
@@ -52,8 +30,7 @@ class HttpResponse(object):
 class Spider(object):
     name = "smzdm"
 
-    def __init__(self,agent):
-        self.agent = agent
+    def __init__(self):
         self.Flag = True
     def start_requests(self):
         start_url = ["https://www.baidu.com", "https://www.bing.com", ]
@@ -61,23 +38,15 @@ class Spider(object):
             yield Requset(url, self.parse)
 
     def parse(self, response):
-        print("---------response--------->", response)
-        a = self.read_child_web(response,"d1")
+        print("---------response--------->")
         #a.callback(None)
-        d2= self.agent.request(b'GET',b'http://httpbin.org/get')
-
+        d2 = getPage(b"http://httpbin.org/get")
         return d2
 
     def finish(self,content):
         print("finish")
         self.Flag = False
 
-    def read_child_web(self,content,name):
-        print('read_child_web',name)
-
-        d = readBody(content)
-        d.addCallback(self.print_child_web)
-        return d
 
     def print_child_web(self,content):
         print("print_child_web:",content)
@@ -118,7 +87,7 @@ class Engine(object):
                 req = Q.get(block=False)
                 self.crawlling.append(req)
                 # getPage返回的是一个defer对象
-                d = spider.agent.request(b"GET", req.url.encode("utf-8"))
+                d = getPage(req.url.encode("utf-8"))
                 print("d",d)
 
                 # 当页面下载完之后，会立即调用回调函数get_response_callback
@@ -132,7 +101,7 @@ class Engine(object):
                #print(e)
 
     def outer_print(self,content):
-        print("outer_callback", content)
+        print("outer_callback")
         return 1
 
     def inner_print(self,content):
@@ -159,9 +128,8 @@ def end():
     print("end")
     reactor.stop()
 
-agent = Agent(reactor, contextFactory)
 
-spider = Spider(agent)
+spider = Spider()
 #_active = set()
 engine = Engine()
 d = engine.crwal(spider)
@@ -169,6 +137,6 @@ d = engine.crwal(spider)
 #_active.add(d)
 
 dd = DeferredList([d,])
-dd.addCallback(lambda _:reactor.stop())
+#dd.addCallback(lambda _:reactor.stop())
 
 reactor.run()

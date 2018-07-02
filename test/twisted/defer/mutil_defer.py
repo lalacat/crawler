@@ -1,7 +1,6 @@
 from twisted.internet import reactor,defer
 from twisted.internet.defer import returnValue,Deferred,DeferredList
 from twisted.web.client import getPage
-import requests
 
 def print_web(content):
     #print("print_web:%s"%num)
@@ -34,7 +33,6 @@ def get_page(url):
     #d.addCallback(lambda _:reactor.stop())
 
     yield d
-
 
 
 
