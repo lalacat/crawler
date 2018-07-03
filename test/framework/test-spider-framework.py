@@ -52,7 +52,8 @@ class ExecutionEngine(object):
         self._close = None
         self.scheduler = None
         #self.max = 5
-        #self.crawlling = []
+        #保证每个defer都执行完
+        self.crawlling = []
 
     @staticmethod
     def get_response_callback(content, request):
@@ -70,7 +71,7 @@ class ExecutionEngine(object):
             print("爬虫：%s 还剩下%d个网页"%(spider_name,self.scheduler.qsize()))
 
         try:
-            if self.scheduler.qsize() == 0 :
+            if self.scheduler.qsize() == 0 and len(self.crawlling) == 0:
                 print("爬虫 %s end"%spider_name)
                 self._close.callback(None)
                 return

@@ -1,21 +1,12 @@
-
 from twisted.web.client import getPage
 from twisted.internet import reactor,defer
-from twisted.internet.defer import inlineCallbacks,Deferred,returnValue,DeferredList
-#from test.public_api.web import get_need_datas,print_result
-import json,time
-from bs4 import BeautifulSoup
-from twisted.protocols.sip import URL
-from twisted.python.urlpath import  URLPath
-headers = {'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'
-            ,'content-type':"application/json"}
 from six.moves.urllib.parse import (urljoin, urlsplit, urlunsplit,
                                     urldefrag, urlencode, urlparse,
                                     quote, parse_qs, parse_qsl,
                                     ParseResult, unquote, urlunparse)
 from w3lib.util import to_bytes, to_native_str, to_unicode
 import string
-from urllib.parse import quote
+
 
 # constants from RFC 3986, Section 2.2 and 2.3
 RFC3986_GEN_DELIMS = b':/?#[]@'
@@ -71,98 +62,77 @@ def safe_url_string(url, encoding='utf8', path_encoding='utf8'):
         quote(to_bytes(parts.query, encoding), _safe_chars),
         quote(to_bytes(parts.fragment, encoding), _safe_chars),
     ))
-def print_qyl163_content(lis,u):
-    urls = list()
-    print("print:%s"%u)
-    for l in lis:
-        result = dict()
-        try:
-            href_temp = l.a.get("href")
-            result["href"] = "http://www.qyl63.com" + href_temp
-            result["title"] = l.a.get("title")
-            result["img"] = l.a.div.img.get("src")
-            u = result["href"]
-            #解决url中带有中文字符
-            #_us = safe_url_string(u)
-            _us = quote(u).replace("%3A",":")
-            child_web = getPage(_us.encode("utf-8"))
-            #child_web = getPage(b"http://httpbin.org/get")
-            child_web.addCallback(add_video_url,result)
-            child_web.addCallback(print_dic)
-            urls.append(child_web)
-        except Exception as e :
-            print(e)
-    return DeferredList(urls)
+def escape_ajax(url):
+    """
+    Return the crawleable url according to:
+    https://developers.google.com/webmasters/ajax-crawling/docs/getting-started
 
-def add_video_url(child_page,result):
-    try:
-        bs_obj = BeautifulSoup(child_page, "html.parser")
-        video_url = bs_obj.find('div', id='player-container').video.source.get("src")
-        result["video_url"] = video_url
-    except Exception as e :
-        print(e)
-    return result
+    >>> escape_ajax("www.example.com/ajax.html#!key=value")
+    'www.example.com/ajax.html?_escaped_fragment_=key%3Dvalue'
+    >>> escape_ajax("www.example.com/ajax.html?k1=v1&k2=v2#!key=value")
+    'www.example.com/ajax.html?k1=v1&k2=v2&_escaped_fragment_=key%3Dvalue'
+    >>> escape_ajax("www.example.com/ajax.html?#!key=value")
+    'www.example.com/ajax.html?_escaped_fragment_=key%3Dvalue'
+    >>> escape_ajax("www.example.com/ajax.html#!")
+    'www.example.com/ajax.html?_escaped_fragment_='
 
+    URLs that are not "AJAX crawlable" (according to Google) returned as-is:
 
-def get_qyl163_content(content):
-    print("parse")
-    try:
-        bs_obj = BeautifulSoup(content,"html.parser")
-        ul = bs_obj.find("ul","videos")
-        lis = ul.find_all("li")
+    >>> escape_ajax("www.example.com/ajax.html#key=value")
+    'www.example.com/ajax.html#key=value'
+    >>> escape_ajax("www.example.com/ajax.html#")
+    'www.example.com/ajax.html#'
+    >>> escape_ajax("www.example.com/ajax.html")
+    'www.example.com/ajax.html'
+    """
+    defrag, frag = urldefrag(url)
+    if not frag.startswith('!'):
+        return url
+    return add_or_replace_parameter(defrag, '_escaped_fragment_', frag[1:])
 
-    except Exception as e :
-        print(e)
+def add_or_replace_parameter(url, name, new_value):
+    """Add or remove a parameter to a given url
 
-    return lis
+    >>> import w3lib.url
+    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php', 'arg', 'v')
+    'http://www.example.com/index.php?arg=v'
+    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3', 'arg4', 'v4')
+    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3&arg4=v4'
+    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3', 'arg3', 'v3new')
+    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3new'
+    >>>
 
+    """
+    parsed = urlsplit(url)
+    args = parse_qsl(parsed.query, keep_blank_values=True)
 
+    new_args = []
+    found = False
+    for name_, value_ in args:
+        if name_ == name:
+            new_args.append((name_, new_value))
+            found = True
+        else:
+            new_args.append((name_, value_))
 
-def print_dic(context):
-    print("print_web")
-    print(context)
+    if not found:
+        new_args.append((name, new_value))
 
+    query = urlencode(new_args)
+    return urlunsplit(parsed._replace(query=query))
 
-def finish(context):
-    print("finish")
-    return None
+if __name__ == "__main__":
+    url = "http://www.qyl63.com/92082/火爆网红鹿少女浴室性感情趣高跟被吊着闯红灯下面被干出血了呻吟给力/"
 
+    s =safe_url_string(url,"utf-8")
+    print(s)
 
-@inlineCallbacks
-def read_url(url):
-    d = getPage(url.encode('utf-8'))
-    try:
-        d.addCallbacks(get_qyl163_content)
-        d.addCallback(print_qyl163_content,url)
-        d.addCallback(finish)
-    except Exception as e :
-        print(e)
+    _utl = escape_ajax(s)
 
+    def print_web(content):
+        print(content)
 
-    yield d
-
-
-
-if __name__ == '__main__':
-    start = time.clock()
-    url = "http://www.qyl63.com/recent/"
-
-
-    t1 = time.time()
-    result = list()
-    for i in range(2,5):
-        i = str(i)
-        u = url + i
-        print(u)
-        d = read_url(u)
-        result.append(d)
-
-    
-    dd = defer.DeferredList(result)
-    dd.addBoth(lambda _:reactor.stop())
-
-
-
+    d = getPage(s.encode("utf-8"))
+    d.addCallback(print_web)
+    d.addCallback(lambda _:reactor.stop)
     reactor.run()
-    end =time.clock()
-    print("运行时间%3.2f"%(end-start))
