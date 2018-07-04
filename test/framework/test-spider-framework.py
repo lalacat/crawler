@@ -6,6 +6,7 @@ from pkgutil import iter_modules
 from importlib import import_module
 from test.public_api.web import MongoDb
 from test.spider import BaseSpider,BaseQylSpider
+from urllib.parse import quote
 
 
 class HttpResponse(object):
@@ -29,6 +30,7 @@ class Scheduler(object):
         print("爬虫：%s 已载入" %self.name)
 
     def next_request(self):
+        # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
         try:
             req = self.q.get(block=False)
         except Exception as e:
@@ -76,10 +78,15 @@ class ExecutionEngine(object):
                 self._close.callback(None)
                 return
 
-            # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
             req = self.scheduler.next_request()
-
-            d = getPage(req.url.encode('utf-8'))
+            #对即将处理的req存储到临时列表中，这是为了防止其他的req还没处理完，程序就结束了，因为判断程序结束的标志时scheduler的q.size()为0，
+            #即任务队列中的数据全部取出来了，但是结束标志中还需要在定义一个标志，表示所有的defer都处理完了，就用crawlling进行处理，任务进行前，
+            #先将要进行的任务存储到crawlling列表中，当数据处理完，再将对应的req从列表中去除，当列表为空的时候，证明所有的defer的callback处理完了
+            self.crawlling.append(req)
+            # 对网页进行编码的处理，防止网页中含有中文字符，程序不能对中文字符进行解析，报错；
+            # 对网页进行处理后‘：’也会被解析成“%3A”，所以要对解析后的网页在进行处理将“：”重新代替回来
+            _url = quote(req.url).replace("%3A",":")
+            d = getPage(_url.encode('utf-8'))
             # d.addCallback(self.get_response_callback,req)
             # d.addCallback(self.print_web)
             d.addCallback(req.parse,req.url)

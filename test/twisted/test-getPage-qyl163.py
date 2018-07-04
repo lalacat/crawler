@@ -10,6 +10,7 @@ headers = {'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20
             ,'content-type':"application/json"}
 def print_qyl163_content(lis,u):
     urls = list()
+    num = 0
     #print("print:%s"%u)
     for l in lis:
         result = dict()
@@ -23,7 +24,8 @@ def print_qyl163_content(lis,u):
             _us = quote(u).replace("%3A",":")
             child_web = getPage(_us.encode("utf-8"))
             child_web.addCallback(add_video_url,result)
-            child_web.addCallback(print_dic)
+            child_web.addCallback(print_dic,num)
+            num += 1
             urls.append(child_web)
         except Exception as e :
             print(e)
@@ -57,8 +59,8 @@ def print_len(context):
     print(len(context))
     #print(context)
 
-def print_dic(context):
-    print(context)
+def print_dic(context,num):
+    print(str(num),context)
 
 def finish(context):
     print("finish")
@@ -85,7 +87,7 @@ if __name__ == '__main__':
 
 
     t1 = time.time()
-    '''
+
     
 
     result = list()
@@ -95,9 +97,9 @@ if __name__ == '__main__':
         print(u)
         d = read_url(u)
         result.append(d)
-    '''
-    d = read_url(u)
-    dd = defer.DeferredList([d,])
+
+    #d = read_url(u)
+    dd = defer.DeferredList(result)
     dd.addBoth(lambda _:reactor.stop())
 
 
