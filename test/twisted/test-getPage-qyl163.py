@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     t1 = time.time()
 
-    
+    '''
 
     result = list()
     for i in range(2,5):
@@ -97,9 +97,10 @@ if __name__ == '__main__':
         print(u)
         d = read_url(u)
         result.append(d)
+    '''
 
-    #d = read_url(u)
-    dd = defer.DeferredList(result)
+    d = read_url(u)
+    dd = defer.DeferredList((d,))
     dd.addBoth(lambda _:reactor.stop())
 
 

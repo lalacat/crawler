@@ -113,6 +113,7 @@ class MongoDb(object):
         print("开始写入到表%s"%self.collection_name)
         if isinstance(result, list):
             for post in result:
+              #  print(type(post))
                 try:
                     self.dcolls[self.collection_name].insert_one(post)
                 except Exception as e:

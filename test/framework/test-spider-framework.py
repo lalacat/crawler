@@ -7,6 +7,7 @@ from importlib import import_module
 from test.public_api.web import MongoDb
 from test.spider import BaseSpider,BaseQylSpider
 from urllib.parse import quote
+from twisted.python import log
 
 
 class HttpResponse(object):
@@ -87,14 +88,36 @@ class ExecutionEngine(object):
             # 对网页进行处理后‘：’也会被解析成“%3A”，所以要对解析后的网页在进行处理将“：”重新代替回来
             _url = quote(req.url).replace("%3A",":")
             d = getPage(_url.encode('utf-8'))
+
+
             # d.addCallback(self.get_response_callback,req)
             # d.addCallback(self.print_web)
-            d.addCallback(req.parse,req.url)
-            d.addCallback(db.insert_mongoDb)
-            d.addCallback(lambda _:reactor.callLater(0,self._next_request,spider_name,db))
 
-        except Exception as e:
-            print(e)
+            d.addCallback(req.parse,req.url)
+            d.addCallback(self.finish_crawl, req)
+            if db is not None:
+                d.addCallback(db.insert_mongoDb)
+
+            d.addErrback(self.crawl_err)
+            d.addBoth(lambda _:reactor.callLater(0,self._next_request,spider_name,db))
+
+        except AttributeError as e:
+            print("AttributeError",e)
+            return None
+        except Exception as e :
+            print("Exception",e)
+
+
+
+    def finish_crawl(self,content,req):
+        print("finish")
+        self.crawlling.remove(req)
+        return content
+
+    def crawl_err(self,content):
+        print("error found")
+        print(content)
+        return "error"
 
     @defer.inlineCallbacks
     def open_spider(self,spider,db=None):
@@ -140,22 +163,27 @@ class Crawler(object):
         engine = self._create_engine()
         spider = self._create_spider(spider)
         try:
-            # 判断爬虫是否有专用的数据库，数据库的地址，名称在爬虫类中定义
-            if hasattr(spider,"db_url"):
-                db_url = spider.db_url
-            else:
-                db_url = "127.0.0.1:27017"
-            if hasattr(spider,"db_name"):
-                db_name = spider.db_name
-            else:
-                db_name = "Twisted_Database"
+            if hasattr(spider,"db_flag"):
+                if spider.db_flag:
+                    # 判断爬虫是否有专用的数据库，数据库的地址，名称在爬虫类中定义
+                    if hasattr(spider,"db_url"):
+                        db_url = spider.db_url
+                    else:
+                        db_url = "127.0.0.1:27017"
+                    if hasattr(spider,"db_name"):
+                        db_name = spider.db_name
+                    else:
+                        db_name = "Twisted_Database"
+                    db = self._create_db(db_url, db_name)
+                    db.collection_name = spider.name
+                    yield db.connectDb()
+                else:
+                    print("此爬虫不关联数据库")
+                    db = None
         except Exception as e :
             print(e)
 
-        db = self._create_db(db_url,db_name)
-        db.collection_name = spider.name
 
-        yield db.connectDb()
         yield engine.open_spider(spider,db)
         yield engine.start()
 
