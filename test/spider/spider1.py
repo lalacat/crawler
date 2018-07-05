@@ -32,3 +32,4 @@ class Spider1(BaseSpider):
         except Exception as e:
             print(e)
         return list
+    

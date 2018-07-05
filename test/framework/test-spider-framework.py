@@ -5,7 +5,12 @@ from test.public_api.web import MongoDb
 from urllib.parse import quote
 from test.framework.import_spider import Spider
 import time
-from twisted.python import log
+
+import logging
+LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
+logger = logging.getLogger(__name__)
 
 
 class HttpResponse(object):
@@ -26,7 +31,7 @@ class Scheduler(object):
         self.name = name
 
     def open(self):
-        print("爬虫：%s 已载入" %self.name)
+        logger.info("爬虫：%s 已载入" %self.name)
 
     def next_request(self):
         # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
@@ -68,12 +73,12 @@ class ExecutionEngine(object):
         :return:
         '''
         if self.scheduler.qsize() != 0 :
-            print("爬虫：%s 还剩下%d个网页"%(spider_name,self.scheduler.qsize()))
+            logger.info("爬虫：%s 还剩下%d个网页"%(spider_name,self.scheduler.qsize()))
 
         try:
             if self.scheduler.qsize() == 0 and len(self.crawlling) == 0:
-                print("爬虫 %s end"%spider_name)
-                self._close.callback(None)
+                logger.info("爬虫 %s end"%spider_name,exc_info=True,extra={'spider': spider_name})
+                self._finish_stopping_engine()
                 return
 
             req = self.scheduler.next_request()
@@ -99,15 +104,15 @@ class ExecutionEngine(object):
             d.addBoth(lambda _:reactor.callLater(0,self._next_request,spider_name,db))
 
         except AttributeError as e:
-            print("AttributeError",e)
+            logger.error("对象没有对应的属性",e)
             return None
         except Exception as e :
-            print("Exception",e)
+            logger.error("Exception",e)
 
 
     #当一个defer爬虫结束后，将完成的爬虫线程从list中移除去
     def finish_crawl(self,content,req):
-        print("finish")
+        logger.info("finish")
         self.crawlling.remove(req)
         return content
 
@@ -125,12 +130,12 @@ class ExecutionEngine(object):
         while True:
             try:
                 req = next(start_requests)
-                print("读取网站:%s"%req.url)
+                logger.info("读取网站:%s"%req.url)
             except StopIteration as e:
-                print("网站读取完毕")
+                logger.error("网站读取完毕")
                 break
             except Exception as e :
-                print(e)
+                logger.error("再对spider操作的过程中出现错误",e)
             self.scheduler.enqueue_request(req)
         reactor.callLater(0,self._next_request,spider.name,db)
 
@@ -139,21 +144,23 @@ class ExecutionEngine(object):
         self._close = defer.Deferred()
         yield self._close
 
+    def  _finish_stopping_engine(self):
+        self._close.callback(None)
 
 class Crawler(object):
     """
     用户封装调度器以及引擎的...
     """
     def _create_engine(self):
-        print("爬虫引擎已创建")
+        logger.info("爬虫引擎已创建")
         return ExecutionEngine()
 
     def _create_spider(self,spider):
-        print("爬虫：%s 已创建" %spider.name)
+        logger.info("爬虫：%s 已创建" %spider.name)
         return spider()
 
     def _create_db(self,db_url,db_name):
-        print("数据库已创建")
+        logger.info("数据库已创建")
         return MongoDb(db_url,db_name)
 
     @defer.inlineCallbacks
@@ -176,10 +183,10 @@ class Crawler(object):
                     db.collection_name = spider.name
                     yield db.connectDb()
                 else:
-                    print("此爬虫不关联数据库")
+                    logger.warning("此爬虫不关联数据库")
                     db = None
         except Exception as e :
-            print(e)
+            logger.error("数据库创建失败")
 
 
         yield engine.open_spider(spider,db)
@@ -227,4 +234,4 @@ if __name__ == "__main__":
     cmd = Commond()
     cmd.run()
     end = time.clock()
-    print("运行时间%3.2f"%(end-start))
+    logger.info("运行时间%3.2f"%(end-start))
