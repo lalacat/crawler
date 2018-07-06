@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class SpiderLoader(object):
 
+
     def import_spider(self,path):
 
         #导入爬虫包
@@ -79,8 +80,8 @@ class SpiderLoader(object):
         return dict_spider
 
     def get_spider(self,spiders):
-        for c in spiders:
-            for obj in vars(c).values():
+        for module in spiders:
+            for obj in vars(module).values():
                 """
                 vars（）实现返回对象object的属性和属性值的字典对象
                 要过滤出obj是类的信息，其中类的信息包括，模块导入其他模块的类的信息，模块中的父类，模块中所有定义的类
@@ -92,9 +93,11 @@ class SpiderLoader(object):
                 """
                 if inspect.isclass(obj) and \
                         issubclass(obj, BaseSpider) and \
-                        obj.__module__ == c.__name__ and \
+                        obj.__module__ == module.__name__ and \
+                        getattr(obj,"name",None) and \
                         not obj == BaseSpider :
-                    yield obj
+
+                    yield obj,module.__name__
 
 '''
 spider_module_path("crawler")
@@ -109,7 +112,8 @@ from collections import defaultdict
 sl = SpiderLoader()
 sl.spider_module_path("crawler")
 spider = sl.import_spider("spider")
-found = defaultdict()
-print(sl.__name__)
-for l in sl.get_spider(spider):
-    found[l.name].append(spider.__name__,l.__name__)
+found = defaultdict(list)
+for l,name in sl.get_spider(spider):
+    found[l.name].append((name,l.__name__))
+
+print(found)

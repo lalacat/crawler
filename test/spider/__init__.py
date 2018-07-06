@@ -7,6 +7,7 @@ class Request(object):
         self.url = url
         self.parse = parse
 
-
+class Spider(object):
+    pass
 class BaseQylSpider(object):
     pass

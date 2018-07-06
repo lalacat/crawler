@@ -1,8 +1,8 @@
-from test.spider import BaseSpider,Request
+from test.spider import Spider,Request
 from test.public_api.web import get_smzdm_datas,print_smzdm_result
 from twisted.internet.defer import inlineCallbacks
 
-class Spider1(BaseSpider):
+class Spider1(Spider):
     name = "task1"
     url = 'https://www.smzdm.com/homepage/json_more?p='
 
