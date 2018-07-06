@@ -32,4 +32,4 @@ class Spider1(Spider):
         except Exception as e:
             print(e)
         return list
-    
+
