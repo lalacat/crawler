@@ -106,6 +106,7 @@ class SpiderLoader(object):
                     yield obj,module.__name__
 
     def _load_all_spiders(self):
+        pass
 
 
 
