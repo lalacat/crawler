@@ -2,7 +2,7 @@ from importlib import import_module
 from pkgutil import iter_modules
 import sys,os
 import inspect
-from test.spider import BaseSpider
+from spider import BaseSpider
 import logging
 
 
@@ -121,6 +121,16 @@ print(ss)
 from collections import defaultdict
 
 sl = SpiderLoader()
+spider_modules=["crawler.commands","crawler.spider"]
+bank = []
+
+for name in spider_modules:
+    for m in sl.import_spider(name):
+        print(m)
+
+'''
+
+
 sl.spider_module_path("crawler")
 spider = sl.import_spider("spider")
 found = defaultdict(list)
@@ -128,3 +138,4 @@ for l,name in sl.get_spider(spider):
     found[l.name].append((name,l.__name__))
 
 print(found)
+'''

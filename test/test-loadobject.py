@@ -1,6 +1,5 @@
 from importlib import import_module
 from zope.interface.verify import verifyClass, DoesNotImplement
-from test.twisted.log import LogCounterHandler
 def load_object(path):
     """
     给定一个obj的绝对路径，能够返回一个obj，通常配合着setting使用
@@ -30,4 +29,4 @@ def load_object(path):
 
 a = load_object("test.twisted.log.test-for-log-handle.LogCounterHandler")
 
-verifyClass(LogCounterHandler,a)
+print(a)

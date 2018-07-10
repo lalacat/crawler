@@ -1,7 +1,7 @@
-import sys,os,time,inspect
+import sys,os, inspect
 from pkgutil import iter_modules
 from importlib import import_module
-from test.spider import BaseSpider,BaseQylSpider
+from spider import BaseSpider,BaseQylSpider
 
 
 class Spider(object):
