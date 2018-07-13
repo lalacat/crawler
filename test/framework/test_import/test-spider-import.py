@@ -6,7 +6,6 @@ from spider import BaseSpider
 import logging
 import warnings,traceback
 from collections import defaultdict
-
 logger = logging.getLogger(__name__)
 
 class SpiderLoader(object):
@@ -60,9 +59,12 @@ class SpiderLoader(object):
                     msg = ("\n{tb}Could not load spiders from module '{modname}'. "
                            "See above traceback for details.".format(
                         modname="crawler.commands", tb=traceback.format_exc()))
-                    warnings.warn(msg, RuntimeWarning)
+                    logger.warn(msg, RuntimeWarning)
                 else:
                     raise
+            self._check_name_duplicates()
+
+
 
     def _load_spiders(self,module):
         for spcls in self._iter_spider_classes(module):
@@ -76,11 +78,9 @@ class SpiderLoader(object):
                  for name, locations in self._found.items()
                  if len(locations) > 1]
         if dupes:
-            msg = ("\nThere are several spiders with the same name:\n\n"
-                   "{}\n\n  This can cause unexpected behavior.".format(
-                "\n\n".join(dupes)))
-            warnings.warn(msg, UserWarning)
-
+            msg = ("\n有爬虫类的名称定义的相同:\n\n"
+                   "{}\n\n这样会导致爬虫运行不成功，导致爬虫失败！！！".format("\n\n".join(dupes)))
+            logger.warning(msg)
 
     def _iter_spider_classes(self,module):
         #for module in spiders:
@@ -100,7 +100,17 @@ class SpiderLoader(object):
                     getattr(obj,"name",None) and \
                     not obj == BaseSpider :
 
+                logger.debug(type(obj))
                 yield obj
+
+    def load(self,spider_name):
+
+        try:
+            return self._spiders[spider_name]
+        except KeyError :
+            raise KeyError("没有找到对应的爬虫：{}".format(spider_name))
+
+
 
     '''
     
@@ -143,21 +153,11 @@ spider_module_path("crawler")
 s = import_spider("spider")
 ss= get_spider_dict(s)
 print(ss)
-
-
 '''
 
 sl = SpiderLoader()
 for i in sl._found.items():
-    print(i)
-sl._check_name_duplicates()
 
-'''
-sl.spider_module_path("crawler")
-spider = sl.import_spider("spider")
-found = defaultdict(list)
-for l,name in sl.get_spider(spider):
-    found[l.name].append((name,l.__name__))
+    pass
+    #print(i)
 
-print(found)
-'''
