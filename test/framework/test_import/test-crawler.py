@@ -4,21 +4,40 @@ from test.framework.test_import.test_loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.test_import.interface import ISpiderLoader
 from zope.interface import Interface
-
+from test.framework.test_spider_framework import ExecutionEngine,MongoDb
 
 logger = logging.getLogger(__name__)
 
-class Crawler(Interface):
+class Crawler(object):
 
-    def __init__(self):
+    def __init__(self,spidercls):
         self.crawling = False
-        pass
+        self.spider = None
+        self.engine = None
+        self.spidercls = spidercls
 
     @inlineCallbacks
     def crwal(self,*args,**kwargs):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
 
+        try:
+            self.spider = self._create_engine(*args, **kwargs)
+
+    """
+    用户封装调度器以及引擎的...
+    """
+    def _create_engine(self):
+        logger.info("爬虫引擎已创建")
+        return ExecutionEngine()
+
+    def _create_spider(self,*args, **kwargs):
+        logger.info("爬虫： 已创建" )
+        return spidercls
+
+    def _create_db(self,db_url,db_name):
+        logger.info("数据库已创建")
+        return MongoDb(db_url,db_name)
 
 
 class CrawlerRunner(object):
