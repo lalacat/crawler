@@ -1,13 +1,16 @@
 from importlib import import_module
 from pkgutil import iter_modules
-import sys,os
 import inspect
 from spider import BaseSpider
 import logging
-import warnings,traceback
+import traceback
 from collections import defaultdict
+from test.framework.test_import.interface import ISpiderLoader
+from zope.interface import implementer
+
 logger = logging.getLogger(__name__)
 
+@implementer(ISpiderLoader)
 class SpiderLoader(object):
 
     def __init__(self):
@@ -110,7 +113,13 @@ class SpiderLoader(object):
         except KeyError :
             raise KeyError("没有找到对应的爬虫：{}".format(spider_name))
 
+    @classmethod
+    def from_settings(cls,settings=None):
+        # 返回一个实例，可以设置条件
+        return cls()
 
+    def list(self):
+        return list(self._spiders.keys())
 
     '''
     
@@ -146,18 +155,4 @@ class SpiderLoader(object):
     '''
 
 
-
-
-'''
-spider_module_path("crawler")
-s = import_spider("spider")
-ss= get_spider_dict(s)
-print(ss)
-'''
-
-sl = SpiderLoader()
-for i in sl._found.items():
-
-    pass
-    #print(i)
 
