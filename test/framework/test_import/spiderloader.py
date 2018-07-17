@@ -1,11 +1,11 @@
 from importlib import import_module
 from pkgutil import iter_modules
 import inspect
-from spider import BaseSpider
+from spider import BaseSpider,Spider
 import logging
 import traceback
 from collections import defaultdict
-from test.framework.test_import.interface import ISpiderLoader
+from test.framework.interface import ISpiderLoader
 from zope.interface import implementer
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class SpiderLoader(object):
     def __init__(self):
         self._found = defaultdict(list)
         self._spiders = {}
-        self._spider_modules = ["commands", "spider"]
+        self._spider_modules = ["spider"]
         self.warn_only = True
         self._load_all_spiders()
 
@@ -98,7 +98,7 @@ class SpiderLoader(object):
             4.剔除父类
             """
             if inspect.isclass(obj) and \
-                    issubclass(obj, BaseSpider) and \
+                    issubclass(obj, Spider) and \
                     obj.__module__ == module.__name__ and \
                     getattr(obj,"name",None) and \
                     not obj == BaseSpider :

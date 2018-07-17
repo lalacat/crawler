@@ -1,8 +1,8 @@
-from spider import BaseSpider,Request
+from spider import Spider,Request
 from test.public_api.web import get_smzdm_datas
 
 
-class Spider1(BaseSpider):
+class Spider1(Spider):
     name = "task10"
     url = 'https://www.smzdm.com/homepage/json_more?p='
 
