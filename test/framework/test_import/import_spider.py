@@ -85,5 +85,5 @@ class Spider(object):
                         issubclass(obj, BaseQylSpider) and \
                         obj.__module__ == c.__name__ and \
                         getattr(obj,'name', None) and \
-                        not obj == BaseSpider:
+                        not obj == BaseQylSpider:
                     yield obj

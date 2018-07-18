@@ -121,20 +121,3 @@ def add_or_replace_parameter(url, name, new_value):
     query = urlencode(new_args)
     return urlunsplit(parsed._replace(query=query))
 
-if __name__ == "__main__":
-    url = "http://www.qyl63.com/92082/火爆网红鹿少女浴室性感情趣高跟被吊着闯红灯下面被干出血了呻吟给力/"
-    #url = 'https://www.smzdm.com/homepage/json_more?p='
-
-    s =safe_url_string(url,"utf-8")
-
-    print(s)
-
-    _utl = escape_ajax(s)
-    print(_utl)
-    def print_web(content):
-        print(content)
-
-    d = getPage(s.encode("utf-8"))
-    d.addCallback(print_web)
-    d.addCallback(lambda _:reactor.stop)
-    reactor.run()

@@ -1,11 +1,12 @@
-from spider import BaseSpider,Request
+from spider import BaseSpider,Request,BaseQylSpider,Spider
 from bs4 import BeautifulSoup
 from twisted.python import failure
 from urllib.parse import quote
 from twisted.web.client import getPage
+
 from twisted.internet.defer import DeferredList
 
-class QylSpider(BaseSpider):
+class QylSpider(BaseQylSpider):
     name = "QYL-1"
     url =  "http://www.qyl63.com/recent/"
     db_name = "QYL"
@@ -17,7 +18,7 @@ class QylSpider(BaseSpider):
     def start_requests(self):
         start_url = list()
 
-        for i in range(10):
+        for i in range(3):
             if i < 1:
                 u = self.url
             elif i > 1 :
@@ -52,7 +53,6 @@ class QylSpider(BaseSpider):
 
     #对列表中的每一项进行解析，获取需要的元素
     def _item_dicts(self,lis):
-        print("")
         urls = list()
         num = 0
         for l in lis:

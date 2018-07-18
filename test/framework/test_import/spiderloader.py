@@ -100,9 +100,7 @@ class SpiderLoader(object):
             if inspect.isclass(obj) and \
                     issubclass(obj, Spider) and \
                     obj.__module__ == module.__name__ and \
-                    getattr(obj,"name",None) and \
-                    not obj == BaseSpider :
-
+                    getattr(obj,"name",None):
                 logger.debug(type(obj))
                 yield obj
 

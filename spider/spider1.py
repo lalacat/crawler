@@ -1,9 +1,9 @@
-from spider import Spider,Request
-from test.public_api.web import get_smzdm_datas
+from spider import Spider,Request,BaseSpider
+from test.public_api.web import get_smzdm_datas,print_smzdm_result
 
 
 class Spider1(Spider):
-    name = "task10"
+    name = "task1"
     url = 'https://www.smzdm.com/homepage/json_more?p='
 
     def __init__(self):
@@ -13,7 +13,7 @@ class Spider1(Spider):
     def start_requests(self):
         start_url = list()
 
-        for i in range(20):
+        for i in range(1):
             i = str(i)
             u = self.url + i
             start_url.append(u)
@@ -27,8 +27,8 @@ class Spider1(Spider):
         print("解析网页：", url)
         try:
             list = get_smzdm_datas(context)
-            #print_smzdm_result(list,url)
-            list.append({"url":url})
+            print_smzdm_result(list,url)
+            #list.append({"url":url})
         except Exception as e:
             print(e)
         return list

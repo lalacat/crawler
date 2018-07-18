@@ -3,7 +3,7 @@ import logging
 from test.framework.test_import.test_loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
-from test.framework.test_spider_framework import ExecutionEngine,MongoDb
+from test.framework.engine import ExecutionEngine
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,8 @@ class Crawler(object):
             当然，如果返回的是一个异常，其也会将其打包成一个已经激活的deferred，只不过就不是通过callback而是errback激活的。
             '''
             yield maybeDeferred(self.engine.start)
-        except Exception:
+        except Exception as e:
+            logger.error(e)
             self.crawling = False
             if self.engine is not None:
                 yield self.engine.close()
@@ -47,16 +48,18 @@ class Crawler(object):
     """
     def _create_engine(self):
         logger.info("爬虫引擎已创建")
-        return ExecutionEngine(self,lambda _: self.stop())
+        #return ExecutionEngine(self,lambda _: self.stop())
+        return ExecutionEngine()
 
     def _create_spider(self,*args, **kwargs):
         logger.info("爬虫：%s 已创建" %self.spidercls.name)
         return self.spidercls.from_crawler(self,*args,**kwargs)
 
+    '''
     def _create_db(self,db_url,db_name):
         logger.info("数据库已创建")
         return MongoDb(db_url,db_name)
-
+    '''
 
     @inlineCallbacks
     def stop(self):
@@ -71,7 +74,9 @@ class Crawler(object):
 
 class CrawlerRunner(object):
     def __init__(self):
-        self.spider
+        self.spider_loder = _get_spider_loader()
+        self._crawlers = set()
+        self._active = set()
 
 
 
