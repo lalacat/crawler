@@ -8,6 +8,8 @@ class Spider1(Spider):
 
     def __init__(self):
         #self.q = queue.Queue()
+        #Spider.__init__(self)
+        super(Spider1,self).__init__()
         self.num = 0
 
     def start_requests(self):
@@ -33,3 +35,7 @@ class Spider1(Spider):
             print(e)
         return list
 
+
+s = Spider1()
+if getattr(s,"name"):
+    print(s.name)

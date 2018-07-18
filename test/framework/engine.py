@@ -111,7 +111,7 @@ class ExecutionEngine(object):
     def finish_crawl(self,content,req):
         logger.info("finish")
         self.crawlling.remove(req)
-        print(len(self.crawlling))
+        #print(len(self.crawlling))
         return content
 
     def crawl_err(self,content,req):
@@ -136,14 +136,17 @@ class ExecutionEngine(object):
             except Exception as e :
                 logger.error("在对spider网页导入的操作的过程中出现错误",e)
             self.scheduler.put_request(req)
-        reactor.callLater(0,self._next_request,spider.name,db)
 
     @defer.inlineCallbacks
-    def start(self):
+    def start(self,spider):
         logger.info("engine start")
         self._close = defer.Deferred()
+        reactor.callLater(0,self._next_request,spider.name)
         yield self._close
 
     def  _finish_stopping_engine(self):
         print("")
+        self._close.callback(None)
+    def stop(self):
+        print("stop")
         self._close.callback(None)

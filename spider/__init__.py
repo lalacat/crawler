@@ -37,10 +37,10 @@ class Spider(object_ref):
     @classmethod
     def from_crawler(cls,crawler,*args,**kwargs):
         spider = cls(*args,**kwargs)
-        spider._ser_crawler(crawler)
+        spider._set_crawler(crawler)
         return spider
 
-    def _ser_crawler(self,crawler):
+    def _set_crawler(self,crawler):
         self.crawler = crawler
 
 
