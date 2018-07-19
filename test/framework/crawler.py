@@ -35,7 +35,7 @@ class Crawler(object):
             当然，如果返回的是一个异常，其也会将其打包成一个已经激活的deferred，只不过就不是通过callback而是errback激活的。
             '''
             yield maybeDeferred(self.engine.start,self.spider)
-            yield self.timedelay(10)
+            #yield self.timedelay(5)
         except Exception as e:
             logger.error(e)
             self.crawling = False
@@ -97,6 +97,7 @@ class CrawlerRunner(object):
         return self._crawl(crawler)
 
     def _crawl(self,crawler,*args,**kwargs):
+        print(crawler)
         self._crawlers.add(crawler)
         d = crawler.crawl(*args,**kwargs)
         self._active.add(d)

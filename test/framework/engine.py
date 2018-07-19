@@ -67,6 +67,7 @@ class ExecutionEngine(object):
                 self._finish_stopping_engine()
                 return
 
+
             req = self.scheduler.next_request()
             #if req is not None:
             #对即将处理的req存储到临时列表中，这是为了防止其他的req还没处理完，程序就结束了，因为判断程序结束的标志时scheduler的q.size()为0，
@@ -145,8 +146,9 @@ class ExecutionEngine(object):
         yield self._close
 
     def  _finish_stopping_engine(self):
-        print("")
+        print("finish")
         self._close.callback(None)
     def stop(self):
         print("stop")
+        print(self._close.callbacks)
         self._close.callback(None)

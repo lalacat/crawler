@@ -65,7 +65,7 @@ class SpiderLoader(object):
                     logger.warn(msg, RuntimeWarning)
                 else:
                     raise
-            self._check_name_duplicates()
+        self._check_name_duplicates()
 
 
 
@@ -86,7 +86,6 @@ class SpiderLoader(object):
             logger.warning(msg)
 
     def _iter_spider_classes(self,module):
-        #for module in spiders:
         for obj in vars(module).values():
             """
             vars（）实现返回对象object的属性和属性值的字典对象
