@@ -34,8 +34,3 @@ class Spider1(Spider):
         except Exception as e:
             print(e)
         return list
-
-
-s = Spider1()
-if getattr(s,"name"):
-    print(s.name)

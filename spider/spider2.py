@@ -3,11 +3,11 @@ from test.public_api.web import get_smzdm_datas
 
 
 class Spider2(Spider):
-    #name = "task2"
+    name = "task2"
     url = 'https://www.smzdm.com/homepage/json_more?p='
 
     def __init__(self):
-        #self.q = queue.Queue()
+        super(Spider2,self).__init__()
         self.num = 0
 
     def start_requests(self):

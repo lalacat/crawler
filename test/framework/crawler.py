@@ -7,7 +7,7 @@ from test.framework.engine import ExecutionEngine
 import time
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
 
 class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
@@ -20,7 +20,8 @@ class Crawler(object):
         self.spidercls = spidercls
 
     @inlineCallbacks
-    def crwal(self,*args,**kwargs):
+    def crawl(self,*args,**kwargs):
+        print("into crawler.crawl")
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
 
@@ -85,19 +86,17 @@ defer外层闭环是由CrawlerRunner的_crawl中得到d-->_done
 '''
 
 
-
 class CrawlerRunner(object):
     def __init__(self):
         self.spider_loder = _get_spider_loader()
         self._crawlers = set()
         self._active = set()
 
-    def crawler(self,crawler_or_spidercls,):
-        crawler  = self.create_crawler(crawler_or_spidercls)
+    def crawl(self,crawler_or_spidercls,):
+        crawler = self.create_crawler(crawler_or_spidercls)
         return self._crawl(crawler)
 
     def _crawl(self,crawler,*args,**kwargs):
-        print(crawler)
         self._crawlers.add(crawler)
         d = crawler.crawl(*args,**kwargs)
         self._active.add(d)
@@ -119,7 +118,7 @@ class CrawlerRunner(object):
         '''
         if isinstance(crawler_or_spidercls,Crawler):
             return crawler_or_spidercls
-        return
+        return Crawler(crawler_or_spidercls)
 
     def _create_crawler(self,spidercls):
         #判断传入的参数是自定义爬虫的name还是对应的class模块

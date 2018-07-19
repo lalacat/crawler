@@ -7,12 +7,14 @@ cls = _get_spider_loader()
 
 _active = set()
 cr = CrawlerRunner()
+module = cls._spiders["task1"]
 for name, module in cls._spiders.items():
-    print(name,module)
-    cr.crawler(module)
+    print(module)
+    cr.crawl(module)
 
 print(cr._active)
-dd = DeferredList(_active)
+
+dd = DeferredList(cr._active)
 
 #dd.addCallback(lambda _ :reactor.callLater(5,crawler.stop))
 #dd.addCallback(crawler.stop)
