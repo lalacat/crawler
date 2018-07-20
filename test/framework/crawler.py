@@ -5,6 +5,7 @@ from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
 from test.framework.engine import ExecutionEngine
 import time
+from test.setting import Setting
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -13,11 +14,12 @@ class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
     # 装载爬虫，导入爬虫的网页
     # 将爬虫导入到引擎中
-    def __init__(self,spidercls):
+    def __init__(self,spidercls,settings=None):
         self.crawling = False
         self.spider = None
         self.engine = None
         self.spidercls = spidercls
+
 
     @inlineCallbacks
     def crawl(self,*args,**kwargs):
@@ -136,8 +138,8 @@ class CrawlerProcess(CrawlerRunner):
 
 
 
-def _get_spider_loader():
-    cls_path = "test.framework.test_import.spiderloader.SpiderLoader"
+def _get_spider_loader(settings):
+    cls_path = settings["SPIDER_MANAGER_CLASS"]
     loader_cls = load_object(cls_path)
     try:
         verifyClass(ISpiderLoader,loader_cls)
@@ -152,4 +154,6 @@ def _get_spider_loader():
     return loader_cls.from_settings()
 
 
-
+s = Setting()
+c = _get_spider_loader(s)
+print(c._spiders)

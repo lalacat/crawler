@@ -1,1 +1,0 @@
-LOG_FORMATTER = "AAA"

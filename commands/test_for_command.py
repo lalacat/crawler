@@ -3,7 +3,6 @@ from pkgutil import iter_modules
 import inspect
 import sys,os
 from exceptions import UsageError
-from setting import BaseSettings
 import optparse
 
 

@@ -4,7 +4,7 @@ os.chdir("..")
 path = os.getcwd()
 sys.path.append(path)
 from commands import test_command3
-from setting import BaseSettings
+from test.setting import BaseSettings
 parser = argparse.ArgumentParser(prog="Command",
                                  formatter_class=argparse.RawTextHelpFormatter,
                                  conflict_handler='resolve',
