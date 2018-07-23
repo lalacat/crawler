@@ -1,5 +1,5 @@
 import json
-import conf
+import conf,copy
 from importlib import import_module
 from test.setting import default_setting
 
@@ -102,6 +102,9 @@ class BaseSettings(object):
     def __contains__(self, item):
         return item in self.attributes
 
+    def __len__(self):
+        return len(self.attributes)
+
     def get(self, name, default=None):
         return self[name] if self[name] is not None else default
 
@@ -161,6 +164,7 @@ class BaseSettings(object):
                 for name, value in values.item():
                     self.set(name, value, values.getpriority(name))
             else:
+                print(type(values))
                 for name, value in values.items():
                     self.set(name, value, priority)
 
@@ -220,27 +224,40 @@ class BaseSettings(object):
         if priority >= self.getpriority(name):
             del self.attributes[name]
 
-class Setting(BaseSettings):
-    '''
-    导入默认的设置文件
-    '''
+    def copy(self):
+        #对当前设置进行深度复制，为的是根据不同的对象，可能在个别的配置上存在着不同
 
+        return copy.deepcopy(self)
+
+
+class Setting(BaseSettings):
+    """导入默认的设置文件"""
     def __init__(self,value=None,priority="project"):
         super(Setting,self).__init__()
         #将默认的配置导入进来
         self.setmodule(default_setting,'default')
 
-        for  name,value in self:
-            if isinstance(value,dict):
+        for name,val in self:
+            if isinstance(val,dict):
                 self.set(name,BaseSettings(value,"default"),'default')
         self.update(value,priority)
 
 
 
 def iter_default_settings():
-    #导入默认的配置文件dir()返回的list类型的数据
-
+    """导入默认的配置文件dir()返回的list类型的数据"""
     for name in dir(default_setting):
         if name.isupper():
             yield name,getattr(default_setting, name)
 
+def overridden_or_new_settings(settings):
+    """返回添加的或者重写的配置"""
+    for name,value in settings:
+        if name in dir(default_setting):
+            print("name is here")
+
+    for name, defvalue in iter_default_settings():
+        print(name,defvalue)
+        value = settings[name]
+        if not isinstance(defvalue, dict) and value != defvalue:
+            yield name, value

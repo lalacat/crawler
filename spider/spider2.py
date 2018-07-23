@@ -2,7 +2,7 @@ from spider import BaseSpider,Request,Spider
 from test.public_api.web import get_smzdm_datas
 
 
-class Spider2(Spider):
+class Spider2(BaseSpider):
     name = "task2"
     url = 'https://www.smzdm.com/homepage/json_more?p='
 

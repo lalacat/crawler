@@ -4,7 +4,7 @@ from test.public_api.web import get_smzdm_datas,print_smzdm_result
 
 class Spider1(Spider):
     name = "task1"
-    url = 'https://www.smzdm.com/homepage/json_more?p='
+    custom_settings = ["URL = 'https://www.smzdm.com/homepage/json_more?p='"]
 
     def __init__(self):
         #self.q = queue.Queue()

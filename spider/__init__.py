@@ -7,19 +7,21 @@ import logging
 class BaseSpider(object):
     def __init__(self,**kwargs):
         self.name = type(self).__name__
-        #将kwargs参数绑定到实例上，不会报错：AttributeError: 'BaseSpider' object has no attribute 'd'
+        """将kwargs参数绑定到实例上，不会报错：AttributeError: 'BaseSpider' object has no attribute 'd'"""
         self.__dict__.update(kwargs)
+
+
 class Request(object):
     def __init__(self, url, parse):
         self.url = url
         self.parse = parse
 
 
-
-
-
 class Spider(object_ref):
     name = None
+    """真对部分爬虫有单独的用户设置，用户设置类型是["key1=value1","key2=value2"]"""
+    custom_settings = None
+
     def __init__(self,name=None,**kwargs):
         if name is not None:
             self.name = name
@@ -39,6 +41,11 @@ class Spider(object_ref):
         spider = cls(*args,**kwargs)
         spider._set_crawler(crawler)
         return spider
+
+    @classmethod
+    def update_settings(cls, settings):
+        settings.setdict(cls.custom_settings or {}, priority='spider')
+
 
     def _set_crawler(self,crawler):
         self.crawler = crawler

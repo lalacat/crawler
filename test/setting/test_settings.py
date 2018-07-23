@@ -7,3 +7,4 @@ for name,value in iter_default_settings():
 
 s = Setting()
 #print(s.attributes)
+print(s["TEST1"])

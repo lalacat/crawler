@@ -3,14 +3,16 @@ from test.framework.crawler import Crawler,_get_spider_loader
 from test.framework.record_live_instances import print_live_refs
 from twisted.internet.defer import DeferredList
 from twisted.internet import reactor
-cls = _get_spider_loader()
+from test.setting import Setting
+s = Setting()
+cls = _get_spider_loader(s)
 
 _active = set()
 for name, module in cls._spiders.items():
     print(name,module)
-    crawler = Crawler(module)
+    crawler = Crawler(module,s)
     #spider = crawler._create_spider()
-    d = crawler.crwal()
+    d = crawler.crawl()
     _active.add(d)
 
 

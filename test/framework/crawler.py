@@ -5,7 +5,7 @@ from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
 from test.framework.engine import ExecutionEngine
 import time
-from test.setting import Setting
+from test.setting import overridden_settings
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -18,8 +18,13 @@ class Crawler(object):
         self.crawling = False
         self.spider = None
         self.engine = None
+        #导入的是爬虫对应的模块，不是名称
         self.spidercls = spidercls
-
+        self.settings = settings.copy()
+        self.spidercls.update_settings(self.settings)
+        d = dict(overridden_settings(self.settings))
+        print(d)
+        logger.info("添加或重写的设置如下：%(settings)r",{'setting':d})
 
     @inlineCallbacks
     def crawl(self,*args,**kwargs):
@@ -154,6 +159,3 @@ def _get_spider_loader(settings):
     return loader_cls.from_settings()
 
 
-s = Setting()
-c = _get_spider_loader(s)
-print(c._spiders)
