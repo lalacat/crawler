@@ -202,11 +202,8 @@ class BaseSettings(object):
             # 针对name存在的情况，只需要对对应的SettingsAttribute实例更新value和priority即可
             self.attributes[name].set(value, priority)
 
-
     def setdict(self, values, priority="project"):
-        '''
-        针对name1=value1,...,类型的的参数values 是list类型
-        '''
+        """针对name1=value1,...,类型的的参数values 是list类型"""
         values = conf.arglist_to_dict(values)
         '''
         for k, v in values.items():
@@ -224,7 +221,6 @@ class BaseSettings(object):
             if key.isupper():
                 self.set(key,getattr(module,key),priority)
 
-
     def delete(self, name, priority='project'):
         self._assert_mutability()
         priority = get_settings_priority(priority)
@@ -232,8 +228,7 @@ class BaseSettings(object):
             del self.attributes[name]
 
     def copy(self):
-        #对当前设置进行深度复制，为的是根据不同的对象，可能在个别的配置上存在着不同
-
+        """对当前设置进行深度复制，为的是根据不同的对象，可能在个别的配置上存在着不同"""
         return copy.deepcopy(self)
 
 
@@ -241,14 +236,12 @@ class Setting(BaseSettings):
     """导入默认的设置文件"""
     def __init__(self,value=None,priority="project"):
         super(Setting,self).__init__()
-        #将默认的配置导入进来
+        """将默认的配置导入进来"""
         self.setmodule(default_setting,'default')
-
         for name,val in self:
             if isinstance(val,dict):
                 self.set(name,BaseSettings(value,"default"),'default')
         self.update(value,priority)
-
 
 
 def iter_default_settings():
@@ -257,21 +250,18 @@ def iter_default_settings():
         if name.isupper():
             yield name,getattr(default_setting, name)
 
+
 def overridden_or_new_settings(settings):
     """返回添加的或者重写的配置"""
-
     for name,value in settings:
-        #检查新写入
+        """检查新写入"""
         if dir(default_setting).__contains__(name):
-            #检查重写入
+            """检查重写入"""
             defvalue = getattr(default_setting, name)
             if not isinstance(defvalue, dict) and settings[name] != defvalue:
                 yield name, value
         else :
             yield name, value
-
-
-
     '''
         for name, defvalue in iter_default_settings():
         print(name,defvalue)
