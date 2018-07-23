@@ -2,6 +2,8 @@ import json
 import conf,copy
 from importlib import import_module
 from test.setting import default_setting
+import logging
+logger = logging.getLogger(__name__)
 
 SETTINGG_PRIORITIES = {
     'default': 0,
@@ -153,6 +155,7 @@ class BaseSettings(object):
             将类如'{"a":"b"}'的字符串转变为{"a":"b"}字典型
             """
             values = json.loads(values)
+            print("update:",values)
         if values is not None:
             # 这个条件判断，是满足，其他的命令的setiing能绑定到当前实例的setting
             # 例如public_command.setting中的name:value都绑定好优先级
@@ -161,12 +164,13 @@ class BaseSettings(object):
             # 因为此时传入的values是BaseSetting的实例，数据结构是 {name:<SettingsAttribute value=True priority=40>}
             # 是包含name,value,priority,因此set中的priority是根据name来取得的等价于self.attributes[name].priority
             if isinstance(values, BaseSettings):
-                for name, value in values.item():
+                for name, value in values.items():
                     self.set(name, value, values.getpriority(name))
             else:
-                print(type(values))
+                logger.warning(values)
                 for name, value in values.items():
-                    self.set(name, value, priority)
+                    '''防止空格的存在导致有相同的name'''
+                    self.set(name.strip(), value, priority)
 
     def set(self, name, value, priority="project"):
         """
@@ -186,6 +190,7 @@ class BaseSettings(object):
         """
         priority = get_settings_priority(priority)
         if name not in self:
+
             # 如果value是SettingsAttribute实例的话，直接存入字典中就行了
             if isinstance(value, SettingsAttribute):
 
@@ -198,24 +203,26 @@ class BaseSettings(object):
             self.attributes[name].set(value, priority)
 
 
-    def setdict(self, values, priority):
+    def setdict(self, values, priority="project"):
         '''
-        针对name1=value1,...,类型的的参数
+        针对name1=value1,...,类型的的参数values 是list类型
         '''
         values = conf.arglist_to_dict(values)
-        print(values)
+        '''
         for k, v in values.items():
             self.set(k.strip(), v, priority)
+        '''
+        self.update(values,priority)
+
 
 
     def setmodule(self,module,priority='project'):
-
+        '''用于导入默认的设置包或者自定义的设置文件'''
         if isinstance(module,str):
             module = import_module(module)
-
         for key in dir(module):
             if key.isupper():
-                self.set(key,getattr(module,key),property)
+                self.set(key,getattr(module,key),priority)
 
 
     def delete(self, name, priority='project'):
@@ -252,12 +259,23 @@ def iter_default_settings():
 
 def overridden_or_new_settings(settings):
     """返回添加的或者重写的配置"""
-    for name,value in settings:
-        if name in dir(default_setting):
-            print("name is here")
 
-    for name, defvalue in iter_default_settings():
+    for name,value in settings:
+        #检查新写入
+        if dir(default_setting).__contains__(name):
+            #检查重写入
+            defvalue = getattr(default_setting, name)
+            if not isinstance(defvalue, dict) and settings[name] != defvalue:
+                yield name, value
+        else :
+            yield name, value
+
+
+
+    '''
+        for name, defvalue in iter_default_settings():
         print(name,defvalue)
         value = settings[name]
         if not isinstance(defvalue, dict) and value != defvalue:
             yield name, value
+    '''

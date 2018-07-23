@@ -3,7 +3,6 @@ from twisted.python import failure
 from test.framework.record_live_instances import object_ref
 import logging
 
-
 class BaseSpider(object):
     def __init__(self,**kwargs):
         self.name = type(self).__name__
