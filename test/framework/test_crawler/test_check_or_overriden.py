@@ -25,7 +25,7 @@ d = dict(overridden_or_new_settings(new_s))
 
 
 
-logging.info("Overridden settings: %(settings)r\r", {'settings': d})
+logging.info("Overridden settings:\n %(settings)r", {'settings': d})
 
 '''
 

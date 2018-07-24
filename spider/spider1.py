@@ -4,13 +4,13 @@ from test.public_api.web import get_smzdm_datas,print_smzdm_result
 
 class Spider1(Spider):
     name = "task1"
-    custom_settings = ["URL = 'https://www.smzdm.com/homepage/json_more?p='"]
+    custom_settings = ["URL = https://www.smzdm.com/homepage/json_more?p="]
 
     def __init__(self):
         #self.q = queue.Queue()
         #Spider.__init__(self)
         super(Spider1,self).__init__()
-        self.num = 0
+        self.url = self.settings["URL"]
 
     def start_requests(self):
         start_url = list()
@@ -19,8 +19,6 @@ class Spider1(Spider):
             i = str(i)
             u = self.url + i
             start_url.append(u)
-
-        self. num = start_url.__len__()
 
         for url in start_url:
             yield Request(url,self._parse)
@@ -32,5 +30,5 @@ class Spider1(Spider):
             print_smzdm_result(list,url)
             #list.append({"url":url})
         except Exception as e:
-            print(e)
+            self.logger(e)
         return list

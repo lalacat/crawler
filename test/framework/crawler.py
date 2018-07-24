@@ -23,12 +23,11 @@ class Crawler(object):
         self.settings = settings.copy()
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
-        print(d)
-        logger.info("添加或重写的设置如下：%(settings)r",{'setting':d})
+        logger.info("添加或重写的设置如下：\n %(settings)r",{'settings':d})
 
     @inlineCallbacks
     def crawl(self,*args,**kwargs):
-        print("into crawler.crawl")
+        #print("into crawler.crawl")
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
 

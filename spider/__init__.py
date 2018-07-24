@@ -3,6 +3,9 @@ from twisted.python import failure
 from test.framework.record_live_instances import object_ref
 import logging
 
+logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+
+
 class BaseSpider(object):
     def __init__(self,**kwargs):
         self.name = type(self).__name__
@@ -43,6 +46,7 @@ class Spider(object_ref):
 
     @classmethod
     def update_settings(cls, settings):
+        cls.settings = settings
         settings.setdict(cls.custom_settings or {}, priority='spider')
 
 

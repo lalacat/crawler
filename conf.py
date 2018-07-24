@@ -6,4 +6,4 @@ def arglist_to_dict(arglist):
     :param arglist:["key=value"]列表,传入参数的类型必须是list
     :return: 返回一个dict
     """
-    return dict(x.split('=',1).strip() for x in arglist)
+    return dict(x.split('=',1) for x in arglist)

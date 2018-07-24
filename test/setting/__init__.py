@@ -4,6 +4,7 @@ from importlib import import_module
 from test.setting import default_setting
 import logging
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
 SETTINGG_PRIORITIES = {
     'default': 0,
@@ -167,10 +168,9 @@ class BaseSettings(object):
                 for name, value in values.items():
                     self.set(name, value, values.getpriority(name))
             else:
-                logger.warning(values)
                 for name, value in values.items():
                     '''防止空格的存在导致有相同的name'''
-                    self.set(name.strip(), value, priority)
+                    self.set(name.strip(), value.strip(), priority)
 
     def set(self, name, value, priority="project"):
         """

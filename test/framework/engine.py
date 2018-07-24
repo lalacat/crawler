@@ -5,7 +5,8 @@ from urllib.parse import quote
 from test.framework.url_convert import safe_url_string
 
 import logging
-LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+#LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 logger = logging.getLogger(__name__)
@@ -87,7 +88,6 @@ class ExecutionEngine(object):
             #d.addCallback(self.print_web)
 
             d.addCallback(req.parse,req.url)
-            d.addCallback(self.print_web)
             d.addCallback(self.finish_crawl, req)
             if db is not None:
                 d.addCallback(db.insert_mongoDb)
@@ -112,7 +112,6 @@ class ExecutionEngine(object):
     def finish_crawl(self,content,req):
         logger.info("finish")
         self.crawlling.remove(req)
-        #print(len(self.crawlling))
         return content
 
     def crawl_err(self,content,req):
@@ -146,9 +145,8 @@ class ExecutionEngine(object):
         yield self._close
 
     def  _finish_stopping_engine(self):
-        print("finish")
+        logger.info("finish")
         self._close.callback(None)
     def stop(self):
-        print("stop")
-        print(self._close.callbacks)
+        logger.info("stop")
         self._close.callback(None)
