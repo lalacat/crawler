@@ -5,7 +5,7 @@ from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
 from test.framework.engine import ExecutionEngine
 import time
-from test.setting import overridden_or_new_settings
+from test.framework.setting import overridden_or_new_settings
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

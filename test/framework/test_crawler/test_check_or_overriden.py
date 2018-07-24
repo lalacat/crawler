@@ -1,8 +1,5 @@
 from test.framework.crawler import _get_spider_loader
-from twisted.internet.defer import DeferredList
-from twisted.internet import reactor
-from test.setting import Setting,overridden_or_new_settings
-from conf import arglist_to_dict
+from test.framework.setting import Setting,overridden_or_new_settings
 import logging
 logging.basicConfig(level=logging.DEBUG)
 

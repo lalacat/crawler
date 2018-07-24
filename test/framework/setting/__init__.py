@@ -1,7 +1,7 @@
 import json
 import conf,copy
 from importlib import import_module
-from test.setting import default_setting
+from test.framework.setting import default_setting
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
@@ -237,7 +237,7 @@ class Setting(BaseSettings):
     def __init__(self,value=None,priority="project"):
         super(Setting,self).__init__()
         """将默认的配置导入进来"""
-        self.setmodule(default_setting,'default')
+        self.setmodule(default_setting, 'default')
         for name,val in self:
             if isinstance(val,dict):
                 self.set(name,BaseSettings(value,"default"),'default')

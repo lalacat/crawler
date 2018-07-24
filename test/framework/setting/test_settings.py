@@ -1,4 +1,4 @@
-from test.setting import iter_default_settings,Setting
+from test.framework.setting import iter_default_settings,Setting
 
 
 for name,value in iter_default_settings():
