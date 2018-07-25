@@ -100,7 +100,6 @@ class SpiderLoader(object):
                     issubclass(obj, Spider) and \
                     obj.__module__ == module.__name__ and \
                     getattr(obj,"name",None):
-                logger.debug(type(obj))
                 yield obj
 
     def load(self,spider_name):

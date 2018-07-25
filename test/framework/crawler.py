@@ -1,4 +1,5 @@
 from twisted.internet.defer import inlineCallbacks,maybeDeferred,DeferredList
+from twisted.internet import reactor
 import logging
 from test.framework.test_import.test_loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
@@ -21,6 +22,7 @@ class Crawler(object):
         self.engine = None
         #导入的是爬虫对应的模块，不是名称
         self.spidercls = spidercls
+        logger.debug(type(settings))
         self.settings = settings.copy()
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
@@ -94,17 +96,21 @@ defer外层闭环是由CrawlerRunner的_crawl中得到d-->_done
 
 
 class CrawlerRunner(object):
+
     def __init__(self,settings=None):
         if isinstance(settings,dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
+        logger.debug(type(self.settings))
         self.spider_loder = _get_spider_loader(settings)
+        #装载的是Crawler的集合
         self._crawlers = set()
+        #装载的是defer的集合
         self._active = set()
 
-    def crawl(self,crawler_or_spidercls,):
+    def crawl(self,crawler_or_spidercls, *args, **kwargs):
         crawler = self.create_crawler(crawler_or_spidercls)
-        return self._crawl(crawler)
+        return self._crawl(crawler,*args, **kwargs)
 
     def _crawl(self,crawler,*args,**kwargs):
         self._crawlers.add(crawler)
@@ -128,13 +134,17 @@ class CrawlerRunner(object):
         '''
         if isinstance(crawler_or_spidercls,Crawler):
             return crawler_or_spidercls
-        return Crawler(crawler_or_spidercls)
+        return self._create_crawler(crawler_or_spidercls)
 
     def _create_crawler(self,spidercls):
         #判断传入的参数是自定义爬虫的name还是对应的class模块
         if isinstance(spidercls,str):
             spidercls = self.spider_loder.load(spidercls)
-        return Crawler(spidercls)
+        return Crawler(spidercls,self.settings)
+
+    def stop(self):
+
+        return DeferredList([c.stop() for c in list(self._crawlers)])
 
     @inlineCallbacks
     def join(self):
@@ -152,8 +162,8 @@ class CrawlerProcess(CrawlerRunner):
     各种操作信号在这个类中完成注册。
 
     """
-    def __init__(self):
-        super(CrawlerProcess,self).__init__()
+    def __init__(self,settings=None):
+        super(CrawlerProcess,self).__init__(settings)
 
     def start(self,stop_after_crawl = True):
 
@@ -161,7 +171,25 @@ class CrawlerProcess(CrawlerRunner):
             d = self.join()
             if d.called:
                 return
-        
+            d.addBoth(self._stop_reactor)
+
+        # 对reactor进行定制化处理，只能针对ipv4，设置一个内部解释器用于域名的查找
+        #reactor.installResolver(self._get_dns_resolver())
+        # 返回一个线程池twisted.python.threadpool.ThreadPool,和python的原生类Thread有关
+        tp = reactor.getThreadPool()
+        # 调节线程池的大小adjustPoolsize(self, minthreads=None, maxthreads=None)
+        tp.adjustPoolsize(maxthreads=self.settings.getint('REACTOR_THREADPOOL_MAXSIZE'))
+
+        # 添加系统事件触发事件当系统关闭的时候，系统事件激活之前，reactor将会被激活进行停止的操作
+        reactor.addSystemEventTrigger('before', 'shutdown', self.stop)
+        reactor.run(installSignalHandlers=False)  # blocking call
+
+
+    def _stop_reactor(self,_=None):
+        try:
+            reactor.stop()
+        except RuntimeError:
+            pass
 
 
 

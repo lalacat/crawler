@@ -139,6 +139,9 @@ class BaseSettings(object):
                              "are 0/1, True/False, '0'/'1', "
                              "'True'/'False' and 'true'/'false'")
 
+    def getint(self,name,default=0):
+        return int(self.get(name,default))
+
 
     def update(self, values, priority='project'):
         """
