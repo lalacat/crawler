@@ -1,11 +1,12 @@
-from twisted.internet.defer import inlineCallbacks,maybeDeferred
+from twisted.internet.defer import inlineCallbacks,maybeDeferred,DeferredList
 import logging
 from test.framework.test_import.test_loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
 from test.framework.engine import ExecutionEngine
 import time
-from test.framework.setting import overridden_or_new_settings
+from test.framework.setting import overridden_or_new_settings,Setting
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -93,8 +94,11 @@ defer外层闭环是由CrawlerRunner的_crawl中得到d-->_done
 
 
 class CrawlerRunner(object):
-    def __init__(self):
-        self.spider_loder = _get_spider_loader()
+    def __init__(self,settings=None):
+        if isinstance(settings,dict) or settings is None:
+            settings = Setting(settings)
+        self.settings = settings
+        self.spider_loder = _get_spider_loader(settings)
         self._crawlers = set()
         self._active = set()
 
@@ -132,13 +136,32 @@ class CrawlerRunner(object):
             spidercls = self.spider_loder.load(spidercls)
         return Crawler(spidercls)
 
+    @inlineCallbacks
+    def join(self):
+        """
+        当所有的crawler完成激活之后，返回已经激活的defer的列表
+        """
+        while self._active:
+            yield DeferredList(self._active)
+
 
 class CrawlerProcess(CrawlerRunner):
+    """
+    这个类主要是用来完成多个爬虫能够同时进行的功能，核心就是取得DeferredList，然后执行reactor.run()。
+    包含了reator的配置，启动，停止，
+    各种操作信号在这个类中完成注册。
+
+    """
     def __init__(self):
         super(CrawlerProcess,self).__init__()
 
+    def start(self,stop_after_crawl = True):
 
-
+        if stop_after_crawl:
+            d = self.join()
+            if d.called:
+                return
+        
 
 
 

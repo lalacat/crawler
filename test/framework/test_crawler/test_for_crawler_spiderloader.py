@@ -7,7 +7,6 @@ cls = _get_spider_loader(s)
 
 _active = set()
 for name, module in cls._spiders.items():
-    print(name,module)
     crawler = Crawler(module,s)
     #spider = crawler._create_spider()
     d = crawler.crawl()
@@ -15,6 +14,8 @@ for name, module in cls._spiders.items():
 
 
 dd = DeferredList(_active)
+if dd.called:
+    print("have called")
 
 #dd.addCallback(lambda _ :reactor.callLater(5,crawler.stop))
 #dd.addCallback(crawler.stop)

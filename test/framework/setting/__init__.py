@@ -234,14 +234,14 @@ class BaseSettings(object):
 
 class Setting(BaseSettings):
     """导入默认的设置文件"""
-    def __init__(self,value=None,priority="project"):
+    def __init__(self,values=None,priority="project"):
         super(Setting,self).__init__()
         """将默认的配置导入进来"""
         self.setmodule(default_setting, 'default')
         for name,val in self:
             if isinstance(val,dict):
-                self.set(name,BaseSettings(value,"default"),'default')
-        self.update(value,priority)
+                self.set(name,BaseSettings(values,"default"),'default')
+        self.update(values,priority)
 
 
 def iter_default_settings():
