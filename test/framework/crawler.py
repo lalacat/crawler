@@ -1,10 +1,10 @@
 from twisted.internet.defer import inlineCallbacks,maybeDeferred,DeferredList
 from twisted.internet import reactor
 import logging
-from test.framework.test_import.test_loadobject import load_object
+from test.framework.test_import.loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
-from test.framework.engine.engine import ExecutionEngine
+from test.framework.engine.test_engine import ExecutionEngine
 import time
 from test.framework.setting import overridden_or_new_settings,Setting
 
@@ -27,6 +27,10 @@ class Crawler(object):
         d = dict(overridden_or_new_settings(self.settings))
         logger.info("添加或重写的设置如下：\n %(settings)r",{'settings':d})
 
+        #获取log的格式
+        lf_cls = load_object(self.settings['LOG_FORMATTER'])
+        self.logformatter = lf_cls.from_crawler(self)
+
     @inlineCallbacks
     def crawl(self,*args,**kwargs):
         assert not self.crawling, "已经开始爬虫了........"
@@ -36,6 +40,7 @@ class Crawler(object):
             self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
+            yield self.engine.start()
             yield self.engine.open_spider(self.spider,start_requests)
             '''
             此函数的功能就是如果作为其参数返回值为defer，那么其不作任何处理，原样将defer返回。
@@ -64,8 +69,8 @@ class Crawler(object):
     """
     def _create_engine(self):
         logger.info("爬虫引擎已创建")
-        #return ExecutionEngine(self,lambda _: self.stop())
-        return ExecutionEngine()
+        return ExecutionEngine(self,lambda _: self.stop())
+        #return ExecutionEngine()
 
     def _create_spider(self,*args, **kwargs):
         logger.info("爬虫：%s 已创建" %self.spidercls.name)

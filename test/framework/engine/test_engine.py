@@ -3,19 +3,27 @@ from twisted.web.client import getPage
 from queue import Queue
 from urllib.parse import quote
 from test.framework.url_convert import safe_url_string
-import logging
-#LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+import logging,time
+
+
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 logger = logging.getLogger(__name__)
+
 class ExecutionEngine(object):
     """
     引擎：所有调度
     """
 
-    def __init__(self):
-        #print("引擎初始化")
+    def __init__(self,crawler,spider_closed_callback):
+        logger.debug("引擎初始化")
+        self.crawler =crawler
+        self.settings = crawler.settings
+        #获取log的格式
+        self.logformatter = crawler.logformatter
+
+        self.running = False
         self._close = None
         self.scheduler = None
         #self.max = 5
@@ -23,6 +31,25 @@ class ExecutionEngine(object):
         self.crawlling = []
 
 
+    @defer.inlineCallbacks
+    def start(self):
+        assert not self.running,"引擎已启动"
+        self.start_time = time.time(2.3)
+        print(self.start_time)
+        logger.debug("engine start: %{time}r",{'time':self.start_time})
+
+        print("kaishi")
+        #yield 信号处理
+        self.running = True
+
+
+        self._closewait = defer.Deferred()
+        yield self._closewait
+
+
+    def stop(self):
+        logger.info("stop")
+        self._close.callback(None)
 
     def _next_request(self,spider_name="default_task",db=None):
         '''
@@ -95,7 +122,6 @@ class ExecutionEngine(object):
     #将爬虫中的网页读取出来
     def open_spider(self,spider,start_requests,db=None):
         logger.info("分解spider")
-        self.scheduler = Scheduler(spider.name)
         yield self.scheduler.open()
         while True:
             try:
@@ -108,16 +134,8 @@ class ExecutionEngine(object):
                 logger.error("在对spider网页导入的操作的过程中出现错误",e)
             self.scheduler.put_request(req)
 
-    @defer.inlineCallbacks
-    def start(self,spider):
-        logger.info("engine start")
-        self._close = defer.Deferred()
-        reactor.callLater(0,self._next_request,spider.name)
-        yield self._close
 
     def  _finish_stopping_engine(self):
         logger.info("finish")
         self._close.callback(None)
-    def stop(self):
-        logger.info("stop")
-        self._close.callback(None)
+
