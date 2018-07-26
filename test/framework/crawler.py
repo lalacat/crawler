@@ -4,7 +4,7 @@ import logging
 from test.framework.test_import.test_loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
-from test.framework.engine import ExecutionEngine
+from test.framework.engine.engine import ExecutionEngine
 import time
 from test.framework.setting import overridden_or_new_settings,Setting
 
@@ -22,7 +22,6 @@ class Crawler(object):
         self.engine = None
         #导入的是爬虫对应的模块，不是名称
         self.spidercls = spidercls
-        logger.debug(type(settings))
         self.settings = settings.copy()
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
@@ -30,7 +29,6 @@ class Crawler(object):
 
     @inlineCallbacks
     def crawl(self,*args,**kwargs):
-        #print("into crawler.crawl")
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
 
@@ -143,7 +141,12 @@ class CrawlerRunner(object):
         return Crawler(spidercls,self.settings)
 
     def stop(self):
+        #停止
+        """
+        Stops simultaneously all the crawling jobs taking place.
 
+        Returns a deferred that is fired when they all have ended.
+        """
         return DeferredList([c.stop() for c in list(self._crawlers)])
 
     @inlineCallbacks
@@ -162,8 +165,8 @@ class CrawlerProcess(CrawlerRunner):
     各种操作信号在这个类中完成注册。
 
     """
-    def __init__(self,settings=None):
-        super(CrawlerProcess,self).__init__(settings)
+    def __init__(self):
+        super(CrawlerProcess,self).__init__()
 
     def start(self,stop_after_crawl = True):
 
@@ -179,6 +182,7 @@ class CrawlerProcess(CrawlerRunner):
         tp = reactor.getThreadPool()
         # 调节线程池的大小adjustPoolsize(self, minthreads=None, maxthreads=None)
         tp.adjustPoolsize(maxthreads=self.settings.getint('REACTOR_THREADPOOL_MAXSIZE'))
+
 
         # 添加系统事件触发事件当系统关闭的时候，系统事件激活之前，reactor将会被激活进行停止的操作
         reactor.addSystemEventTrigger('before', 'shutdown', self.stop)

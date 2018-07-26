@@ -113,13 +113,10 @@ class BaseSettings(object):
 
     def getbool(self, name, default=False):
         """
-        Get a setting value as a boolean.
+        将设定值转化为boolean类型的值：
+        1，'1'，True,'true','True'都返回的是True
+        0,'0',False,'false','False'都返回的是False
 
-        ``1``, ``'1'``, `True`` and ``'True'`` return ``True``,
-        while ``0``, ``'0'``, ``False``, ``'False'`` and ``None`` return ``False``.
-
-        For example, settings populated through environment variables set to
-        ``'0'`` will return ``False`` when using this method.
 
         :param name: the setting name
         :type name: string
@@ -135,13 +132,12 @@ class BaseSettings(object):
                 return True
             if got in ("False", "false"):
                 return False
-            raise ValueError("Supported values for boolean settings "
-                             "are 0/1, True/False, '0'/'1', "
+            raise ValueError("仅支持以下的值为boolean类型的值返回 "
+                             " 0/1, True/False, '0'/'1', "
                              "'True'/'False' and 'true'/'false'")
 
     def getint(self,name,default=0):
         return int(self.get(name,default))
-
 
     def update(self, values, priority='project'):
         """
