@@ -1,4 +1,4 @@
-from twisted.internet import defer,reactor
+from twisted.internet import defer,reactor,task
 from twisted.web.client import getPage
 from queue import Queue
 from urllib.parse import quote
@@ -10,6 +10,54 @@ LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 logger = logging.getLogger(__name__)
+
+class Slot(object):
+    """
+    爬虫过程中，管理爬虫的
+    """
+    def __init__(self,start_requests,close_if_idle,nextcall,scheduler):
+        """
+
+        :param start_requests: 获取Spider中的爬虫网站
+        :param close_if_idle:
+        :param nextcall:
+        :param scheduler:
+        """
+        self.closing = False
+        self.inprogress = set() #存放正在爬虫的网站,保证每个defer都执行完
+        self.start_requests = start_requests
+        self.close_if_idle = close_if_idle
+        self.nextcall = nextcall
+        self.scheduler = scheduler
+        # 不断调用方法，通过start和stop控制调用的启停
+        self.heartbeat = task.LoopingCall(nextcall.schedule)
+
+    def add_request(self, request):
+        """
+
+        :param request:
+        :return:
+        """
+        self.inprogress.add(request)
+
+    def remove_request(self, request):
+        self.inprogress.remove(request)
+        self._maybe_fire_closing()
+
+    def close(self):
+        self.closing = defer.Deferred()
+        self._maybe_fire_closing()
+        return self.closing
+
+    def _maybe_fire_closing(self):
+        if self.closing and not self.inprogress:
+            if self.nextcall:
+                self.nextcall.cancel()
+                if self.heartbeat.running:
+                    self.heartbeat.stop()
+            self.closing.callback(None)
+
+
 
 class ExecutionEngine(object):
     """
@@ -23,39 +71,43 @@ class ExecutionEngine(object):
         #获取log的格式
         self.logformatter = crawler.logformatter
 
+        self.slot = None
+        self.spider = None
         self.running = False
-        self._close = None
-        self.scheduler = None
-        #self.max = 5
-        #保证每个defer都执行完
-        self.crawlling = []
 
+        self.scheduler = None
+
+        self.crawlling = []
+        self._spider_closed_callback = spider_closed_callback
 
     @defer.inlineCallbacks
     def start(self):
-        assert not self.running,"引擎已启动"
-        self.start_time = time.time(2.3)
+        assert not self.running,"引擎已启动" #running为Flase的时候，不报错，为True的时候，报错
+        self.start_time = time.time()
         print(self.start_time)
-        logger.debug("engine start: %{time}r",{'time':self.start_time})
+        logger.info("engine start: %d",self.start_time)
 
-        print("kaishi")
         #yield 信号处理
         self.running = True
-
 
         self._closewait = defer.Deferred()
         yield self._closewait
 
 
     def stop(self):
-        logger.info("stop")
-        self._close.callback(None)
+        assert self.running,"引擎没有运行"
+        logger.info("停止引擎")
+        self.running = False
+        self._closewait.callback(None)
 
-    def _next_request(self,spider_name="default_task",db=None):
-        '''
-        :param kargs: name ,
+    def _next_request(self,spider):
+        """
+        爬虫爬网页的主要运行方法
+        :param spider:
         :return:
-        '''
+        """
+        solt = self.slot
+
         if self.scheduler.qsize() != 0 :
             logger.info("爬虫：%s 还剩下%d个网页"%(spider_name,self.scheduler.qsize()))
 

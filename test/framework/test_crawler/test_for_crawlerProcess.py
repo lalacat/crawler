@@ -15,3 +15,4 @@ for name, module in cp.spider_loder._spiders.items():
     cp.crawl(module)
 
 cp.start()
+cp.stop()
