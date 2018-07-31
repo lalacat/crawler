@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class Slot(object):
     """
-    爬虫过程中，管理爬虫的
+    爬虫过程中，爬虫引擎的插槽
     """
     def __init__(self,start_requests,close_if_idle,nextcall,scheduler):
         """
@@ -50,6 +50,11 @@ class Slot(object):
         return self.closing
 
     def _maybe_fire_closing(self):
+        """
+        当执行close方法后，self.closing不为False，而且要保证在执行的爬虫任务都要完成的情况下，
+        才能够停止心跳函数
+        :return:
+        """
         if self.closing and not self.inprogress:
             if self.nextcall:
                 self.nextcall.cancel()
@@ -108,6 +113,15 @@ class ExecutionEngine(object):
         """
         solt = self.slot
 
+        #
+        while not self._needs_backout():
+            pass
+
+        if solt.start_requests and not self._needs_backout():
+            pass
+
+        '''
+        
         if self.scheduler.qsize() != 0 :
             logger.info("爬虫：%s 还剩下%d个网页"%(spider_name,self.scheduler.qsize()))
 
@@ -150,6 +164,18 @@ class ExecutionEngine(object):
             return None
         except Exception as e :
             logger.error("Exception",e)
+    '''
+    def _needs_backout(self):
+        slot = self.slot
+        """
+        判断爬虫的状态：只要有一个False返回False,全True返回True
+        1.引擎是否正在运行
+        2.爬虫的状态管理类是否关闭了
+        """
+        return not self.running \
+            or slot.closing \
+            #or self.downloader.needs_backout() \
+            #or self.scraper.slot.needs_backout()
 
     def print_web(self,content):
 

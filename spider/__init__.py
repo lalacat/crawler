@@ -38,6 +38,11 @@ class Spider(object_ref):
         #使用LoggerAdapter类来传递上下文信息到日志事件的信息中
         return logging.LoggerAdapter(logger,{"爬虫":self})
 
+    def log(self,message,level=logging.DEBUG,**kw):
+
+        self.logger.log(level,message,**kw)
+
+
     @classmethod
     def from_crawler(cls,crawler,*args,**kwargs):
         spider = cls(*args,**kwargs)
