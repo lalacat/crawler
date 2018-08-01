@@ -113,10 +113,14 @@ class ExecutionEngine(object):
         """
         solt = self.slot
 
-        #
+        # 是否等待
         while not self._needs_backout():
+            # 从scheduler中获取request
+            # 注意：第一次获取时，是没有的，也就是会break出来
+            # 从而执行下面的逻辑
             pass
 
+        # 如果start_requests有数据且不需要等待
         if solt.start_requests and not self._needs_backout():
             pass
 
@@ -168,9 +172,12 @@ class ExecutionEngine(object):
     def _needs_backout(self):
         slot = self.slot
         """
-        判断爬虫的状态：只要有一个False返回False,全True返回True
+        判断爬虫的状态判断是否需要等待：
+        只要有一个False返回False,全True返回True
         1.引擎是否正在运行
         2.爬虫的状态管理类是否关闭了
+        3.downloader下载超过预设
+        4.scraper处理response超过预设
         """
         return not self.running \
             or slot.closing \
