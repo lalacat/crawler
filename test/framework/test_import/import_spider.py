@@ -2,7 +2,7 @@ import sys,os, inspect
 from pkgutil import iter_modules
 from importlib import import_module
 from spider import BaseSpider,BaseQylSpider
-
+import logging
 
 class Spider(object):
     def __init__(self,projectName,path="spider"):
@@ -48,7 +48,7 @@ class Spider(object):
         spiders.append(spider)
 
         if hasattr(spider, "__path__"):
-            print(spider.__path__)
+            logging.info(spider.__path__)
 
             for _, subpath, ispkg in iter_modules(spider.__path__):
                 # 取得模块的绝对路径

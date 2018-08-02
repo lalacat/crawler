@@ -9,8 +9,8 @@ from twisted.internet.defer import DeferredList
 class QylSpider(BaseQylSpider):
     name = "QYL-1"
     url =  "http://www.qyl63.com/recent/"
-    db_name = "QYL"
-    db_flag = True
+    #db_name = "QYL"
+    #db_flag = True
     def __init__(self):
         #self.q = queue.Queue()
         self.num = 0
