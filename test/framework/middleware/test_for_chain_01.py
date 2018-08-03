@@ -15,7 +15,7 @@ class SpiderMiddlewareManager(object):
 
     def process_start_requests(self, start_requests, spider):
         logger.info("process_start_requests")
-        return process_chain(start_requests, spider)
+        return process_chain({},start_requests, spider)
 
 def process_chain(callbacks, input, *a, **kw):
     print("""Return a Deferred built by chaining the given callbacks""")
