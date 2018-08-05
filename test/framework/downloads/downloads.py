@@ -5,6 +5,7 @@ class HttpsDownloadHandler(object):
 from twisted.web.client import HTTPClientFactory
 from twisted.web.http import HTTPClient
 from twisted.internet import reactor
+from test.framework.downloads.parse_url import _parsed
 
 def getPage(url, contextFactory=None, *args, **kwargs):
     """Download a web page as a string.
@@ -14,8 +15,9 @@ def getPage(url, contextFactory=None, *args, **kwargs):
 
     See HTTPClientFactory to see what extra args can be passed.
     """
-    scheme, host, port, path = _parse(url)
-    factory = HTTPClientFactory(url, *args, **kwargs)
+    scheme, host, port, path = _parsed(url)
+    print(host,port)
+    factory = HTTPClientFactory(url.encode('utf-8'), *args, **kwargs)
     if scheme == 'https':
         from twisted.internet import ssl
         if contextFactory is None:

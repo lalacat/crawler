@@ -26,13 +26,14 @@ def _parsed_url_agrs(parsed):
     scheme = b(parsed.scheme)
     netloc = b(parsed.netloc)
     # 将urlparse分解的各个变量合成标准的url
-    path = urlunparse('','',parsed.path or '/',parsed.params,parsed.query,'')
+    path = urlunparse(['','',parsed.path or '/',parsed.params,parsed.query,''])
     path = b(path)
+    print(path)
     host = b(parsed.hostname)
     port = parsed.port
     if port is None:
         port = 443 if scheme == b'https' else 80
-    return scheme, netloc, host, port, path
+    return scheme, host, port, path
 
 def _parsed(url):
     """
@@ -45,7 +46,9 @@ def _parsed(url):
     parsed = urlparse(url)
     return _parsed_url_agrs(parsed)
 
+'''
 url = "https://www.chapters.indigo.ca/en-ca/books/amazon-sucks-donkey-balls/9780470170779-item.html"
 url2 = "http://www.cnblogs.com:8800/shuchao/"
 parsed = _parsed(url)
 print(parsed)
+'''
