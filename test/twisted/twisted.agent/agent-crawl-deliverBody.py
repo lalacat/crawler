@@ -30,7 +30,7 @@ def cbRequest(response):
     print('Response phrase:', response.phrase)
     ''''''
     finished = defer.Deferred()
-    datas = response.deliverBody(BeginningPrinter(finished))
+    response.deliverBody(BeginningPrinter(finished))
     return finished
     #d = readBody(response)
     #d.addCallback(print_web)
