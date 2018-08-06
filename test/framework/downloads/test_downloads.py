@@ -26,3 +26,11 @@ def getPage(url, contextFactory=None, *args, **kwargs):
     else:
         reactor.connectTCP(host, port, factory)
     return factory.deferred
+
+def print_fun(content):
+    print(content)
+d = getPage("https://www.smzdm.com/homepage/json_more?p=1")
+print(type(d))
+d.addCallback(print_fun)
+
+reactor.run()

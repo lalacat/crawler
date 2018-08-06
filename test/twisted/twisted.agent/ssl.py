@@ -7,7 +7,7 @@ from twisted.internet.ssl import optionsForClientTLS
 
 from twisted.web.iweb import IPolicyForHTTPS
 from twisted.web.client import Agent, ResponseFailed, BrowserLikePolicyForHTTPS
-
+'''
 @implementer(IPolicyForHTTPS)
 class OneHostnameWorkaroundPolicy(object):
     def __init__(self):
@@ -20,10 +20,11 @@ class OneHostnameWorkaroundPolicy(object):
 @react
 def main(reactor):
     agent = Agent(reactor, OneHostnameWorkaroundPolicy())
-    requested = agent.request(b"GET", sys.argv[1].encode("ascii"))
+    requested = agent.request(b"GET",b"https://www.baidu.com")
     def gotResponse(response):
         print(response.code)
     def noResponse(failure):
         failure.trap(ResponseFailed)
         print(failure.value.reasons[0].getTraceback())
     return requested.addCallbacks(gotResponse, noResponse)
+'''

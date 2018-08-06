@@ -11,7 +11,7 @@ from twisted.web.http_headers import Headers
 class BeginningPrinter(Protocol):
     def __init__(self, finished):
         self.finished = finished
-        self.remaining = 1024 * 10
+        self.remaining = 1024 * 100
 
     def dataReceived(self, bytes):
         if self.remaining:
@@ -26,8 +26,8 @@ class BeginningPrinter(Protocol):
 
 agent = Agent(reactor)
 d = agent.request(
-    'GET',
-    'http://example.com/'.encode('utf-8'),
+    b'GET',
+    b'http://example.com/',
     Headers({'User-Agent': ['Twisted Web Client Example']}),
     None)
 

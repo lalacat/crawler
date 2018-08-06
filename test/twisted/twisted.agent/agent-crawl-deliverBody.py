@@ -5,9 +5,11 @@ from twisted.web.http_headers import Headers
 from zope.interface import implementer
 from twisted.web.iweb import IBodyProducer
 from twisted.internet.protocol import Protocol
+from pprint import pformat
+
 import json
 import time
-from test.public_api.web import get_need_datas,print_result,end_crawl
+from test.public_api.web import get_smzdm_datas,print_smzdm_result,end_crawl
 headers = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
                   'content-type':["application/json"]})
 
@@ -20,13 +22,13 @@ class WebClientContextFactory(ClientContextFactory):
         return ClientContextFactory.getContext(self)
 
 def cbRequest(response):
-    '''
+
     print('Response version:', response.version)
     print('Response headers:')
     print(pformat(list(response.headers.getAllRawHeaders())))
     print('Response code:', response.code)
     print('Response phrase:', response.phrase)
-    '''
+    ''''''
     finished = defer.Deferred()
     datas = response.deliverBody(BeginningPrinter(finished))
     return finished
@@ -76,13 +78,14 @@ contextFactory = WebClientContextFactory()
 agent = Agent(reactor, contextFactory)
 result = list()
 t1 = time.time()
-for i in range(50):
+for i in range(1):
     i = str(i)
     u = url + i
+    print(u)
     d = agent.request(b"GET", u.encode("utf-8"))
     d.addCallback(cbRequest)
-    d.addCallback(get_need_datas)
-    d.addCallback(print_result,u)
+    d.addCallback(get_smzdm_datas)
+    d.addCallback(print_smzdm_result,u)
     result.append(d)
 
 dd = defer.DeferredList(result)
