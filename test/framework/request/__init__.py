@@ -9,7 +9,7 @@ class Request(object_ref):
         self._encoding = encoding  # this one has to be set first
         self.method = str(method).upper()
         self._set_url(url)
-        self._set_body(body)
+        self.body = body
 
         if callback is not None and callable(callback):
             raise TypeError('callback 回调函数必须是可执行的，得到的是：%s',type(callback).__name__)
@@ -47,20 +47,41 @@ class Request(object_ref):
 
     url = property(_get_url,_set_url)
 
-    def _get_body(self):
+    @property
+    def body(self):
         return self._body
 
-    def _set_body(self,body):
+    @body.setter
+    def body(self,body):
         if body is None:
             self._body = b''
         else:
             self._body = to_bytes(body,self.encoding)
 
-    body = property(_get_body,_set_body)
+    #body = property(_get_body,_set_body)
 
     @property
-    def enconding(self):
+    def encoding(self):
         return self._encoding
+
+    def __str__(self):
+        return "<%s %s>" %(self.method,self.url)
+
+    __repr__ = __str__
+
+    def copy(self):
+        return self.replace()
+
+    def replace(self, *args, **kwargs):
+        """Create a new Request with the same attributes except for those
+        given new values.
+        """
+        for x in ['url', 'method', 'headers', 'body', 'cookies', 'meta',
+                  'encoding', 'priority', 'dont_filter', 'callback', 'errback']:
+            kwargs.setdefault(x, getattr(self, x))
+        cls = kwargs.pop('cls', self.__class__)
+        return cls(*args, **kwargs)
+
 r = Request(":www.ddd.com")
 r._meta = {"aaa":"cccc"}
 print(r.url)
@@ -71,3 +92,4 @@ r.body = "asdfsaf"
 print(r.body)
 r.body = None
 print(r.body)
+print(r)
