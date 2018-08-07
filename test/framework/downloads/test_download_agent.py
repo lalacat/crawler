@@ -31,6 +31,10 @@ class DownloadAgent(object):
                            bindAddress=self._bindAddress,
                            pool=self._pool)
 
+    def download_request(self,request):
+        timeout = request.meta.get('download_timeout') or self._connectTimeout
+        agent = self._getAgent()
+
     
 contextFactory = DownloaderClientContextFactory()
 headers = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],

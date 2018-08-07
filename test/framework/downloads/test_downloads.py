@@ -3,9 +3,8 @@ class HttpsDownloadHandler(object):
         pass
 
 from twisted.web.client import HTTPClientFactory
-from twisted.web.http import HTTPClient
 from twisted.internet import reactor
-from test.framework.downloads.parse_url import _parsed
+from test.framework.request.parse_url import _parsed
 
 def getPage(url, contextFactory=None, *args, **kwargs):
     """Download a web page as a string.
