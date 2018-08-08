@@ -3,7 +3,7 @@ from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
 from twisted.web.http_headers import Headers
 from zope.interface import implementer
-from twisted.web.iweb import IBodyProducer
+from twisted.web.iweb import IBodyProducer,UNKNOWN_LENGTH
 from twisted.internet.protocol import Protocol
 from pprint import pformat
 
@@ -29,8 +29,17 @@ def cbRequest(response):
     print('Response code:', response.code)
     print('Response phrase:', response.phrase)
     '''
-    finished = defer.Deferred()
+    if response.length == 0:
+        print("length: ",response.length)
+
+    expected_size  = response.length if response.length is not UNKNOWN_LENGTH else -1
+    print(expected_size)
+    def _cancel(_):
+        print("father _cancel")
+        response._transport._producer.abortConnection()
+    finished = defer.Deferred(_cancel)
     response.deliverBody(BeginningPrinter(finished))
+    #finished.addCallback(print_web)
     return finished
     #d = readBody(response)
     #d.addCallback(print_web)
@@ -52,6 +61,7 @@ class BeginningPrinter(Protocol):
         self.finished = finished
         #用来保存传输的数据，当数据完整后可以使用json转换为python对象
         self.result = bytes()
+        self.num = 0
 
     def dataReceived(self, datas):
         '''
@@ -60,6 +70,8 @@ class BeginningPrinter(Protocol):
         因为传输的datas并不是一次性传输完的，所以不能直接使用json转换，而是当数据全部传输完毕后，使用json.loads()
         这时候就不涉及到转码和转义字符的问题了。
         '''
+        self.num += 1
+
         self.result += datas
 
     def connectionLost(self, reason):
@@ -81,7 +93,7 @@ t1 = time.time()
 
 d = agent.request(b"GET", url.encode("utf-8"))
 d.addCallback(cbRequest)
-d.addCallback(print_web)
+#d.addCallback(print_web)
 result.append(d)
 
 dd = defer.DeferredList(result)

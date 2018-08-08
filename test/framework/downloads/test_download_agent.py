@@ -1,7 +1,7 @@
 from twisted.web.client import Agent,readBody
 from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
-from twisted.web.iweb import IBodyProducer
+from twisted.web.iweb import IBodyProducer,UNKNOWN_LENGTH
 from twisted.web._newclient import Response
 from twisted.web.http_headers import Headers
 from urllib.parse import urldefrag
@@ -27,6 +27,7 @@ class DownloadAgent(object):
         self._connectTimeout = connectTimeout
         self._bindAddress = bindAddress
         self._pool = pool
+        self._transferdata = None
 
     def _getAgent(self,timeout):
 
@@ -63,7 +64,8 @@ class DownloadAgent(object):
         """记录延迟时间"""
         request.meta['download_latency'] = time() - start_time
         return result
-    def _cbRequest(self,response):
+    def _cbRequest(self,transferdata):
+        '''
         print('Response _transport', response._transport)
         print('Response version:', response.version)
         print('Response code:', response.code)
@@ -71,8 +73,16 @@ class DownloadAgent(object):
         print('Response phrase:', response._bodyBuffer)
         print('Response headers:')
         print(pformat(list(response.headers)))
+        '''
+        if transferdata.length == 0:
+            print("length: ", transferdata.length)
 
-        d = readBody(response)
+        expected_size = transferdata.length if transferdata.length is not UNKNOWN_LENGTH else -1
+        def _cancel(_):
+            transferdata._transport._producer.abortConnection()
+
+        d = defer.Deferred(_cancel)
+        transferdata.deliverBody()
         return d
 
 @implementer(IBodyProducer)
