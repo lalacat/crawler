@@ -9,7 +9,7 @@ class Request(object_ref):
         self._encoding = encoding  # this one has to be set first
         self.method = str(method).upper()
         self._set_url(url)
-        self.body = body
+        self.body = body #用于存储发送给网站的内容
 
         if callback is not None and callable(callback):
             raise TypeError('callback 回调函数必须是可执行的，得到的是：%s',type(callback).__name__)

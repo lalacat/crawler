@@ -2,7 +2,7 @@ from twisted.web.client import Agent, readBody
 from twisted.internet import reactor, defer
 from twisted.internet.ssl import ClientContextFactory
 from twisted.web.http_headers import Headers
-import time
+import time,json
 from test.public_api.web import get_smzdm_datas, print_smzdm_result, end_crawl
 
 headers = Headers({'User-Agent': ['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
@@ -27,20 +27,30 @@ def cbRequest(response,url):
     '''
 
     d = readBody(response)
-    d.addCallback(get_smzdm_datas)
-    d.addCallback(print_smzdm_result,url)
+    d.addCallback(print_web)
+    #d.addCallback(get_smzdm_datas)
+    #d.addCallback(print_smzdm_result,url)
     return d
 
 
-url = 'https://www.smzdm.com/homepage/json_more?p='
+def print_web(result):
+    print("finish")
+    data = str(result)
+    print(type(data))
+    print(data)
+
+    pass
+    return
+
+url = 'http://www.zimuzu.io/'
 contextFactory = WebClientContextFactory()
 
 agent = Agent(reactor, contextFactory)
 result = list()
 t1 = time.time()
-for i in range(50):
+for i in range(1):
     i = str(i)
-    u = url + i
+    u = url
     d = agent.request(b"GET", u.encode("utf-8"))
     d.addCallback(cbRequest,u)
     #d.addCallback(get_need_datas)

@@ -1,13 +1,15 @@
 from twisted.web.client import Agent,readBody
 from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
-from urllib.parse import urldefrag
-from twisted.internet.defer import Deferred
-from pprint import pformat
+from twisted.web.iweb import IBodyProducer
+from twisted.web._newclient import Response
 from twisted.web.http_headers import Headers
+from urllib.parse import urldefrag
+from zope.interface import implementer
+import time
+from pprint import pformat
 from test.framework.request.parse_url import to_bytes
 
-from twisted.web._newclient import Response
 
 class DownloaderClientContextFactory(ClientContextFactory):
 
@@ -41,6 +43,56 @@ class DownloadAgent(object):
         url = urldefrag(request.url)[0]
         method = to_bytes(request.method)
         headers = request.headers
+
+        if request.body:
+            bodyproducer = _RequestBodyProducer(request.body)
+        elif method == b'POST':
+            bodyproducer = _RequestBodyProducer(b'')
+        else :
+            bodyproducer = None
+        start_time = time()
+
+        d = agent.request(method,
+              to_bytes(url),
+              headers,
+              bodyproducer)
+        d.addCallback(self._cb_latency,request,start_time)
+        d.addCallback(self._cbRequest)
+
+    def _cb_latency(self,result,request, start_time):
+        """记录延迟时间"""
+        request.meta['download_latency'] = time() - start_time
+        return result
+    def _cbRequest(self,response):
+        print('Response _transport', response._transport)
+        print('Response version:', response.version)
+        print('Response code:', response.code)
+        print('Response phrase:', response.phrase)
+        print('Response phrase:', response._bodyBuffer)
+        print('Response headers:')
+        print(pformat(list(response.headers)))
+
+        d = readBody(response)
+        return d
+
+@implementer(IBodyProducer)
+class _RequestBodyProducer(object):
+
+    def __init__(self, body):
+        self.body = body
+        self.length = len(body)
+
+    def startProducing(self, consumer):
+        consumer.write(self.body)
+        return defer.succeed(None)
+
+    def pauseProducing(self):
+        pass
+
+    def stopProducing(self):
+        pass
+
+
 
 '''
 
