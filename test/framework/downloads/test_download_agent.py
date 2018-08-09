@@ -80,6 +80,8 @@ class DownloadAgent(object):
         print('Response headers:')
         print(pformat(list(response.headers)))
         '''
+        # 如果返回的response的Headers中包含了Content-Length，返回一个具体的数值
+        # 如果Headers中不包含的话就是UNKNOWN_LENGTH
         if transferdata.length == 0:
             print("length: ", transferdata.length)
 
@@ -95,7 +97,8 @@ class DownloadAgent(object):
             error_args = {'url': request.url,"size":expected_size,'maxsize':maxsize}
 
             logger.error(error_msg,error_args)
-            t
+            #twisted.protocols.tls.TLSMemoryBIOProtocol 的方法
+            transferdata._transport._producer.loseConnection()
 
         def _cancel(_):
             transferdata._transport._producer.abortConnection()
