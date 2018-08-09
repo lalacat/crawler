@@ -4,12 +4,15 @@ from twisted.internet.ssl import ClientContextFactory
 from twisted.web.iweb import IBodyProducer,UNKNOWN_LENGTH
 from twisted.web._newclient import Response
 from twisted.web.http_headers import Headers
+from twisted.internet.protocol import Protocol
+
 from urllib.parse import urldefrag
 from zope.interface import implementer
-import time
+import time,json,logging
 from pprint import pformat
 from test.framework.request.parse_url import to_bytes
 
+logger = logging.getLogger(__name__)
 
 class DownloaderClientContextFactory(ClientContextFactory):
 
@@ -22,12 +25,15 @@ class DownloadAgent(object):
     _Agent = Agent
 
     def __init__(self,contextFactory=None, connectTimeout= 10, bindAddress=None,
-                 pool=None):
+                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=True):
         self._contextFactory = contextFactory
         self._connectTimeout = connectTimeout
         self._bindAddress = bindAddress
         self._pool = pool
         self._transferdata = None
+        self._maxsize = maxsize # 规定最大的下载信息，防止下载的网页内容过大，占资源
+        self._warnsize = warnsize# 给下载的网页设置一个警戒线
+        self._fail_on_dataloss = fail_on_dataloss
 
     def _getAgent(self,timeout):
 
@@ -64,7 +70,7 @@ class DownloadAgent(object):
         """记录延迟时间"""
         request.meta['download_latency'] = time() - start_time
         return result
-    def _cbRequest(self,transferdata):
+    def _cbRequest(self,transferdata,request):
         '''
         print('Response _transport', response._transport)
         print('Response version:', response.version)
@@ -77,7 +83,20 @@ class DownloadAgent(object):
         if transferdata.length == 0:
             print("length: ", transferdata.length)
 
+        #若meta中不存的'download_maxsize'这个值的话，会自动赋上默认值self._maxsize
+        maxsize = request.meta.get('download_maxsize',self._maxsize)
+        warnsize = request.meta.get('download_warnsize',self._warnsize)
         expected_size = transferdata.length if transferdata.length is not UNKNOWN_LENGTH else -1
+        fail_on_dataloss = request.meta.get('download_fail_on_dataloss', self._fail_on_dataloss)
+
+        #x and y布尔"与" - 如果 x 为 False，x and y 返回 False，否则它返回 y 的计算值。
+        if maxsize and expected_size > maxsize :
+            error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
+            error_args = {'url': request.url,"size":expected_size,'maxsize':maxsize}
+
+            logger.error(error_msg,error_args)
+            t
+
         def _cancel(_):
             transferdata._transport._producer.abortConnection()
 
@@ -103,6 +122,31 @@ class _RequestBodyProducer(object):
         pass
 
 
+@implementer(IBodyProducer)
+class BeginningPrinter(Protocol):
+    def __init__(self, finished):
+        self.finished = finished
+        #用来保存传输的数据，当数据完整后可以使用json转换为python对象
+        self.result = bytes()
+        self.num = 0
+
+    def dataReceived(self, datas):
+        '''
+        直接传输的数据datas为bytes类型的，不加解码转化为str类型是带有转义符号'\':(\'\\u5929\\u732b\\u7cbe\\u9009\')
+        datas进行了decode("utf-8")解码后，数据变成了('\u5929\u732b\u7cbe\u9009'),此时解码后的数据类型是str
+        因为传输的datas并不是一次性传输完的，所以不能直接使用json转换，而是当数据全部传输完毕后，使用json.loads()
+        这时候就不涉及到转码和转义字符的问题了。
+        '''
+        self.num += 1
+
+        self.result += datas
+
+    def connectionLost(self, reason):
+        print('Finished receiving body:', reason.getErrorMessage())
+        r = json.loads(self.result)
+        #callback(data)调用后，能够向defer数据链中传入一个list数据：[True，传入的参数data]，可以实现将获取的
+        #body传输到下一个函数中去
+        self.finished.callback(r)
 
 '''
 

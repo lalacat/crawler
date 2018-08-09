@@ -19,8 +19,8 @@ print("d4",d4)
 print("d5",d5)
 print("d6",d6)
 
-maxnum = 90
-expect = -1
+maxnum = 1212
+expect = 132
 # 哪个小取值哪个，90 and -1 = -1 ，0 and -1 = 0
 a = maxnum and expect
 print(a)

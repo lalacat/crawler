@@ -38,7 +38,7 @@ def cbRequest(response):
         print("father _cancel")
         response._transport._producer.abortConnection()
     finished = defer.Deferred(_cancel)
-    response.deliverBody(BeginningPrinter(finished))
+    response.deliverBody(BeginningPrinter(finished,response))
     #finished.addCallback(print_web)
     return finished
     #d = readBody(response)
@@ -57,11 +57,12 @@ def print_web(result):
 
 @implementer(IBodyProducer)
 class BeginningPrinter(Protocol):
-    def __init__(self, finished):
+    def __init__(self, finished,response):
         self.finished = finished
         #用来保存传输的数据，当数据完整后可以使用json转换为python对象
         self.result = bytes()
         self.num = 0
+        self._response = response
 
     def dataReceived(self, datas):
         '''
@@ -71,7 +72,13 @@ class BeginningPrinter(Protocol):
         这时候就不涉及到转码和转义字符的问题了。
         '''
         self.num += 1
-
+        '''
+        
+        
+        if self.num == 3:
+            print(self.num)
+            self._response._transport._producer.abortConnection()
+        '''
         self.result += datas
 
     def connectionLost(self, reason):
