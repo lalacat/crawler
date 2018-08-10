@@ -6,10 +6,17 @@ from zope.interface import implementer
 from twisted.web.iweb import IBodyProducer
 from twisted.internet.protocol import Protocol
 from pprint import pformat
-from twisted.web._newclient import Response
+from io import BytesIO
+
 import json
-import time
+import time,logging
 from test.public_api.web import get_smzdm_datas,print_smzdm_result,end_crawl
+
+LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
+
+
 headers = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
                   'content-type':["application/json"]})
 
@@ -21,25 +28,17 @@ class WebClientContextFactory(ClientContextFactory):
     def getContext(self, hostname, port):
         return ClientContextFactory.getContext(self)
 
-def cbRequest(response,u,i):
-    '''
+def cbRequest(response,url):
+
     print('Response version:', response.version)
     print('Response headers:')
     print(pformat(list(response.headers.getAllRawHeaders())))
     print('Response code:', response.code)
     print('Response phrase:', response.phrase)
-    '''
-    print("i", i)
-    if i == "0":
-        print("loseConnection")
-        error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
-        error_args = {'url':u , "size": "10m", 'maxsize': "1020m"}
-
-        # twisted.protocols.tls.TLSMemoryBIOProtocol 的方法
-        response._transport._producer.loseConnection()
-        raise defer.CancelledError(error_msg % error_args)
+    ''''''
     finished = defer.Deferred()
-    response.deliverBody(BeginningPrinter(finished,i,response))
+    response.deliverBody(BeginningPrinter(finished,url))
+    finished.addErrback(lambda a:print("error",a))
     return finished
     #d = readBody(response)
     #d.addCallback(print_web)
@@ -57,13 +56,14 @@ def print_web(result):
 
 @implementer(IBodyProducer)
 class BeginningPrinter(Protocol):
-    def __init__(self, finished,i,response):
+    def __init__(self, finished,url):
         self.finished = finished
         #用来保存传输的数据，当数据完整后可以使用json转换为python对象
-        self.result = bytes()
-        self.num = i
-        self.time = 0
-        self.response = response
+        self._bodybuf = BytesIO()
+        self._bytes_received = 0
+        self._maxsize = 1000
+        self._request = url
+
 
     def dataReceived(self, datas):
         '''
@@ -72,19 +72,27 @@ class BeginningPrinter(Protocol):
         因为传输的datas并不是一次性传输完的，所以不能直接使用json转换，而是当数据全部传输完毕后，使用json.loads()
         这时候就不涉及到转码和转义字符的问题了。
         '''
-        self.time += 1
-        if self.time == 3:
-            print("lose Connection")
-            temp =self.response._transport._producer
-            print(type(temp))
-            self.response._transport._producer.loseConnection()
-        self.result += datas
+        if self.finished.called:
+            return
+        if self._bytes_received >= 1000:
+            print("cancel")
+            #self.finished(None)
+
+        if self._maxsize and self._bytes_received > self._maxsize:
+            logging.info("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+                         "最大值(%(maxsize)s) bytes " % {
+                'request' : self._request,
+                'bytes' : self._bytes_received,
+                'maxsize' : self._maxsize
+            })
+            self.finished.cancel()
+        self._bytes_received += len(datas)
+        self._bodybuf.write(datas)
 
     def connectionLost(self, reason):
-        print('Finished receiving body:', self.num,reason.getErrorMessage())
-        print(len(self.result))
-
-        r = json.loads(self.result)
+        print('Finished receiving body:',self._bytes_received, reason.getErrorMessage())
+        result = self._bodybuf.getvalue()
+        r = json.loads(result)
         #callback(data)调用后，能够向defer数据链中传入一个list数据：[True，传入的参数data]，可以实现将获取的
         #body传输到下一个函数中去
         self.finished.callback(r)
@@ -98,16 +106,14 @@ contextFactory = WebClientContextFactory()
 agent = Agent(reactor, contextFactory)
 result = list()
 t1 = time.time()
-for i in range(3):
+for i in range(1):
     i = str(i)
     u = url + i
     print(u)
     d = agent.request(b"GET", u.encode("utf-8"))
-    d.addCallback(cbRequest,u,i)
-    d.addErrback(lambda result: print(result))
-
-    #d.addCallback(get_smzdm_datas)
-    #d.addCallback(print_smzdm_result,u)
+    d.addCallback(cbRequest,u)
+    d.addCallback(get_smzdm_datas)
+    d.addCallback(print_smzdm_result,u)
     result.append(d)
 
 dd = defer.DeferredList(result)

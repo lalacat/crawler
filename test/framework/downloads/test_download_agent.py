@@ -6,6 +6,7 @@ from twisted.web._newclient import Response
 from twisted.web.http_headers import Headers
 from twisted.internet.protocol import Protocol
 
+from io import BytesIO
 from urllib.parse import urldefrag
 from zope.interface import implementer
 import time,json,logging
@@ -99,13 +100,16 @@ class DownloadAgent(object):
             logger.error(error_msg,error_args)
             #twisted.protocols.tls.TLSMemoryBIOProtocol 的方法
             transferdata._transport._producer.loseConnection()
+            raise defer.CancelledError(error_msg % error_args)
 
         def _cancel(_):
             transferdata._transport._producer.abortConnection()
 
-        d = defer.Deferred(_cancel)
-        transferdata.deliverBody()
-        return d
+        finished = defer.Deferred(_cancel)
+        transferdata.deliverBody(_ResponseReader(
+            finished,transferdata,request,maxsize,warnsize,fail_on_dataloss
+        ))
+        return finished
 
 @implementer(IBodyProducer)
 class _RequestBodyProducer(object):
@@ -126,23 +130,55 @@ class _RequestBodyProducer(object):
 
 
 @implementer(IBodyProducer)
-class BeginningPrinter(Protocol):
-    def __init__(self, finished):
-        self.finished = finished
+class _ResponseReader(Protocol):
+    def __init__(self, finished,transferdata,request,maxsize,warnsize,fail_on_dataloss):
+        self._finished = finished
         #用来保存传输的数据，当数据完整后可以使用json转换为python对象
-        self.result = bytes()
-        self.num = 0
+        self._transferdata = transferdata
+        self._request = request
+        self._maxsize = maxsize
+        self._warnsize = warnsize
+        self._fail_on_dataloss = fail_on_dataloss
+        self._bytes_received = 0 # 记录body的大小
+        self._bodybuf = BytesIO() #记录body的内容
+
 
     def dataReceived(self, datas):
-        '''
+        """
         直接传输的数据datas为bytes类型的，不加解码转化为str类型是带有转义符号'\':(\'\\u5929\\u732b\\u7cbe\\u9009\')
         datas进行了decode("utf-8")解码后，数据变成了('\u5929\u732b\u7cbe\u9009'),此时解码后的数据类型是str
         因为传输的datas并不是一次性传输完的，所以不能直接使用json转换，而是当数据全部传输完毕后，使用json.loads()
         这时候就不涉及到转码和转义字符的问题了。
-        '''
-        self.num += 1
+        """
+        if self.finished.called:
+            return
 
-        self.result += datas
+        self._bodybuf.write(datas)
+        self._bytes_received += len(self._bytes_received)
+
+        if self._maxsize and self._bytes_received > self._maxsize:
+            logger.error("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+                         "最大值(%(maxsize)s) bytes " % {
+                'request' : self._request,
+                'bytes' : self._bytes_received,
+                'maxsize' : self._maxsize
+            })
+            # 当下载量超过最大值的时候，把数据缓存变量情况，取消下载
+            self._bodybuf.truncate(0)
+            #执行cancel()后，直接跳到connectionLost,并返回defer，
+            #注意的是，此defer之后的callbacks都不会被执行
+            self._finished.cancel()
+
+        if self._warnsize and self._bytes_received > self._warnsize:
+            self._reached_warnsize = True
+            logger.warning("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+                         "警戒值(%(warnsize)s) bytes " % {
+                'request' : self._request,
+                'bytes' : self._bytes_received,
+                'warnsize' : self._warnsize
+            })
+
+
 
     def connectionLost(self, reason):
         print('Finished receiving body:', reason.getErrorMessage())
