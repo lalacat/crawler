@@ -121,3 +121,4 @@ def add_or_replace_parameter(url, name, new_value):
     query = urlencode(new_args)
     return urlunsplit(parsed._replace(query=query))
 
+U = ""

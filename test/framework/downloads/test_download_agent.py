@@ -133,14 +133,14 @@ class _RequestBodyProducer(object):
 class _ResponseReader(Protocol):
     def __init__(self, finished,transferdata,request,maxsize,warnsize,fail_on_dataloss):
         self._finished = finished
-        #用来保存传输的数据，当数据完整后可以使用json转换为python对象
+        # 用来保存传输的数据，当数据完整后可以使用json转换为python对象
         self._transferdata = transferdata
         self._request = request
         self._maxsize = maxsize
         self._warnsize = warnsize
         self._fail_on_dataloss = fail_on_dataloss
-        self._bytes_received = 0 # 记录body的大小
-        self._bodybuf = BytesIO() #记录body的内容
+        self._bytes_received = 0  # 记录body的大小
+        self._bodybuf = BytesIO()  # 记录body的内容
 
 
     def dataReceived(self, datas):
@@ -165,8 +165,10 @@ class _ResponseReader(Protocol):
             })
             # 当下载量超过最大值的时候，把数据缓存变量情况，取消下载
             self._bodybuf.truncate(0)
-            #执行cancel()后，直接跳到connectionLost,并返回defer，
-            #注意的是，此defer之后的callbacks都不会被执行
+            """
+            执行cancel()后，直接跳到connectionLost,并返回defer，
+            注意的是，此defer之后的callbacks都不会被执行
+            """
             self._finished.cancel()
 
         if self._warnsize and self._bytes_received > self._warnsize:
