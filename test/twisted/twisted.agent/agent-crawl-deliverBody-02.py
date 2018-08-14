@@ -28,7 +28,8 @@ def cbRequest(response,u,i):
     print(pformat(list(response.headers.getAllRawHeaders())))
     print('Response code:', response.code)
     print('Response phrase:', response.phrase)
-    '''
+
+
     print("i", i)
     if i == "0":
         print("loseConnection")
@@ -44,6 +45,7 @@ def cbRequest(response,u,i):
 
         response._transport._producer.loseConnection()
         raise defer.CancelledError(error_msg % error_args)
+    '''
     finished = defer.Deferred()
     response.deliverBody(BeginningPrinter(finished,i,response))
     return finished
@@ -79,16 +81,22 @@ class BeginningPrinter(Protocol):
         这时候就不涉及到转码和转义字符的问题了。
         '''
         self.time += 1
+        ''' 
         if self.time == 3:
             print("lose Connection")
             temp =self.response._transport._producer
             print(type(temp))
             self.response._transport._producer.loseConnection()
+        '''
         self.result += datas
 
     def connectionLost(self, reason):
         print('Finished receiving body:', self.num,reason.getErrorMessage())
-        print(len(self.result))
+        #print(len(self.result))
+        print(" %s 数据有丢失，如果要处理这个错误的话，在默认设置中"
+              "将DOWNLOAD_FAIL_ON_DATALOSS = False"
+              %self.response.request.absoluteURI.decode())
+
 
         r = json.loads(self.result)
         #callback(data)调用后，能够向defer数据链中传入一个list数据：[True，传入的参数data]，可以实现将获取的

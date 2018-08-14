@@ -5,6 +5,8 @@ LOG_FORMATTER = "AAA"
 #A
 #B
 #C
+CONCURRENT_REQUESTS_PER_DOMAIN = 8 #  设置HTTPConnectionPool最大保持连接个数
+
 #D
 DOWNLOAD_TIMEOUT = 180      # 3mins
 

@@ -75,9 +75,11 @@ class BeginningPrinter(Protocol):
         if self.finished.called:
             return
         if self._bytes_received >= 1000:
-            print("cancel")
+            pass
+            #print("cancel")
             #self.finished(None)
 
+        '''
         if self._maxsize and self._bytes_received > self._maxsize:
             logging.info("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
                          "最大值(%(maxsize)s) bytes " % {
@@ -85,12 +87,15 @@ class BeginningPrinter(Protocol):
                 'bytes' : self._bytes_received,
                 'maxsize' : self._maxsize
             })
-            self.finished.cancel()
+            #self.finished.cancel()
+        '''
         self._bytes_received += len(datas)
         self._bodybuf.write(datas)
 
     def connectionLost(self, reason):
         print('Finished receiving body:',self._bytes_received, reason.getErrorMessage())
+        #for r in reason.value:
+
         result = self._bodybuf.getvalue()
         r = json.loads(result)
         #callback(data)调用后，能够向defer数据链中传入一个list数据：[True，传入的参数data]，可以实现将获取的

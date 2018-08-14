@@ -1,4 +1,5 @@
-from twisted.web.client import Agent,ResponseDone,ResponseFailed,HTTP11ClientProtocol
+from twisted.web.client import Agent,ResponseDone,ResponseFailed,\
+    HTTP11ClientProtocol,HTTPConnectionPool
 from twisted.web.http import _DataLoss, PotentialDataLoss
 from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
@@ -16,11 +17,42 @@ from test.framework.request.parse_url import to_bytes
 
 logger = logging.getLogger(__name__)
 
+
 class DownloaderClientContextFactory(ClientContextFactory):
+    """用于Https验证"""
 
     def getContext(self,host=None,port=None):
         print('getContext',host,port)
         return ClientContextFactory.getContext(self)
+
+
+class HTTPDownloadHandler(object):
+
+    def __init__(self,settings):
+        # 管理连接的，作用request完成后，connections不会自动关闭，而是保持在缓存中，再次被利用
+        self._pool = HTTPConnectionPool(reactor,persistent=True)
+        self._pool.maxPersistentPerHost = settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
+        self._pool._factory.noisy = False # 用于设置proxy代理
+
+        self._contextFactory = DownloaderClientContextFactory()
+
+        self._default_maxsize = settings.getint('DOWNLOAD_MAXSIZE')
+        self._default_warnsize = settings.getint('DOWNLOAD_WARNSIZE')
+        self._fail_on_dataloss = settings.getbool('DOWNLOAD_FAIL_ON_DATALOSS')
+        self._disconnect_timeout = 1
+
+    def download_request(self,request,spider):
+        """返回一个http download 的 defer"""
+        agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
+                              maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
+                              warnsize=getattr(spider,'download_warnsize',self._default_warnsize),
+                              fail_on_dataloss=self._fail_on_dataloss
+                              )
+        return agent.download_request(request)
+
+    def close(self):
+        #  关闭所有的永久连接，并将它们移除pool 返回是一个defer
+        d = self._pool.closeCachedConnections()
 
 
 class DownloadAgent(object):
@@ -72,6 +104,7 @@ class DownloadAgent(object):
         """记录延迟时间"""
         request.meta['download_latency'] = time() - start_time
         return result
+
     def _cbRequest(self,transferdata,request):
         '''
         print('Response _transport', response._transport)
@@ -140,6 +173,8 @@ class _ResponseReader(Protocol):
         self._maxsize = maxsize
         self._warnsize = warnsize
         self._fail_on_dataloss = fail_on_dataloss
+        self._fail_on_dataloss_warned = False
+
         self._bytes_received = 0  # 记录body的大小
         self._bodybuf = BytesIO()  # 记录body的内容
 
@@ -191,12 +226,32 @@ class _ResponseReader(Protocol):
             logger.error(e)
         #  针对不同的loss connection进行问题的处理
         if reason.check(ResponseDone): #  正常完成数据下载
-            self
-        print('Finished receiving body:', reason.getErrorMessage())
-        r = json.loads(self.result)
-        #callback(data)调用后，能够向defer数据链中传入一个list数据：[True，传入的参数data]，可以实现将获取的
-        #body传输到下一个函数中去
-        self.finished.callback(r)
+            logger.info('Finished receiving body:')
+            # callback(data)调用后，能够向defer数据链中传入一个list数据：
+            # [True，传入的参数data]，可以实现将获取的body传输到下一个函数中去
+            self._finished.callback((self._transferdata,body,None))
+            return
+
+        #  当body中没有设置Content-Length或者是Transfer-Encoding的时候，
+        # response传输完后，会引起这个错误
+        if reason.check(PotentialDataLoss):
+            self._finished.callback((self._transferdata,body,['partial']))
+            return
+
+        #  any(x)判断x对象是否为空对象，如果都为空、0、false，则返回false，如果不都为空、0、false，则返回true
+        if reason.check(ResponseFailed) and any(r.check(_DataLoss) for r in reason.value.reasons):
+            if not self._fail_on_dataloss:
+                self._finished.callback((self._transferdata,body,['dataloss']))
+                return
+
+            elif not self._fail_on_dataloss_warned :
+                logger.warning("%s 数据有丢失，如果要处理这个错误的话，在默认设置中"
+                               "将DOWNLOAD_FAIL_ON_DATALOSS = False"
+                               %self._transferdata.request.absoluteURI.decode())
+                self._fail_on_dataloss_warned = True
+
+        self._finished.errback(reason)
+
 
 '''
 
