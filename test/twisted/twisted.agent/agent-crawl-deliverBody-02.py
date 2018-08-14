@@ -35,7 +35,13 @@ def cbRequest(response,u,i):
         error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
         error_args = {'url':u , "size": "10m", 'maxsize': "1020m"}
 
-        # twisted.protocols.tls.TLSMemoryBIOProtocol 的方法
+        print("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+                         "警戒值(%(warnsize)s) bytes " % {
+                'request' : u,
+                'bytes' : 100,
+                'warnsize' : 90
+            })
+
         response._transport._producer.loseConnection()
         raise defer.CancelledError(error_msg % error_args)
     finished = defer.Deferred()

@@ -1,4 +1,5 @@
-from twisted.web.client import Agent,readBody
+from twisted.web.client import Agent,ResponseDone,ResponseFailed,HTTP11ClientProtocol
+from twisted.web.http import _DataLoss, PotentialDataLoss
 from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
 from twisted.web.iweb import IBodyProducer,UNKNOWN_LENGTH
@@ -142,7 +143,6 @@ class _ResponseReader(Protocol):
         self._bytes_received = 0  # 记录body的大小
         self._bodybuf = BytesIO()  # 记录body的内容
 
-
     def dataReceived(self, datas):
         """
         直接传输的数据datas为bytes类型的，不加解码转化为str类型是带有转义符号'\':(\'\\u5929\\u732b\\u7cbe\\u9009\')
@@ -180,9 +180,18 @@ class _ResponseReader(Protocol):
                 'warnsize' : self._warnsize
             })
 
-
-
     def connectionLost(self, reason):
+        if self._finished.called:
+            return
+
+        self._body = self._bodybuf.getvalue()
+        try:
+            body = json.loads(self._body)
+        except Exception as e :
+            logger.error(e)
+        #  针对不同的loss connection进行问题的处理
+        if reason.check(ResponseDone): #  正常完成数据下载
+            self
         print('Finished receiving body:', reason.getErrorMessage())
         r = json.loads(self.result)
         #callback(data)调用后，能够向defer数据链中传入一个list数据：[True，传入的参数data]，可以实现将获取的
