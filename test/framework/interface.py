@@ -13,6 +13,6 @@ class ISpiderLoader(Interface):
         """Return a list with the names of all spiders available in the
         project"""
     '''
-    def find_by_request(request):
-        """Return the list of spiders names that can handle the given request"""
+    def find_by_request(request_and_response):
+        """Return the list of spiders names that can handle the given request_and_response"""
     '''

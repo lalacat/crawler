@@ -3,10 +3,10 @@ from bs4 import BeautifulSoup
 
 '''
 headers = { 'User-Agent'  :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0' }
-req  = request.Request(url='https://www.smzdm.com/',headers=headers)
+req  = request_and_response.Request(url='https://www.smzdm.com/',headers=headers)
 
 
-html = request.urlopen(req)
+html = request_and_response.urlopen(req)
 
 bs_obj = BeautifulSoup(html.read(),"html.parser")
 '''

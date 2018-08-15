@@ -6,7 +6,7 @@ from lxml import etree
 pagewebXpath = 'body/div[@id="content"]/div/div[@id="feed-wrap"]/div/div[@class="feed-main-con"]'
 ulXpath = "body/div[@id='content']/div/div[@id='feed-wrap']/div/div[@class='feed-main-con']/ul[@id='feed-main-list']"
 def read_url(request,xpath):
-    #print(request.decode('utf-8'))
+    #print(request_and_response.decode('utf-8'))
     r_s = etree.HTML(request.decode('utf-8'))
     ul = r_s.xpath(xpath)[0].xpath('./div[@class="feed-pagenation"]/ul/li')
     print(ul)

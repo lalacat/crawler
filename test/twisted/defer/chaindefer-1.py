@@ -108,7 +108,7 @@ class Engine(object):
 
     def _next_request(self,spider):
         print("spider name:",spider.name)
-        print('----->request', Q.qsize())
+        print('----->request_and_response', Q.qsize())
         if Q.qsize() == 0 and len(self.crawlling) == 0:
             self._close.callback(None)
             return

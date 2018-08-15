@@ -1,7 +1,9 @@
 from test.framework.record_live_instances import object_ref
 from twisted.web.http_headers import Headers
 from test.framework.url_convert import safe_url_string,escape_ajax
-from test.framework.request.parse_url import to_bytes
+from test.framework.request_and_response.parse_url import to_bytes
+
+
 class Request(object_ref):
     def __init__(self,url,callback=None,method='GET',headers=None,
                 body=None,cookies=None,meta=None,encoding='UTF-8',
@@ -11,10 +13,10 @@ class Request(object_ref):
         self._set_url(url)
         self.body = body #用于存储发送给网站的内容
 
-        if callback is not None and callable(callback):
-            raise TypeError('callback 回调函数必须是可执行的，得到的是：%s',type(callback).__name__)
-        if errback is not None and callable(errback):
-            raise TypeError('errback 回调函数必须是可执行的，得到的是：%s', type(callback).__name__)
+        if callback is not None and not callable(callback):
+            raise TypeError('callback 回调函数必须是可执行的，得到的是：%s' % type(callback).__name__)
+        if errback is not None and not callable(errback):
+            raise TypeError('errback 回调函数必须是可执行的，得到的是：%s' % type(callback).__name__)
         assert callback or not errback,'不能只设置errback而没有callback'
         self.callback = callback
         self.errback = errback
@@ -58,7 +60,6 @@ class Request(object_ref):
         else:
             self._body = to_bytes(body,self.encoding)
 
-    #body = property(_get_body,_set_body)
 
     @property
     def encoding(self):
@@ -82,14 +83,36 @@ class Request(object_ref):
         cls = kwargs.pop('cls', self.__class__)
         return cls(*args, **kwargs)
 
-r = Request(":www.ddd.com")
-r._meta = {"aaa":"cccc"}
-print(r.url)
-r.url = "http://www.ddd.com"
-print(r.url)
-print(r.meta)
-r.body = "asdfsaf"
-print(r.body)
-r.body = None
-print(r.body)
-print(r)
+
+class Response(object_ref):
+
+    def __init__(self, url, status=200, headers=None, body=b'', flags=None, request=None):
+       self.headers = Headers(headers or {})
+       self.status = int(status)
+       self._set_body(body)
+       self._set_url(url)
+       self.requset = request
+       self.flags = [] if flags is None else list(flags)
+
+
+    @property
+    def meta(self):
+        try:
+            return self.requset.meta
+        except AttributeError:
+            raise AttributeError(
+                "Response.meta 不可用，这个response没有绑定任何的request"
+            )
+
+    def _get_url(self):
+        return self._url
+
+    def _set_url(self,url):
+        if isinstance(url,str):
+            self._url = url
+        else:
+            raise TypeError('%s url must be str, got %s:' % (type(self).__name__,
+                                                             type(url).__name__))
+    url = property(_get_url,_set_url)
+
+    

@@ -13,7 +13,7 @@ from urllib.parse import urldefrag
 from zope.interface import implementer
 import time,json,logging
 from pprint import pformat
-from test.framework.request.parse_url import to_bytes
+from test.framework.request_and_response.parse_url import to_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -111,23 +111,19 @@ class DownloadAgent(object):
               headers,
               bodyproducer)
         d.addCallback(self._cb_latency,request,start_time)
-        d.addCallback(self._cbRequest)
+
+        #  下载request.body
+        d.addCallback(self._cb_body_get,request)
+        d.addCallback(self._cb_body_done)
+
 
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
         request.meta['download_latency'] = time() - start_time
         return result
 
-    def _cbRequest(self,transferdata,request):
-        '''
-        print('Response _transport', response._transport)
-        print('Response version:', response.version)
-        print('Response code:', response.code)
-        print('Response phrase:', response.phrase)
-        print('Response phrase:', response._bodyBuffer)
-        print('Response headers:')
-        print(pformat(list(response.headers)))
-        '''
+    def _cb_body_get(self,transferdata,request):
+
         # 如果返回的response的Headers中包含了Content-Length，返回一个具体的数值
         # 如果Headers中不包含的话就是UNKNOWN_LENGTH
         if transferdata.length == 0:
@@ -157,6 +153,28 @@ class DownloadAgent(object):
             finished,transferdata,request,maxsize,warnsize,fail_on_dataloss
         ))
         return finished
+
+    def _cb_body_done(self,result):
+        txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
+        '''
+        print('Response _transport', response._transport)
+        print('Response version:', response.version)
+        print('Response code:', response.code)
+        print('Response phrase:', response.phrase)
+        print('Response phrase:', response._bodyBuffer)
+        print('Response headers:')
+        print(pformat(list(response.headers)))
+        '''
+        status = int(txresponse.code)
+        header = dict()
+        for k,v in txresponse.headers.getAllRawHeaders():
+            header[k] = v
+
+
+        return (body,status,header)
+
+
+
 
 @implementer(IBodyProducer)
 class _RequestBodyProducer(object):
@@ -207,7 +225,7 @@ class _ResponseReader(Protocol):
         if self._maxsize and self._bytes_received > self._maxsize:
             logger.error("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
                          "最大值(%(maxsize)s) bytes " % {
-                'request' : self._request,
+                'request_and_response' : self._request,
                 'bytes' : self._bytes_received,
                 'maxsize' : self._maxsize
             })
@@ -223,7 +241,7 @@ class _ResponseReader(Protocol):
             self._reached_warnsize = True
             logger.warning("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
                          "警戒值(%(warnsize)s) bytes " % {
-                'request' : self._request,
+                'request_and_response' : self._request,
                 'bytes' : self._bytes_received,
                 'warnsize' : self._warnsize
             })
@@ -272,7 +290,7 @@ contextFactory = DownloaderClientContextFactory()
 headers = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
                   'content-type':["application/json"]})
 agent = Agent(reactor, contextFactory)
-d = agent.request(b'GET',
+d = agent.request_and_response(b'GET',
               b'https://smzdm.com',
               headers=headers,
               )

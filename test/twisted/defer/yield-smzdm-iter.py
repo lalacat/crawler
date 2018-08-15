@@ -13,7 +13,7 @@ header = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) G
                   'content-type':["application/json"]})
 
 def read_url(request):
-    #print(request.decode('utf-8'))
+    #print(request_and_response.decode('utf-8'))
     r_s = etree.HTML(request.decode('utf-8'))
     ul = r_s.xpath("body/div[@id='content']/div/div[@id='feed-wrap']/div"
                      "/div[@class='feed-main-con']/ul[@id='feed-main-list']")[0].xpath('./li')

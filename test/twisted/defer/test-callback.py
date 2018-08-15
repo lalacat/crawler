@@ -57,7 +57,7 @@ if __name__ == "__main__":
     d2 = defer.Deferred()
     d1.addCallback(print1)
     d1.addCallback(print2)
-    r = Request("request",d1)
+    r = Request("request_and_response",d1)
     rep = HtttpRespose("content",r)
     result = r.parse.callback(rep)
     print(type(result))

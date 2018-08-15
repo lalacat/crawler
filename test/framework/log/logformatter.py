@@ -23,7 +23,7 @@ from twisted.python.failure import Failure
 """
 SCRAPEDMSG = u"Scraped from %(src)s" + os.linesep + "%(item)s"# os.linesep代表回车
 DROPPEDMSG = u"Dropped: %(exception)s" + os.linesep + "%(item)s"
-CRAWLEDMSG = u"Crawled:(%(spider_name)s)(%(status)s) %(request)s%(request_flags)s %(response_flags)s"
+CRAWLEDMSG = u"Crawled:(%(spider_name)s)(%(status)s) %(request_and_response)s%(request_flags)s %(response_flags)s"
 
 class LogFormatter(object):
     """
@@ -44,9 +44,9 @@ class LogFormatter(object):
             'args': {
                 'spider_name': spider.name,
                 'status': response.status,
-                'request': request,
+                'request_and_response': request,
                 'request_flags': request_flags,
-                #'referer': referer_str(request),
+                #'referer': referer_str(request_and_response),
                 'response_flags': response_flags,
                 # backward compatibility with Scrapy logformatter below 1.4 version
                 'flags': response_flags

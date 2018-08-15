@@ -20,7 +20,7 @@ class OneHostnameWorkaroundPolicy(object):
 @react
 def main(reactor):
     agent = Agent(reactor, OneHostnameWorkaroundPolicy())
-    requested = agent.request(b"GET",b"https://www.baidu.com")
+    requested = agent.request_and_response(b"GET",b"https://www.baidu.com")
     def gotResponse(response):
         print(response.code)
     def noResponse(failure):

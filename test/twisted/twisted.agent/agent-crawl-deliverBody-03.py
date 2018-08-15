@@ -81,9 +81,9 @@ class BeginningPrinter(Protocol):
 
         '''
         if self._maxsize and self._bytes_received > self._maxsize:
-            logging.info("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+            logging.info("从(%(request_and_response)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
                          "最大值(%(maxsize)s) bytes " % {
-                'request' : self._request,
+                'request_and_response' : self._request,
                 'bytes' : self._bytes_received,
                 'maxsize' : self._maxsize
             })

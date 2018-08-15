@@ -36,9 +36,9 @@ def cbRequest(response,u,i):
         error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
         error_args = {'url':u , "size": "10m", 'maxsize': "1020m"}
 
-        print("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+        print("从(%(request_and_response)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
                          "警戒值(%(warnsize)s) bytes " % {
-                'request' : u,
+                'request_and_response' : u,
                 'bytes' : 100,
                 'warnsize' : 90
             })
