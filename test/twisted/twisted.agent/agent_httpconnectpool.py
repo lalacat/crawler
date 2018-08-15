@@ -29,8 +29,16 @@ def requestGet(url):
     d.addCallback(cbRequest)
     return d
 
-def print_fun(content):
-    print(content)
+def print_fun(clientprotocol,i):
+    try:
+        d = clientprotocol.request(i)
+        d.addCallback(fun_print)
+    except Exception as e :
+        print(e)
+    return d
+
+def fun_print(con):
+    print(con)
 # Two requests to the same host:
 d =  requestGet('http://www.baidu.com/')
 d1 = requestGet("http://ping.chinaz.com/")
@@ -39,12 +47,13 @@ d3 = requestGet("http://www.baidu.com/")
 dd = DeferredList([d,d1,d2,d3])
 def cbShutdown(ignored):
     for i in pool._connections.keys():
-        print(i)
+        #print(i)
         try:
             finsh = Deferred()
             d = pool.getConnection(i,finsh)
-            finsh.callback(print_fun)
-            d.callback(print_fun)
+            #finsh.addCallback(print_fun)
+            d.addCallback(print_fun,i)
+
         except Exception as e :
             print(e)
     #d = pool.getConnection("baidu",'com')

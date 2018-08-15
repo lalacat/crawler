@@ -53,6 +53,19 @@ class HTTPDownloadHandler(object):
     def close(self):
         #  关闭所有的永久连接，并将它们移除pool 返回是一个defer
         d = self._pool.closeCachedConnections()
+        #  直接关闭closeCachedConnections会引起网络或者服务器端的问题，所以，通过人工设置延迟
+        #  来激发defer,closeCachedConnections不能直接处理额外的errbacks，所以需要个人设定一个
+        #  callback在_disconnect_timeout之后
+        delayed_call = reactor.callLater(self._disconnect_timeout,d.callback,[])
+
+        #  防止delayed_call激活两次
+        def cancel_delayed_call(result):
+            if delayed_call.active():
+                delayed_call.cancel()
+            return result
+
+        d.addBoth(cancel_delayed_call)
+        return d
 
 
 class DownloadAgent(object):
