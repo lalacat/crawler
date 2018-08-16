@@ -5,6 +5,9 @@ from twisted.internet import reactor
 def got_poem(res):
     print("Your poem is served:")
     print(res)
+    if not d1.active():
+        print("cancel")
+        d.cancel()
 
 
 def poem_failed(err):
@@ -25,14 +28,15 @@ def poem_done(_):
 
 #d.errback(Failure(Exception("I have failed")))
 d = Deferred()
-d1 = reactor.callLater(0,d.callback,"Another short poem")
 def cancel_delayed_call(result):
     if d1.active():
         print("cancel")
-        d1.cancel()
+        d.cancel()
     return result
-d1.callback("no")
+#d1.callback("no")
 d.addCallback(cancel_delayed_call)
+d1 = reactor.callLater(1,d.callback,"Another short poem")
+
 d.addCallback(got_poem)
 
 reactor.run()

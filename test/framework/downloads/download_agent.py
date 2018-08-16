@@ -56,7 +56,8 @@ class HTTPDownloadHandler(object):
         #  callback在_disconnect_timeout之后
         delayed_call = reactor.callLater(self._disconnect_timeout,d.callback,[])
 
-        #  防止delayed_call激活两次
+        #  判断cancel_delayed_call是否在等待，True就是出于激活状态
+        #  False代表着已经被激活或者已经被取消了
         def cancel_delayed_call(result):
             if delayed_call.active():
                 delayed_call.cancel()
@@ -117,11 +118,21 @@ class DownloadAgent(object):
         self._timeout_cl = reactor.callLater(timeout,d.cancel)
         d.addBoth()
 
-
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
         request.meta['download_latency'] = time() - start_time
         return result
+
+    def _cb_timeout(self,result,url,timeout):
+        if self._timeout_cl.active():
+            self._timeout_cl.cancel()
+            return result
+        #  当规定的时间内_RequestBodyProducer没有收到connectionLost()的时候，强制退出
+        if self._transferdata:
+            self._transferdata._transport.stopProducing()
+
+        raise TimeoutError("下载 %s 花费的时间超过 %s 秒." % (url, timeout))
+
 
     def _cb_body_get(self,transferdata,request):
 
@@ -153,6 +164,8 @@ class DownloadAgent(object):
         transferdata.deliverBody(_ResponseReader(
             finished,transferdata,request,maxsize,warnsize,fail_on_dataloss
         ))
+        # 表示接收到了数据
+        self._transferdata = transferdata
         return finished
 
     def _cb_body_done(self,result,request,url):
