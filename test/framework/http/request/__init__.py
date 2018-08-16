@@ -1,7 +1,7 @@
 from test.framework.record_live_instances import object_ref
 from twisted.web.http_headers import Headers
 from test.framework.url_convert import safe_url_string,escape_ajax
-from test.framework.request_and_response.parse_url import to_bytes
+from test.framework.http.parse_url import to_bytes
 
 
 class Request(object_ref):
@@ -83,36 +83,3 @@ class Request(object_ref):
         cls = kwargs.pop('cls', self.__class__)
         return cls(*args, **kwargs)
 
-
-class Response(object_ref):
-
-    def __init__(self, url, status=200, headers=None, body=b'', flags=None, request=None):
-       self.headers = Headers(headers or {})
-       self.status = int(status)
-       self._set_body(body)
-       self._set_url(url)
-       self.requset = request
-       self.flags = [] if flags is None else list(flags)
-
-
-    @property
-    def meta(self):
-        try:
-            return self.requset.meta
-        except AttributeError:
-            raise AttributeError(
-                "Response.meta 不可用，这个response没有绑定任何的request"
-            )
-
-    def _get_url(self):
-        return self._url
-
-    def _set_url(self,url):
-        if isinstance(url,str):
-            self._url = url
-        else:
-            raise TypeError('%s url must be str, got %s:' % (type(self).__name__,
-                                                             type(url).__name__))
-    url = property(_get_url,_set_url)
-
-    

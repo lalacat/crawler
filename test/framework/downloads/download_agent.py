@@ -1,19 +1,17 @@
-from twisted.web.client import Agent,ResponseDone,ResponseFailed,\
-    HTTP11ClientProtocol,HTTPConnectionPool
+from twisted.web.client import Agent,ResponseDone,ResponseFailed, \
+    HTTPConnectionPool
 from twisted.web.http import _DataLoss, PotentialDataLoss
 from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
 from twisted.web.iweb import IBodyProducer,UNKNOWN_LENGTH
-from twisted.web._newclient import Response
-from twisted.web.http_headers import Headers
 from twisted.internet.protocol import Protocol
 
 from io import BytesIO
 from urllib.parse import urldefrag
 from zope.interface import implementer
-import time,json,logging
-from pprint import pformat
-from test.framework.request_and_response.parse_url import to_bytes
+import time, logging
+from test.framework.http.parse_url import to_bytes
+from test.framework.http.response import Response
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +112,10 @@ class DownloadAgent(object):
 
         #  下载request.body
         d.addCallback(self._cb_body_get,request)
-        d.addCallback(self._cb_body_done)
+        d.addCallback(self._cb_body_done,request,url)
+        #  检查是否超时，如果在设定时间还没返回结果，就将defer取消
+        self._timeout_cl = reactor.callLater(timeout,d.cancel)
+        d.addBoth()
 
 
     def _cb_latency(self,result,request, start_time):
@@ -129,19 +130,19 @@ class DownloadAgent(object):
         if transferdata.length == 0:
             print("length: ", transferdata.length)
 
-        #若meta中不存的'download_maxsize'这个值的话，会自动赋上默认值self._maxsize
+        # 若meta中不存的'download_maxsize'这个值的话，会自动赋上默认值self._maxsize
         maxsize = request.meta.get('download_maxsize',self._maxsize)
         warnsize = request.meta.get('download_warnsize',self._warnsize)
         expected_size = transferdata.length if transferdata.length is not UNKNOWN_LENGTH else -1
         fail_on_dataloss = request.meta.get('download_fail_on_dataloss', self._fail_on_dataloss)
 
-        #x and y布尔"与" - 如果 x 为 False，x and y 返回 False，否则它返回 y 的计算值。
+        #  x and y布尔"与" - 如果 x 为 False，x and y 返回 False，否则它返回 y 的计算值。
         if maxsize and expected_size > maxsize :
             error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
             error_args = {'url': request.url,"size":expected_size,'maxsize':maxsize}
 
             logger.error(error_msg,error_args)
-            #twisted.protocols.tls.TLSMemoryBIOProtocol 的方法
+            #  twisted.protocols.tls.TLSMemoryBIOProtocol 的方法
             transferdata._transport._producer.loseConnection()
             raise defer.CancelledError(error_msg % error_args)
 
@@ -154,7 +155,7 @@ class DownloadAgent(object):
         ))
         return finished
 
-    def _cb_body_done(self,result):
+    def _cb_body_done(self,result,request,url):
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         '''
         print('Response _transport', response._transport)
@@ -167,11 +168,13 @@ class DownloadAgent(object):
         '''
         status = int(txresponse.code)
         header = dict()
-        for k,v in txresponse.headers.getAllRawHeaders():
-            header[k] = v
+        try:
+            for k,v in txresponse.headers.getAllRawHeaders():
+                header[k] = v
+        except KeyError as e :
+            print("header is None")
 
-
-        return (body,status,header)
+        return Response(url=url,status=status,header=header,body=body,flags=flags,request=request)
 
 
 
@@ -250,11 +253,8 @@ class _ResponseReader(Protocol):
         if self._finished.called:
             return
 
-        self._body = self._bodybuf.getvalue()
-        try:
-            body = json.loads(self._body)
-        except Exception as e :
-            logger.error(e)
+        body = self._bodybuf.getvalue()
+
         #  针对不同的loss connection进行问题的处理
         if reason.check(ResponseDone): #  正常完成数据下载
             logger.info('Finished receiving body:')

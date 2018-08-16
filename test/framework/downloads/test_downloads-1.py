@@ -1,9 +1,6 @@
-from twisted.web.client import HTTPClientFactory
-from twisted.internet import reactor
-from test.framework.request_and_response.parse_url import _parsed
 from test.framework.downloads.download_agent import HTTPDownloadHandler
 from test.framework.setting import Setting
-from test.framework.request_and_response import Request
+from test.framework.http.request import Request
 from spider.spider1 import Spider1
 
 url = 'https://www.smzdm.com/homepage/json_more?p=1'
