@@ -116,7 +116,7 @@ class DownloadAgent(object):
         d.addCallback(self._cb_body_done,request,url)
         #  检查是否超时，如果在设定时间还没返回结果，就将defer取消
         self._timeout_cl = reactor.callLater(timeout,d.cancel)
-        d.addBoth()
+        d.addBoth(self._cb_timeout,request,url,timeout)
 
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
