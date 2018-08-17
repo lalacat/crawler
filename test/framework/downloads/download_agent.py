@@ -20,7 +20,6 @@ class DownloaderClientContextFactory(ClientContextFactory):
     """用于Https验证"""
 
     def getContext(self,host=None,port=None):
-        print('getContext',host,port)
         return ClientContextFactory.getContext(self)
 
 
@@ -56,7 +55,7 @@ class HTTPDownloadHandler(object):
         #  callback在_disconnect_timeout之后
         delayed_call = reactor.callLater(self._disconnect_timeout,d.callback,[])
 
-        #  判断cancel_delayed_call是否在等待，True就是出于激活状态
+        #  判断cancel_delayed_call是否在等待，True就是出于激活状态,还没被执行
         #  False代表着已经被激活或者已经被取消了
         def cancel_delayed_call(result):
             if delayed_call.active():
@@ -89,8 +88,10 @@ class DownloadAgent(object):
                            pool=self._pool)
 
     def download_request(self,request):
+        logger.debug("进入下载download_request")
         timeout = request.meta.get('download_timeout') or self._connectTimeout
-        agent = self._getAgent(request,timeout)
+        logger.debug("download_timeout is %d"%timeout)
+        agent = self._getAgent(timeout)
         #url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
         # urldefrag去掉fragment
         url = urldefrag(request.url)[0]
@@ -103,28 +104,43 @@ class DownloadAgent(object):
             bodyproducer = _RequestBodyProducer(b'')
         else :
             bodyproducer = None
-        start_time = time()
+        start_time = time.time()
 
         d = agent.request(method,
               to_bytes(url),
               headers,
               bodyproducer)
         d.addCallback(self._cb_latency,request,start_time)
+        try:
+            #  下载request.body
+            d.addCallback(self._cb_body_get,request)
+            d.addCallback(self._cb_body_done,request,url)
+            d.addCallback(self.fun_print)
 
-        #  下载request.body
-        d.addCallback(self._cb_body_get,request)
-        d.addCallback(self._cb_body_done,request,url)
-        #  检查是否超时，如果在设定时间还没返回结果，就将defer取消
-        self._timeout_cl = reactor.callLater(timeout,d.cancel)
-        d.addBoth(self._cb_timeout,request,url,timeout)
+            #  检查是否超时，如果在设定时间还没返回结果，就将defer取消
+
+            self._timeout_cl = reactor.callLater(timeout,d.cancel)
+            d.addBoth(self._cb_timeout,request,url,timeout)
+        except Exception as e:
+            print(e)
+        return d
+
+    def fun_print(self,content):
+        print("fun_print")
+        print(content)
+        return content
 
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
-        request.meta['download_latency'] = time() - start_time
+        request.meta['download_latency'] = time.time() - start_time
+        logger.debug("记录延迟时间 %d "%request.meta['download_latency'])
         return result
 
     def _cb_timeout(self,result,url,timeout):
+        logger.debug("进入下载超时处理方法")
+        # 如果_timeout_cl还没触发，就取消掉，不用再延迟了
         if self._timeout_cl.active():
+            logger.debug("下载没有超时")
             self._timeout_cl.cancel()
             return result
         #  当规定的时间内_RequestBodyProducer没有收到connectionLost()的时候，强制退出
@@ -139,7 +155,7 @@ class DownloadAgent(object):
         # 如果返回的response的Headers中包含了Content-Length，返回一个具体的数值
         # 如果Headers中不包含的话就是UNKNOWN_LENGTH
         if transferdata.length == 0:
-            print("length: ", transferdata.length)
+            logger.debug("length: ", transferdata.length)
 
         # 若meta中不存的'download_maxsize'这个值的话，会自动赋上默认值self._maxsize
         maxsize = request.meta.get('download_maxsize',self._maxsize)
@@ -164,11 +180,12 @@ class DownloadAgent(object):
         transferdata.deliverBody(_ResponseReader(
             finished,transferdata,request,maxsize,warnsize,fail_on_dataloss
         ))
-        # 表示接收到了数据
+        # 表示接收到了数据，用于延迟的判定
         self._transferdata = transferdata
         return finished
 
     def _cb_body_done(self,result,request,url):
+        logger.debug("生成Response")
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         '''
         print('Response _transport', response._transport)
@@ -213,6 +230,7 @@ class _RequestBodyProducer(object):
 @implementer(IBodyProducer)
 class _ResponseReader(Protocol):
     def __init__(self, finished,transferdata,request,maxsize,warnsize,fail_on_dataloss):
+        logger.debug("生成ResponseReader")
         self._finished = finished
         # 用来保存传输的数据，当数据完整后可以使用json转换为python对象
         self._transferdata = transferdata
@@ -232,11 +250,11 @@ class _ResponseReader(Protocol):
         因为传输的datas并不是一次性传输完的，所以不能直接使用json转换，而是当数据全部传输完毕后，使用json.loads()
         这时候就不涉及到转码和转义字符的问题了。
         """
-        if self.finished.called:
+        if self._finished.called:
             return
 
         self._bodybuf.write(datas)
-        self._bytes_received += len(self._bytes_received)
+        self._bytes_received += len(datas)
 
         if self._maxsize and self._bytes_received > self._maxsize:
             logger.error("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
@@ -270,7 +288,7 @@ class _ResponseReader(Protocol):
 
         #  针对不同的loss connection进行问题的处理
         if reason.check(ResponseDone): #  正常完成数据下载
-            logger.info('Finished receiving body:')
+            logger.info('Finished receiving body!!')
             # callback(data)调用后，能够向defer数据链中传入一个list数据：
             # [True，传入的参数data]，可以实现将获取的body传输到下一个函数中去
             self._finished.callback((self._transferdata,body,None))
@@ -284,6 +302,7 @@ class _ResponseReader(Protocol):
 
         #  any(x)判断x对象是否为空对象，如果都为空、0、false，则返回false，如果不都为空、0、false，则返回true
         if reason.check(ResponseFailed) and any(r.check(_DataLoss) for r in reason.value.reasons):
+            logger.debug("数据收到错误",reason.getErrorMessage())
             if not self._fail_on_dataloss:
                 self._finished.callback((self._transferdata,body,['dataloss']))
                 return
@@ -297,32 +316,4 @@ class _ResponseReader(Protocol):
         self._finished.errback(reason)
 
 
-'''
 
-contextFactory = DownloaderClientContextFactory()
-headers = Headers({'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
-                  'content-type':["application/json"]})
-agent = Agent(reactor, contextFactory)
-d = agent.request_and_response(b'GET',
-              b'https://smzdm.com',
-              headers=headers,
-              )
-def cbRequest(response):
-    print('Response _transport',response._transport)
-    print('Response version:', response.version)
-    print('Response code:', response.code)
-    print('Response phrase:', response.phrase)
-    print('Response phrase:',response._bodyBuffer)
-    print('Response headers:')
-    print(pformat(list(response.headers)))
-
-    d = readBody(response)
-    return d
-d.addCallback(cbRequest)
-
-def cbShutdown(ignored):
-    reactor.stop()
-d.addBoth(cbShutdown)
-
-reactor.run()
-'''

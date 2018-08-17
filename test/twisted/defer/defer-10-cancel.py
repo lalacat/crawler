@@ -63,7 +63,7 @@ def outer_fun(content,id):
     print(content+str(id))
     ts = list()
 
-    for i in range(5):
+    for i in range(2):
         d = job("inner job ",i)
         d.addCallback(inner_fun,i)
         ts.append(d)
@@ -87,14 +87,14 @@ if __name__ == "__main__":
 
     ts = list()
 
-    for i in range(5):
+    for i in range(2):
         d = job("outer job ",i)
         d.addCallback(outer_fun,i)
         ts.append(d)
 
 
     dd = DeferredList(ts)
-    d= reactor.callLater(15,dd.cancel)
+    d= reactor.callLater(5,dd.cancel)
     dd.addBoth(_cb_timeout,d)
     dd.addCallback(lambda _:reactor.stop())
 

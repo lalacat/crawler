@@ -2,7 +2,7 @@ from test.framework.downloads.download_agent import HTTPDownloadHandler
 from test.framework.setting import Setting
 from test.framework.http.request import Request
 from spider.spider1 import Spider1
-
+from twisted.internet import reactor
 url = 'https://www.smzdm.com/homepage/json_more?p=1'
 headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
                   'content-type':["application/json"]}
@@ -17,14 +17,24 @@ def request_errback(content):
     print("request_and_response errback")
     print(content)
 
-if callable(request_callback):
-    print("callable")
+def agent_print(content):
+    print("agent_print")
+    print(type(content))
+    print(content)
 
-request = Request(url=url,callback=request_callback,method='get',headers=headers,errback=request_errback)
+
+
+request = Request(url=url,callback=request_callback,method='get',
+                  headers=headers,errback=request_errback,meta={"download_timeout":5})
 
 settings = Setting()
 
 spider = Spider1()
-httphandler = HTTPDownloadHandler(settings)
 
+httphandler = HTTPDownloadHandler(settings)
+agent = httphandler.download_request(request,spider)
+agent.addCallback(agent_print)
+agent.addCallback(lambda _: reactor.stop())
+
+reactor.run()
 
