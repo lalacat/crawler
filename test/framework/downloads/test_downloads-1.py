@@ -15,7 +15,8 @@ def request_callback(content):
 
 def request_errback(content):
     print("request_and_response errback")
-    print(content)
+    print(content[1])
+    return content
 
 def agent_print(content):
     print("agent_print")
@@ -34,7 +35,8 @@ spider = Spider1()
 httphandler = HTTPDownloadHandler(settings)
 agent = httphandler.download_request(request,spider)
 agent.addCallback(agent_print)
-agent.addCallback(lambda _: reactor.stop())
+agent.addErrback(request_errback)
+agent.addBoth(lambda _: reactor.stop())
 
 reactor.run()
 

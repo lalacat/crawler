@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 
 class DownloaderClientContextFactory(ClientContextFactory):
     """用于Https验证"""
-
     def getContext(self,host=None,port=None):
         return ClientContextFactory.getContext(self)
 
@@ -115,29 +114,29 @@ class DownloadAgent(object):
             #  下载request.body
             d.addCallback(self._cb_body_get,request)
             d.addCallback(self._cb_body_done,request,url)
-            d.addCallback(self.fun_print)
-            d.addCallback(self.fun_delay,5)
             #  检查是否超时，如果在设定时间还没返回结果，就将defer取消
+            #  当d.callback执行的方法，一直处于占用状态的时候，callLater是不会执行的，
+            #  只有执行的方法是能够回到reactor主循环的时候，callLater才能执行
+            #  _RequestBodyProducer中dataReceived方法不会一直占用，数据还没接收到是，是会回到reactor循环的，
+            #  当总的接收数据的时间超过了timeout的时候，才会执行d.cancel
             self._timeout_cl = reactor.callLater(timeout,self.fun_cancel,d)
             d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
-            print(e)
+            logger.error(e)
         return d
     """
     测试区
     """
     def fun_print(self,content):
         logger.debug("fun_print 成功")
-        #print(content)
         return content
 
     def fun_cancel(self,obj):
         logger.debug("test cancel")
         obj.cancel()
 
-    #@defer.inlineCallbacks
     def fun_delay(self,content,num):
-        print("休眠 :%d s"%num)
+        logger.debug("休眠 :%d s"%num)
         for i in range(num,0,-1):
             print("倒计时：%d" %i)
             time.sleep(1)
@@ -162,13 +161,12 @@ class DownloadAgent(object):
             return result
         #  当规定的时间内_RequestBodyProducer没有收到connectionLost()的时候，强制退出
         if self._transferdata:
+            logger.error("接收body的程序要停止了")
             self._transferdata._transport.stopProducing()
 
         raise TimeoutError("下载 %s 花费的时间超过 %s 秒." % (url, timeout))
 
-
     def _cb_body_get(self,transferdata,request):
-
         # 如果返回的response的Headers中包含了Content-Length，返回一个具体的数值
         # 如果Headers中不包含的话就是UNKNOWN_LENGTH
         if transferdata.length == 0:
@@ -204,24 +202,13 @@ class DownloadAgent(object):
     def _cb_body_done(self,result,request,url):
         logger.debug("生成Response")
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
-        '''
-        print('Response _transport', txresponse._transport)
-        print('Response version:', txresponse.version)
-        print('Response code:', txresponse.code)
-        print('Response phrase:', txresponse.phrase)
-        print('Response phrase:', txresponse._bodyBuffer)
-        
-        print('Response headers:')
-        print(pformat(list(response.headers)))
-        '''
         status = int(txresponse.code)
-
         header = dict()
         try:
             for k,v in txresponse.headers.getAllRawHeaders():
                 header[k] = v
-        except KeyError as e :
-            print("header is None")
+        except KeyError :
+            logger.error("header is None")
         response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
         return response
 
@@ -256,6 +243,7 @@ class _ResponseReader(Protocol):
         self._request = request
         self._maxsize = maxsize
         self._warnsize = warnsize
+        self._warnsize_flag = False
         self._fail_on_dataloss = fail_on_dataloss
         self._fail_on_dataloss_warned = False
 
@@ -288,15 +276,16 @@ class _ResponseReader(Protocol):
             注意的是，此defer之后的callbacks都不会被执行
             """
             self._finished.cancel()
-
-        if self._warnsize and self._bytes_received > self._warnsize:
-            self._reached_warnsize = True
-            logger.warning("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
-                         "警戒值(%(warnsize)s) bytes " % {
-                'request_and_response' : self._request,
-                'bytes' : self._bytes_received,
-                'warnsize' : self._warnsize
-            })
+        if not self._warnsize_flag:
+            if self._warnsize and self._bytes_received > self._warnsize:
+                self._reached_warnsize = True
+                logger.warning("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+                             "警戒值(%(warnsize)s) bytes " % {
+                    'request' : self._request,
+                    'bytes' : self._bytes_received,
+                    'warnsize' : self._warnsize
+                })
+            self._warnsize_flag = True
 
     def connectionLost(self, reason):
         if self._finished.called:
@@ -315,13 +304,17 @@ class _ResponseReader(Protocol):
         #  当body中没有设置Content-Length或者是Transfer-Encoding的时候，
         # response传输完后，会引起这个错误
         if reason.check(PotentialDataLoss):
+            logger.debug("数据有部分丢失")
             self._finished.callback((self._transferdata,body,['partial']))
             return
 
         #  any(x)判断x对象是否为空对象，如果都为空、0、false，则返回false，如果不都为空、0、false，则返回true
         if reason.check(ResponseFailed) and any(r.check(_DataLoss) for r in reason.value.reasons):
-            logger.debug("数据收到错误",reason.getErrorMessage())
+            logger.debug("数据收到错误，%s"%reason.getErrorMessage())
             if not self._fail_on_dataloss:
+                #  当数据超过下载值得时候，_fail_on_dataloss是用来控制，要不要接收已收的部分数据
+                #  默认是将数据抛掉·
+                logger.debug("接收残缺数据")
                 self._finished.callback((self._transferdata,body,['dataloss']))
                 return
 
