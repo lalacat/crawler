@@ -25,7 +25,7 @@ def agent_print(content):
 
 
 request = Request(url=url,callback=request_callback,method='get',
-                  headers=headers,errback=request_errback,meta={"download_timeout":5})
+                  headers=headers,errback=request_errback,meta={"download_timeout":2})
 
 settings = Setting()
 

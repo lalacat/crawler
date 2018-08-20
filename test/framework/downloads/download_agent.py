@@ -116,20 +116,37 @@ class DownloadAgent(object):
             d.addCallback(self._cb_body_get,request)
             d.addCallback(self._cb_body_done,request,url)
             d.addCallback(self.fun_print)
-
+            d.addCallback(self.fun_delay,5)
             #  检查是否超时，如果在设定时间还没返回结果，就将defer取消
-
-            self._timeout_cl = reactor.callLater(timeout,d.cancel)
-            d.addBoth(self._cb_timeout,request,url,timeout)
+            self._timeout_cl = reactor.callLater(timeout,self.fun_cancel,d)
+            d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
             print(e)
         return d
-
+    """
+    测试区
+    """
     def fun_print(self,content):
-        print("fun_print")
-        print(content)
+        logger.debug("fun_print 成功")
+        #print(content)
         return content
 
+    def fun_cancel(self,obj):
+        logger.debug("test cancel")
+        obj.cancel()
+
+    #@defer.inlineCallbacks
+    def fun_delay(self,content,num):
+        print("休眠 :%d s"%num)
+        for i in range(num,0,-1):
+            print("倒计时：%d" %i)
+            time.sleep(1)
+        return content
+
+
+    """
+    测试区
+    """
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
         request.meta['download_latency'] = time.time() - start_time
@@ -188,23 +205,25 @@ class DownloadAgent(object):
         logger.debug("生成Response")
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         '''
-        print('Response _transport', response._transport)
-        print('Response version:', response.version)
-        print('Response code:', response.code)
-        print('Response phrase:', response.phrase)
-        print('Response phrase:', response._bodyBuffer)
+        print('Response _transport', txresponse._transport)
+        print('Response version:', txresponse.version)
+        print('Response code:', txresponse.code)
+        print('Response phrase:', txresponse.phrase)
+        print('Response phrase:', txresponse._bodyBuffer)
+        
         print('Response headers:')
         print(pformat(list(response.headers)))
         '''
         status = int(txresponse.code)
+
         header = dict()
         try:
             for k,v in txresponse.headers.getAllRawHeaders():
                 header[k] = v
         except KeyError as e :
             print("header is None")
-
-        return Response(url=url,status=status,header=header,body=body,flags=flags,request=request)
+        response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
+        return response
 
 
 
@@ -261,8 +280,7 @@ class _ResponseReader(Protocol):
                          "最大值(%(maxsize)s) bytes " % {
                 'request_and_response' : self._request,
                 'bytes' : self._bytes_received,
-                'maxsize' : self._maxsize
-            })
+                'maxsize' : self._maxsize})
             # 当下载量超过最大值的时候，把数据缓存变量情况，取消下载
             self._bodybuf.truncate(0)
             """
