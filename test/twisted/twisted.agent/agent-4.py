@@ -27,7 +27,7 @@ class BeginningPrinter(Protocol):
 agent = Agent(reactor)
 d = agent.request(
     b'GET',
-    b'http://example.com/',
+    b'https://example.com/',
     Headers({'User-Agent': ['Twisted Web Client Example']}),
     None)
 

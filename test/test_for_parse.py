@@ -9,14 +9,14 @@ class Requset(object):
 class Spider(object):
     name = "smzdm"
     def start_requests(self):
-        start_url = ["http://www.baidu.com","http://www.bing.com",]
+        start_url = ["https://www.baidu.com","https://www.bing.com",]
         for url in start_url:
             print(url)
             yield Requset(url,self.parse)
 
     def parse(self,response):
         print("---------response--------->",response)
-        yield Requset('http://www.cnblogs.com',callback=self.parse)
+        yield Requset('https://www.cnblogs.com',callback=self.parse)
 
 
 s = Spider()

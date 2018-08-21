@@ -42,7 +42,7 @@ def print_web(result):
     pass
     return
 
-url = 'http://www.zimuzu.io/'
+url = 'https://www.zimuzu.io/'
 contextFactory = WebClientContextFactory()
 
 agent = Agent(reactor, contextFactory)

@@ -64,7 +64,7 @@ class Spider(object):
         print("---------response--------->", response)
         a = self.read_child_web(response,"d1")
         #a.callback(None)
-        d2= self.agent.request(b'GET',b'http://httpbin.org/get')
+        d2= self.agent.request(b'GET',b'https://httpbin.org/get')
 
         return d2
 

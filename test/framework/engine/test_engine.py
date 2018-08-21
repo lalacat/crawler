@@ -2,8 +2,11 @@ from twisted.internet import defer,reactor,task
 from twisted.web.client import getPage
 from queue import Queue
 from urllib.parse import quote
+
+from test.framework.engine.reactor import CallLaterOnce
 from test.framework.url_convert import safe_url_string
 import logging,time
+from test.framework.scheduler.test_scheduler import Scheduler
 
 
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
@@ -23,6 +26,8 @@ class Slot(object):
         :param nextcall:
         :param scheduler:
         """
+        logger.debug("卡槽初始化。。。。。。")
+
         self.closing = False
         self.inprogress = set() #存放正在爬虫的网站,保证每个defer都执行完
         self.start_requests = start_requests
@@ -80,7 +85,7 @@ class ExecutionEngine(object):
         self.spider = None
         self.running = False
 
-        self.scheduler = None
+        self.scheduler_cls = Scheduler()
 
         self.crawlling = []
         self._spider_closed_callback = spider_closed_callback
@@ -113,7 +118,9 @@ class ExecutionEngine(object):
         """
         solt = self.slot
 
-        # 是否等待
+        # 是否等待，因为在opeb_spider中通过nextcall中的LoopCall不断的调用
+        # _next_requset必须设置flag来保障，每次调用的时候只有前一次的处理结束
+        # 后才能继续执行新的任务
         while not self._needs_backout():
             # 从scheduler中获取request
             # 注意：第一次获取时，是没有的，也就是会break出来
@@ -205,9 +212,29 @@ class ExecutionEngine(object):
 
     @defer.inlineCallbacks
     #将爬虫中的网页读取出来
-    def open_spider(self,spider,start_requests,db=None):
-        logger.info("分解spider")
-        yield self.scheduler.open()
+    def open_spider(self,spider,start_requests,close_if_idle=True):
+        logger.info("爬虫准备工作开始")
+        assert self.has_capacity(),"此引擎已经在处理爬虫了，所以不能处理%s %r" %\
+            spider.name
+        logger.info("Spider正在打开",extra = {'spider':spider})
+        # 将_next_request注册到reactor循环圈中，便于slot中loopCall不断的调用
+        #  相当于不断调用_next_request(spider)
+        nextcall = CallLaterOnce(self._next_request,spider)
+        #  初始化scheduler
+        scheduler = self.scheduler.from_crawler(self.crawler)
+        #  调用中间件，就是添加若干个inner_derfer
+        #  start_requests = yield start_requests
+        slot = Slot(start_requests,close_if_idle,nextcall,scheduler)
+        self.slot = slot
+        self.spider = spider
+
+        yield self.scheduler.open(spider)
+
+        #  启动页面读取，进行爬虫工作
+        slot.nextcall.schedule()
+        #  自动调用启动，每5秒一次调用
+        slot.heartbeat.start(5)
+
         while True:
             try:
                 req = next(start_requests)
@@ -219,6 +246,10 @@ class ExecutionEngine(object):
                 logger.error("在对spider网页导入的操作的过程中出现错误",e)
             self.scheduler.put_request(req)
 
+
+    def has_capacity(self):
+        """保证一个engine对应对应处理一个spider,一个slot对应一个spider"""
+        return not bool(self.slot)
 
     def  _finish_stopping_engine(self):
         logger.info("finish")

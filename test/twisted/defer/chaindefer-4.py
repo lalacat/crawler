@@ -32,7 +32,7 @@ class Spider(object):
 
     def __init__(self):
         self.Flag = True
-        self.url = "http://httpbin.org/get"
+        self.url = "https://httpbin.org/get"
     def start_requests(self):
         start_url = ["https://www.baidu.com", "https://www.bing.com", "https://www.sogou.com/"]
         for url in start_url:
@@ -41,7 +41,7 @@ class Spider(object):
     def parse(self, response):
         print("---------response--------->")
 
-        d2 = getPage(b"http://httpbin.org/get")
+        d2 = getPage(b"https://httpbin.org/get")
         d2.addCallback(self.inner_callback)
         try:
             print("str:", d2.result.value)

@@ -16,7 +16,7 @@ def print_qyl163_content(lis,u):
         result = dict()
         try:
             href_temp = l.a.get("href")
-            result["href"] = "http://www.qyl63.com" + href_temp
+            result["href"] = "https://www.qyl63.com" + href_temp
             result["title"] = l.a.get("title")
             result["img"] = l.a.div.img.get("src")
             u = result["href"]
@@ -82,8 +82,8 @@ def read_url(url):
 
 if __name__ == '__main__':
     start = time.clock()
-    url = "http://www.qyl63.com/recent/"
-    u = "http://www.qyl63.com/recent"
+    url = "https://www.qyl63.com/recent/"
+    u = "https://www.qyl63.com/recent"
 
 
     t1 = time.time()

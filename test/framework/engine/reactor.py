@@ -24,15 +24,3 @@ class CallLaterOnce(object):
         # 上面注册的是self,所以会执行__call__
         self._call = None
         return self._func(*self._a, **self._kw)
-
-def print_fun(content):
-    print(content)
-    reactor.cancel()
-
-
-
-c = CallLaterOnce(print_fun,"test")
-c.schedule(10)
-
-reactor.run()
-

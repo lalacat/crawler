@@ -12,7 +12,7 @@ agent = Agent(reactor)
 
 d = agent.request(
     b'GET',
-    b'http://www.baidu.com',
+    b'https://www.baidu.com',
     Headers({'User-Agent': ['Twisted Web Client Example']}),
     None)
 

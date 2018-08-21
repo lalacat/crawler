@@ -94,17 +94,17 @@ def add_or_replace_parameter(url, name, new_value):
     """Add or remove a parameter to a given url
 
     >>> import w3lib.url
-    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php', 'arg', 'v')
-    'http://www.example.com/index.php?arg=v'
-    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3', 'arg4', 'v4')
-    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3&arg4=v4'
-    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3', 'arg3', 'v3new')
-    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3new'
+    >>> w3lib.url.add_or_replace_parameter(hhttps, 'arg', 'v')
+    'http://www.example.com/index.httpsarg=v'
+    >>> w3lib.url.add_or_replace_parameter(https, 'arg4', 'v4')
+    'httphttpsww.example.com/index.php?arg1=v1&arg2=v2&arg3=v3&arg4=v4'
+    >>> w3lib.urhttpsd_or_replace_parameter(https, 'arg3', 'v3new')
+    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=httpsw'
     >>>
 
     """
     parsed = urlsplit(url)
-    args = parse_qsl(parsed.query, keep_blank_values=True)
+    args = parse_qsl(parsed.quhttps keep_blank_values=True)
 
     new_args = []
     found = False
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     url = "http://www.qyl63.com/92082/火爆网红鹿少女浴室性感情趣高跟被吊着闯红灯下面被干出血了呻吟给力/"
     #url = 'https://www.smzdm.com/homepage/json_more?p='
 
-    s =safe_url_string(url,"utf-8")
+    s =safe_urlhttpsing(url,"utf-8")
 
     print(s)
 

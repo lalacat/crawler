@@ -8,7 +8,7 @@ from twisted.internet.defer import DeferredList
 
 class QylSpider(BaseQylSpider):
     name = "QYL-1"
-    url =  "http://www.qyl63.com/recent/"
+    url =  "https://www.qyl63.com/recent/"
     db_name = "QYL"
     db_flag = True
     def __init__(self):
@@ -59,7 +59,7 @@ class QylSpider(BaseQylSpider):
             result = dict()
             try:
                 href_temp = l.a.get("href")
-                result["href"] = "http://www.qyl63.com" + href_temp
+                result["href"] = "https://www.qyl63.com" + href_temp
                 result["title"] = l.a.get("title")
                 result["img"] = l.a.div.img.get("src")
                 u = result["href"]

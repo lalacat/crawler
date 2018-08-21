@@ -18,7 +18,7 @@ def reportCancel(fail, which):
 
 
 d1 = Deferred()
-d2 = getPage(b"http://httpbin.org/get")
+d2 = getPage(b"https://httpbin.org/get")
 d2.addCallbacks(cancel2,cancel2)
 #d3 = Deferred().addCallback(cancel2)
 d1.addCallback(cancel1)

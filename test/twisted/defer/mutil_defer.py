@@ -22,7 +22,7 @@ def get_child_web(content):
 def get_child():
     print("get_child")
 
-    yield getPage(b"http://httpbin.org/get")
+    yield getPage(b"https://httpbin.org/get")
 
 
 
@@ -49,7 +49,7 @@ def print_child(content):
 @defer.inlineCallbacks
 def second_defer():
     print('first callback')
-    result = yield getPage(b"http://httpbin.org/get")
+    result = yield getPage(b"https://httpbin.org/get")
     returnValue(result)
 
 

@@ -28,7 +28,7 @@ class Spider(object):
 
     def parse(self,response):
         print("---------response--------->",response)
-        yield Requset('http://www.cnblogs.com',callback=self.parse)
+        yield Requset('https://www.cnblogs.com',callback=self.parse)
 
 
 

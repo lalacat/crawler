@@ -1,7 +1,7 @@
 from test.framework.record_live_instances import object_ref
 from twisted.web.http_headers import Headers
 from test.framework.url_convert import safe_url_string,escape_ajax
-from test.framework.http.parse_url import to_bytes
+from test.framework.https.parse_url import to_bytes
 
 
 class Request(object_ref):

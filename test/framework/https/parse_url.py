@@ -47,8 +47,8 @@ def _parsed(url):
     return _parsed_url_agrs(parsed)
 
 '''
-url = "blob:http://10012580.10012580.com/3f877248-fd3f-4166-a3b4-d6e2ceee752d"
-url2 = "http://www.cnblogs.com:8800/shuchao/"
+url = "blob:https://10012580.10012580.com/3f877248-fd3f-4166-a3b4-d6e2ceee752d"
+url2 = "https://www.cnblogs.com:8800/shuchao/"
 parsed = _parsed(url)
 print(parsed)
 '''

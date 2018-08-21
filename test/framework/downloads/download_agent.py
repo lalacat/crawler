@@ -10,8 +10,8 @@ from io import BytesIO
 from urllib.parse import urldefrag
 from zope.interface import implementer
 import time, logging
-from test.framework.http.parse_url import to_bytes
-from test.framework.http.response import Response
+from test.framework.https.parse_url import to_bytes
+from test.framework.https.response import Response
 
 logger = logging.getLogger(__name__)
 

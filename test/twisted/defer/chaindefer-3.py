@@ -20,7 +20,7 @@ contextFactory = WebClientContextFactory()
 agent = Agent(reactor, contextFactory)
 
 u1 = 'https://www.baidu.com'
-u2 = 'http://httpbin.org/get'
+u2 = 'https://httpbin.org/get'
 
 
 def print1(d):

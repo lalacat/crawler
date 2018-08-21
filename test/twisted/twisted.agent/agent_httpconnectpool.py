@@ -40,10 +40,10 @@ def print_fun(clientprotocol,i):
 def fun_print(con):
     print(con)
 # Two requests to the same host:
-d =  requestGet('http://www.baidu.com/')
-d1 = requestGet("http://ping.chinaz.com/")
-d2 = requestGet("http://tool.chinaz.com/sitespeed/")
-d3 = requestGet("http://www.baidu.com/")
+d =  requestGet('https://www.baidu.com/')
+d1 = requestGet("https://ping.chinaz.com/")
+d2 = requestGet("https://tool.chinaz.com/sitespeed/")
+d3 = requestGet("https://www.baidu.com/")
 dd = DeferredList([d,d1,d2,d3])
 def cbShutdown(ignored):
     for i in pool._connections.keys():

@@ -1,6 +1,6 @@
 from test.framework.downloads.download_agent import HTTPDownloadHandler
 from test.framework.setting import Setting
-from test.framework.http.request import Request
+from test.framework.https.request import Request
 from spider.spider1 import Spider1
 from twisted.internet import reactor
 url = 'https://www.smzdm.com/homepage/json_more?p=1'

@@ -94,12 +94,12 @@ def add_or_replace_parameter(url, name, new_value):
     """Add or remove a parameter to a given url
 
     >>> import w3lib.url
-    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php', 'arg', 'v')
-    'http://www.example.com/index.php?arg=v'
-    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3', 'arg4', 'v4')
-    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3&arg4=v4'
-    >>> w3lib.url.add_or_replace_parameter('http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3', 'arg3', 'v3new')
-    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3=v3new'
+    >>> w3lib.url.add_or_replace_parameter(https', 'arg', 'v')
+    'https://www.example.com/index.php?arg=v'
+    >>> w3lib.url.add_or_replace_parameter(hhttps, 'arg4', 'v4')
+    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3httpsarg4=v4'
+    >>> w3lib.url.add_or_replace_parameter(https, 'arg3', 'v3new')
+    'http://www.example.com/inhttpsphp?arg1=v1&arg2=v2&arg3=v3new'
     >>>
 
     """
@@ -121,4 +121,3 @@ def add_or_replace_parameter(url, name, new_value):
     query = urlencode(new_args)
     return urlunsplit(parsed._replace(query=query))
 
-U = ""
