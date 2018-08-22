@@ -1,9 +1,8 @@
 from twisted.internet import defer,reactor,task
-from twisted.web.client import getPage
-from queue import Queue
 from urllib.parse import quote
 
 from test.framework.engine.reactor import CallLaterOnce
+from test.framework.test_import.loadobject import load_object
 from test.framework.url_convert import safe_url_string
 import logging,time
 from test.framework.scheduler.test_scheduler import Scheduler
@@ -50,6 +49,7 @@ class Slot(object):
         self._maybe_fire_closing()
 
     def close(self):
+        logger.info("关闭slot")
         self.closing = defer.Deferred()
         self._maybe_fire_closing()
         return self.closing
@@ -62,11 +62,12 @@ class Slot(object):
         """
         if self.closing and not self.inprogress:
             if self.nextcall:
+                logger.info("LoopCall取消")
                 self.nextcall.cancel()
                 if self.heartbeat.running:
                     self.heartbeat.stop()
             self.closing.callback(None)
-
+            reactor.stop()
 
 
 class ExecutionEngine(object):
@@ -85,10 +86,14 @@ class ExecutionEngine(object):
         self.spider = None
         self.running = False
 
-        self.scheduler_cls = Scheduler()
+        self.scheduler_cls = load_object(self.settings["SCHEDULER"])
+
 
         self.crawlling = []
         self._spider_closed_callback = spider_closed_callback
+
+        self.flag = False
+
 
     @defer.inlineCallbacks
     def start(self):
@@ -116,8 +121,23 @@ class ExecutionEngine(object):
         :param spider:
         :return:
         """
-        solt = self.slot
+        print("不断调用next_request")
 
+        slot = self.slot
+        ''' 
+        try:
+            self.spider += spider
+            logger.info(self.spider)
+
+            if self.spider == 5:
+                self.flag = True
+            if self.flag:
+                logger.info("心跳停止")
+                self.slot.close()
+
+        except Exception as e:
+            print(e)
+        '''
         # 是否等待，因为在opeb_spider中通过nextcall中的LoopCall不断的调用
         # _next_requset必须设置flag来保障，每次调用的时候只有前一次的处理结束
         # 后才能继续执行新的任务
@@ -128,54 +148,9 @@ class ExecutionEngine(object):
             pass
 
         # 如果start_requests有数据且不需要等待
-        if solt.start_requests and not self._needs_backout():
+        if slot.start_requests and not self._needs_backout():
             pass
 
-        '''
-        
-        if self.scheduler.qsize() != 0 :
-            logger.info("爬虫：%s 还剩下%d个网页"%(spider_name,self.scheduler.qsize()))
-
-        try:
-
-            if self.scheduler.qsize() == 0 and len(self.crawlling) == 0:
-                logger.info("爬虫 %s end"%spider_name)
-                self._finish_stopping_engine()
-                return
-
-
-            req = self.scheduler.next_request()
-            #if req is not None:
-            #对即将处理的req存储到临时列表中，这是为了防止其他的req还没处理完，程序就结束了，因为判断程序结束的标志时scheduler的q.size()为0，
-            #即任务队列中的数据全部取出来了，但是结束标志中还需要在定义一个标志，表示所有的defer都处理完了，就用crawlling进行处理，任务进行前，
-            #先将要进行的任务存储到crawlling列表中，当数据处理完，再将对应的req从列表中去除，当列表为空的时候，证明所有的defer的callback处理完了
-            self.crawlling.append(req)
-            # 对网页进行编码的处理，防止网页中含有中文字符，程序不能对中文字符进行解析，报错；
-            # 对网页进行处理后‘：’也会被解析成“%3A”，所以要对解析后的网页在进行处理将“：”重新代替回来
-            #_url = quote(req.url).replace("%3A",":")
-            #print(_url)
-            _url = safe_url_string(req.url,"utf-8")
-
-            d = getPage(_url.encode('utf-8'))
-
-
-            # d.addCallback(self.get_response_callback,req)
-            #d.addCallback(self.print_web)
-
-            d.addCallback(req.parse,req.url)
-            d.addCallback(self.finish_crawl, req)
-            if db is not None:
-                d.addCallback(db.insert_mongoDb)
-
-            d.addErrback(self.crawl_err,req)
-            d.addBoth(lambda _:reactor.callLater(0,self._next_request,spider_name,db))
-
-        except AttributeError as e:
-            logger.error("对象没有对应的属性",e)
-            return None
-        except Exception as e :
-            logger.error("Exception",e)
-    '''
     def _needs_backout(self):
         slot = self.slot
         """
@@ -209,49 +184,40 @@ class ExecutionEngine(object):
         self.crawlling.remove(req)
         return None
 
-
     @defer.inlineCallbacks
     #将爬虫中的网页读取出来
     def open_spider(self,spider,start_requests,close_if_idle=True):
         logger.info("爬虫准备工作开始")
+        logger.info("Spider正在打开",extra = {'spider':spider})
         assert self.has_capacity(),"此引擎已经在处理爬虫了，所以不能处理%s %r" %\
             spider.name
-        logger.info("Spider正在打开",extra = {'spider':spider})
         # 将_next_request注册到reactor循环圈中，便于slot中loopCall不断的调用
         #  相当于不断调用_next_request(spider)
-        nextcall = CallLaterOnce(self._next_request,spider)
-        #  初始化scheduler
-        scheduler = self.scheduler.from_crawler(self.crawler)
-        #  调用中间件，就是添加若干个inner_derfer
-        #  start_requests = yield start_requests
-        slot = Slot(start_requests,close_if_idle,nextcall,scheduler)
-        self.slot = slot
-        self.spider = spider
+        try:
+            self.spider = spider
+            nextcall = CallLaterOnce(self._next_request,spider)
+            #  初始化scheduler
+            scheduler = self.scheduler_cls.from_crawler(self.crawler)
+            #  调用中间件，就是添加若干个inner_derfer
+            #  start_requests = yield start_requests
+            slot = Slot(start_requests,close_if_idle,nextcall,scheduler)
+            self.slot = slot
+            print("1")
 
-        yield self.scheduler.open(spider)
+            yield self.scheduler_cls.open(spider)
 
-        #  启动页面读取，进行爬虫工作
-        slot.nextcall.schedule()
-        #  自动调用启动，每5秒一次调用
-        slot.heartbeat.start(5)
-
-        while True:
-            try:
-                req = next(start_requests)
-                logger.info("读取网站:%s"%req.url)
-            except StopIteration as e:
-                logger.info("网站读取完毕")
-                break
-            except Exception as e :
-                logger.error("在对spider网页导入的操作的过程中出现错误",e)
-            self.scheduler.put_request(req)
-
+            #  启动页面读取，进行爬虫工作
+            slot.nextcall.schedule()
+            #  自动调用启动，每5秒一次调用
+            slot.heartbeat.start(1)
+        except Exception as e:
+            logger.error(e)
 
     def has_capacity(self):
         """保证一个engine对应对应处理一个spider,一个slot对应一个spider"""
         return not bool(self.slot)
 
-    def  _finish_stopping_engine(self):
+    def _finish_stopping_engine(self):
         logger.info("finish")
         self._close.callback(None)
 

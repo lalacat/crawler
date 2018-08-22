@@ -8,6 +8,8 @@ LOG_FORMATTER = "AAA"
 CONCURRENT_REQUESTS_PER_DOMAIN = 8 #  设置HTTPConnectionPool最大保持连接个数
 
 #D
+# 默认下载器
+DOWNLOAD_HANDLER = "test.framework.downloads.download_agent.HTTPDownloadHandler"
 DOWNLOAD_TIMEOUT = 180      # 3mins
 
 #DOWNLOAD_MAXSIZE = 1024  # 1024m 下载网页大小的最大值
@@ -64,7 +66,7 @@ REACTOR_THREADPOOL_MAXSIZE = 10
 
 #S
 SPIDER_MANAGER_CLASS = "test.framework.test_import.spiderloader.SpiderLoader"
-
+SCHEDULER = "test.framework.scheduler.test_scheduler.Scheduler"
 
 #T
 #U

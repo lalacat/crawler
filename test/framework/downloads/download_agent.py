@@ -37,6 +37,11 @@ class HTTPDownloadHandler(object):
         self._fail_on_dataloss = settings.getbool('DOWNLOAD_FAIL_ON_DATALOSS')
         self._disconnect_timeout = 1
 
+    @classmethod
+    def from_crawler(cls,crawler):
+        return cls(crawler.settingds)
+
+
     def download_request(self,request,spider):
         """返回一个http download 的 defer"""
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
