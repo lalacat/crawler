@@ -5,7 +5,8 @@ LOG_FORMATTER = "AAA"
 #A
 #B
 #C
-CONCURRENT_REQUESTS_PER_DOMAIN = 8 #  设置HTTPConnectionPool最大保持连接个数
+CONCURRENT_REQUESTS_PER_IP = 0  # ip并发度:
+CONCURRENT_REQUESTS_PER_DOMAIN = 8  # 设置HTTPConnectionPool最大保持连接个数
 
 #D
 # 默认下载器
@@ -63,7 +64,7 @@ LOG_LEVEL = 'DEBUG'
 #Q
 #R
 REACTOR_THREADPOOL_MAXSIZE = 10
-
+RANDOMIZE_DOWNLOAD_DELAY = True  # 随机延迟
 #S
 SPIDER_MANAGER_CLASS = "test.framework.test_import.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.scheduler.test_scheduler.Scheduler"

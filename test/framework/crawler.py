@@ -16,7 +16,7 @@ class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
     # 装载爬虫，导入爬虫的网页
     # 将爬虫导入到引擎中
-    def __init__(self,spidercls,settings=None):
+    def __init__(self,spidercls=None,settings=None):
         self.crawling = False
         self.spider = None
         self.engine = None

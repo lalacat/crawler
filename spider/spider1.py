@@ -10,8 +10,8 @@ class Spider1(Spider):
         #self.q = queue.Queue()
         #Spider.__init__(self)
         super(Spider1,self).__init__()
-        #self.url = self.settings["URL"]
-        self.url = "URL = https://www.smzdm.com/homepage/json_more?p=1"
+        self.url = self.settings["URL"]
+        #self.url = "URL = https://www.smzdm.com/homepage/json_more?p=1"
 
     def start_requests(self):
         start_url = list()
