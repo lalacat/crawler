@@ -1,5 +1,5 @@
 import os,logging
-from test.framework.test_import.loadobject import load_object
+from test.framework.objectimport.loadobject import load_object
 from test.framework.setting import Setting
 
 class A(object):

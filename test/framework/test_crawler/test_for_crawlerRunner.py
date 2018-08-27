@@ -1,4 +1,4 @@
-from test.framework.test_import.spiderloader import SpiderLoader
+from test.framework.objectimport.spiderloader import SpiderLoader
 from test.framework.crawler import Crawler,_get_spider_loader,CrawlerRunner
 from test.framework.record_live_instances import print_live_refs
 from twisted.internet.defer import DeferredList

@@ -1,6 +1,6 @@
 from test.framework.crawler import Crawler, _get_spider_loader
 from test.framework.setting import Setting
-from test.framework.test_import.loadobject import load_object
+from test.framework.objectimport.loadobject import load_object
 
 
 class Slot(object):

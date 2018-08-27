@@ -2,7 +2,7 @@ from twisted.internet import defer,reactor,task
 from urllib.parse import quote
 
 from test.framework.engine.reactor import CallLaterOnce
-from test.framework.test_import.loadobject import load_object
+from test.framework.objectimport.loadobject import load_object
 from test.framework.url_convert import safe_url_string
 import logging,time
 from test.framework.scheduler.test_scheduler import Scheduler

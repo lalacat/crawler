@@ -1,7 +1,7 @@
 from twisted.internet.defer import inlineCallbacks,maybeDeferred,DeferredList
 from twisted.internet import reactor
 import logging
-from test.framework.test_import.loadobject import load_object
+from test.framework.objectimport.loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
 from test.framework.engine.test_engine import ExecutionEngine

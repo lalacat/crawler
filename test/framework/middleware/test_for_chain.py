@@ -3,7 +3,7 @@ from twisted.web.client import getPage
 from queue import Queue
 from test.public_api.web import MongoDb
 from urllib.parse import quote
-from test.framework.test_import.import_spider import Spider
+from test.framework.objectimport.import_spider import Spider
 import time
 
 def process_chain(callbacks, input, *a, **kw):

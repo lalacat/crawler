@@ -66,10 +66,11 @@ LOG_LEVEL = 'DEBUG'
 REACTOR_THREADPOOL_MAXSIZE = 10
 RANDOMIZE_DOWNLOAD_DELAY = True  # 随机延迟
 #S
-SPIDER_MANAGER_CLASS = "test.framework.test_import.spiderloader.SpiderLoader"
+SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.scheduler.test_scheduler.Scheduler"
 
 #T
+TEST = {"sdasd":10}
 #U
 #V
 #W
