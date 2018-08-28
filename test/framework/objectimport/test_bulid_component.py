@@ -1,6 +1,6 @@
 from test.framework.setting import BaseSettings, Setting
 from operator import itemgetter
-import logging,pprint
+import logging
 import numbers
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ def bulid_component_list(complist):
         for k,v in complist.items():
             if v is not None and not isinstance(v,numbers.Real):
                 raise ValueError('模块 {} 存在无效值 {},请为模块提供一个确定的数值 '.format(k,v))
-        comlist = [k for k ,v in sorted(complist.items(),key=itemgetter(1))]
+        comlist = [k for k,v in sorted(complist.items(),key=itemgetter(1))]
 
     elif isinstance(complist,list):
         logger.info("载入的模块是list类型，将按设置的默认顺序载入")
@@ -30,14 +30,3 @@ def bulid_component_list(complist):
 
     return comlist
 
-s = Setting()
-a = {"a":10,"b":20,"c":30,"d":5}
-
-b = bulid_component_list(a)
-for k in b :
-    print(k)
-c = [(1,2,3,4,5,6,7),(1,5,4,3,5,6,7),(1,7,8,3,5,6,2)]
-b = itemgetter(1)
-for i in c:
-    for j in sorted(i,itemgetter(1)):
-        print(j)

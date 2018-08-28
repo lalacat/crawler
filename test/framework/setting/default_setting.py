@@ -70,7 +70,14 @@ SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.scheduler.test_scheduler.Scheduler"
 
 #T
-TEST = {"sdasd":10}
+TEST_MIDDLEWARE = {
+                   "test.framework.middleware.test_for_add_mw_01.Test_MW_A":300,
+                   "test.framework.middleware.test_for_add_mw_01.test_fun_A":750,
+                   "test.framework.middleware.test_for_add_mw_02.Test_MW_B":200,
+                   "test.framework.middleware.test_for_add_mw_02.test_fun_B":150,
+                   "test.framework.middleware.test_for_add_mw_03.Test_MW_C":100,
+                   "test.framework.middleware.test_for_add_mw_03.test_fun_C":450,
+                 }
 #U
 #V
 #W

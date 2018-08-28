@@ -39,7 +39,7 @@ class HTTPDownloadHandler(object):
 
     @classmethod
     def from_crawler(cls,crawler):
-        return cls(crawler.settingds)
+        return cls(crawler.settings)
 
 
     def download_request(self,request,spider):

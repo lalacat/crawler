@@ -1,6 +1,8 @@
 from test.framework.crawler import Crawler, _get_spider_loader
 from test.framework.setting import Setting
 from test.framework.objectimport.loadobject import load_object
+from test.framework.downloads.download_agent import HTTPDownloadHandler
+
 
 
 class Slot(object):
