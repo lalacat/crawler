@@ -10,3 +10,7 @@ class Test_MW_C(object):
 
 def test_fun_C(test):
     print(test)
+
+def test_fun_common(test):
+    print("mw_03",test)
+    return "from mw_03"

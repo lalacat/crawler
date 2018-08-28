@@ -11,3 +11,8 @@ class Test_MW_B(object):
 
 def test_fun_B(test):
     print(test)
+
+
+def test_fun_common(test):
+    print("mw_02",test)
+    return "from mw_02"

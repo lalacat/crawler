@@ -28,6 +28,4 @@ def bulid_component_list(complist):
     if len(comlist) != len(complist):
         raise ImportError("载入不完整缺少，存在模块没有导入")
 
-    pprint.pprint(complist)
-
     return comlist
