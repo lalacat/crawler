@@ -4,6 +4,13 @@ class Test_MW_D_03(object):
     def __init__(self,crawler):
         self.crawler = crawler
 
+    def process_request(self):
+        print("mw_d_03 inner test")
+        return "from mw_d_03"
+
+    def open_spider(self):
+        print("mw_d_03 inner test")
+        return "from mw_d_03"
 
     @classmethod
     def from_crawler(cls,crawler):

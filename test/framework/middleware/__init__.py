@@ -105,9 +105,9 @@ class MiddlewareManager(object):
     def close_spider(self, spider):
         return self._process_parallel('close_spider', spider)
 
+
+
 '''
-
-
 s = Setting()
 m = MiddlewareManager.from_settings(s,"A")
 m._process_parallel("test_fun_common","common test")

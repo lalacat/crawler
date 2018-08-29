@@ -56,13 +56,13 @@ s = Setting()
 
 m = DownloaderMiddlewareManager.from_settings(s,"A")
 
-print(m.methods['Test_MW_D_01'])
+print(m.methods['Test_MW_D_01'][0])
 
-m.methods['test_fun_common'].append(m.methods['Test_MW_D_01'].process_request)
+m.methods['test_fun_common'].append(m.methods['Test_MW_D_01'][0].process_request)
 for i in m.methods['test_fun_common']:
     print(i.__name__)
 print(m.methods['Test_MW_D_01'].__class__.__name__)
-print(m.methods['Test_MW_D_01'])
+print(m.methods['test_fun_common'])
 
 '''
 cls = _get_spider_loader(s)
