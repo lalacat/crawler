@@ -81,6 +81,18 @@ TEST_MIDDLEWARE = {
                    "test.framework.middleware.test_for_add_mw_03.test_fun_C":450,
                    "test.framework.middleware.test_for_add_mw_03.test_fun_common":350,
                  }
+TEST_DOWNLOADER_MIDDLEWARE = {
+    "test.framework.downloads.test_for_download_middleware_01.Test_MW_D_01":100,
+    "test.framework.downloads.test_for_download_middleware_01.test_fun_D_A":200,
+    "test.framework.downloads.test_for_download_middleware_01.test_fun_common":150,
+    "test.framework.downloads.test_for_download_middleware_02.Test_MW_D_02":160,
+    "test.framework.downloads.test_for_download_middleware_02.test_fun_D_B":210,
+    "test.framework.downloads.test_for_download_middleware_02.test_fun_common":500,
+    "test.framework.downloads.test_for_download_middleware_03.Test_MW_D_03":10,
+    "test.framework.downloads.test_for_download_middleware_03.test_fun_D_C":300,
+    "test.framework.downloads.test_for_download_middleware_03.test_fun_common":400,
+
+}
 #U
 #V
 #W

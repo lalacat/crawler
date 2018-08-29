@@ -6,7 +6,6 @@ from test.framework.objectimport import bulid_component_list
 from test.framework.setting import Setting
 from test.framework.objectimport.loadobject import load_object
 from test.framework.twisted.defer import process_parallel, process_chain, process_chain_both
-
 logger = logging.getLogger(__name__)
 
 
@@ -33,8 +32,8 @@ class MiddlewareManager(object):
     #  子类实现该方法，从settings中获得方法，如果子类没呀重写该方法
     #  会报错
     def _get_mwlist_from_settings(cls,settings):
-        return bulid_component_list(settings["TEST_MIDDLEWARE"])
-        #raise NotImplementedError
+        #return bulid_component_list(settings["TEST_MIDDLEWARE"])
+        raise NotImplementedError
 
     @classmethod
     def from_settings(cls,settings,crawler=None):
@@ -97,7 +96,7 @@ class MiddlewareManager(object):
         return process_chain(self.methods[methodname],obj,*args)
 
     def _process_chain_both(self, cb_methodname, eb_methodname, obj, *args):
-        return process_chain_both(self.methods[cb_methodname], \
+        return process_chain_both(self.methods[cb_methodname],
             self.methods[eb_methodname], obj, *args)
 
     def open_spider(self, spider):
@@ -106,8 +105,11 @@ class MiddlewareManager(object):
     def close_spider(self, spider):
         return self._process_parallel('close_spider', spider)
 
+'''
+
 
 s = Setting()
 m = MiddlewareManager.from_settings(s,"A")
 m._process_parallel("test_fun_common","common test")
 pprint.pformat(m.methods["test_fun_common"])
+'''

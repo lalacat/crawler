@@ -41,6 +41,7 @@ def process_chain(callbacks, input, *a, **kw):
     d.callback(input)
     return d
 
+
 def process_chain_both(callbacks,errbacks,input,*a,**kw):
     d = defer.Deferred()
     for cb,eb in zip(callbacks,errbacks):
