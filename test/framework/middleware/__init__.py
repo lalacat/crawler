@@ -70,7 +70,7 @@ class MiddlewareManager(object):
 
         if len(middlewares)  != len(clsnames):
             raise ImportError("载入不完整")
-        logger.info("生效的父类中间件 %(componentname)ss:\n%(enabledlist)s",
+        logger.info("生效%(componentname)ss的中间件 :\n%(enabledlist)s",
                     {'componentname': cls.component_name,
                      'enabledlist': pprint.pformat(enabled)},
                     extra={'crawler': crawler})

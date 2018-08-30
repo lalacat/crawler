@@ -1,9 +1,58 @@
-from twisted.internet import defer
+from twisted.internet import defer,reactor
 import logging
 
 from twisted.python import failure
 
 logger = logging.getLogger(__name__)
+
+
+def defer_fail(_failure):
+    """Same as twisted.internet.defer.fail but delay calling errback until
+    next reactor loop
+
+    It delays by 100ms so reactor has a chance to go through readers and writers
+    before attending pending delayed calls, so do not set delay to zero.
+    """
+    d = defer.Deferred()
+    reactor.callLater(0.1, d.errback, _failure)
+    return d
+
+def defer_succeed(result):
+    """Same as twisted.internet.defer.succeed but delay calling callback until
+    next reactor loop
+
+    It delays by 100ms so reactor has a chance to go trough readers and writers
+    before attending pending delayed calls, so do not set delay to zero.
+    """
+    d = defer.Deferred()
+    reactor.callLater(0.1, d.callback, result)
+    return d
+
+def defer_result(result):
+    if isinstance(result, defer.Deferred):
+        return result
+    elif isinstance(result, failure.Failure):
+        return defer_fail(result)
+    else:
+        return defer_succeed(result)
+
+
+def mustbe_deferred(f, *args, **kw):
+    """Same as twisted.internet.defer.maybeDeferred, but delay calling
+    callback/errback to next reactor loop
+    """
+    try:
+        result = f(*args, **kw)
+    # FIXME: Hack to avoid introspecting tracebacks. This to speed up
+    # processing of IgnoreRequest errors which are, by far, the most common
+    # exception in Scrapy - see #125
+    except Exception as e:
+        return defer_fail(failure.Failure(e))
+    except:
+        return defer_fail(failure.Failure())
+    else:
+        return defer_result(result)
+
 
 
 def process_parallel(callbacks, input, *a, **kw):
