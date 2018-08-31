@@ -54,7 +54,6 @@ def mustbe_deferred(f, *args, **kw):
         return defer_result(result)
 
 
-
 def process_parallel(callbacks, input, *a, **kw):
     """
     并行处理

@@ -33,3 +33,4 @@ class Spider1(Spider):
         except Exception as e:
             self.logger(e)
         return list
+

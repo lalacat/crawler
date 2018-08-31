@@ -20,6 +20,7 @@ class MiddlewareManager(object):
     component_name = 'father middleware'
 
     def __init__(self,*middlewares):
+        logging.info("初始化中间件............")
         self.clsnames = middlewares[0]
         self.middlewares = middlewares[1]
 

@@ -200,7 +200,6 @@ class CrawlerProcess(CrawlerRunner):
             pass
 
 
-
 def _get_spider_loader(settings):
     cls_path = settings["SPIDER_MANAGER_CLASS"]
     loader_cls = load_object(cls_path)

@@ -1,3 +1,5 @@
+from test.framework.crawler import Crawler
+from test.framework.downloads import Downloader
 from test.framework.downloads.download_agent import HTTPDownloadHandler
 from test.framework.setting import Setting
 from test.framework.https.request import Request
@@ -29,13 +31,18 @@ request = Request(url=url,callback=request_callback,method='get',
                   headers=headers,errback=request_errback,meta={"download_timeout":2})
 
 settings = Setting()
+crawler = Crawler(Spider1,settings)
+spider = crawler._create_spider()
+downloader = Downloader(crawler)
 
-spider = Spider1.update_settings(settings)
-
+"""
 httphandler = HTTPDownloadHandler(settings)
 agent = httphandler.download_request(request,spider)
 agent.addCallback(agent_print)
 agent.addErrback(request_errback)
+"""
+agent = downloader.fetch(request,spider)
+agent.addBoth(request_callback)
 agent.addBoth(lambda _: reactor.stop())
 
 reactor.run()

@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 def bulid_component_list(complist):
 
     if complist is None:
-        raise ValueError("设置的参数有误，不能查找到")
+        raise ValueError("设置的参数有误，不能查找到所要添加的中间件，重新检查配置名称")
     if isinstance(complist,dict):
         logger.info("载入的模块是dict类型，将按设置的优先级载入")
         #  operator.itemgetter函数获取的不是值，而是定义了一个函数，通过该函数作用到对象上才能获取值。

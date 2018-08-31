@@ -70,6 +70,7 @@ SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.scheduler.test_scheduler.Scheduler"
 
 #T
+'''
 TEST_MIDDLEWARE = {
                    "test.framework.middleware.test_for_add_mw_01.Test_MW_A":300,
                    "test.framework.middleware.test_for_add_mw_01.test_fun_common":320,
@@ -93,6 +94,8 @@ TEST_DOWNLOADER_MIDDLEWARE = {
     "test.framework.downloads.test_for_download_middleware_03.test_fun_common":400,
 
 }
+'''
+TEST_DOWNLOADER_MIDDLEWARE = {}
 #U
 #V
 #W

@@ -43,6 +43,7 @@ class HTTPDownloadHandler(object):
 
 
     def download_request(self,request,spider):
+        logger.info("request：%s，spider: %s"%(request,spider))
         """返回一个http download 的 defer"""
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
