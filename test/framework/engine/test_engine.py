@@ -1,4 +1,8 @@
 from twisted.internet import defer,reactor,task
+from twisted.python.failure import Failure
+
+from test.framework.https.request import Request
+from test.framework.https.response import Response
 from test.framework.twisted.reactor import CallLaterOnce
 from test.framework.objectimport.loadobject import load_object
 import logging,time
@@ -34,13 +38,13 @@ class Slot(object):
 
     def add_request(self, request):
         """
-
         :param request:
         :return:
         """
         self.inprogress.add(request)
 
     def remove_request(self, request):
+        #  当request处理完后就可以移除掉了
         self.inprogress.remove(request)
         self._maybe_fire_closing()
 
@@ -81,93 +85,187 @@ class ExecutionEngine(object):
         self.slot = None
         self.spider = None
         self.running = False
+        self.paused = False
 
+        # 从settings中找到Scheduler调度器，找到Scheduler类
         self.scheduler_cls = load_object(self.settings["SCHEDULER"])
-
-
+        # 同样，找到Downloader下载器类
+        downloader_cls = load_object(self.settings["DOWNLOADER"])
+        self.downloader = downloader_cls(crawler)
         self.crawlling = []
         self._spider_closed_callback = spider_closed_callback
 
         self.flag = False
 
-
     @defer.inlineCallbacks
     def start(self):
         assert not self.running,"引擎已启动" #running为Flase的时候，不报错，为True的时候，报错
         self.start_time = time.time()
-        print(self.start_time)
-        logger.info("engine start: %d",self.start_time)
-
-        #yield 信号处理
+        logger.info("engine start: %d" %self.start_time)
         self.running = True
-
         self._closewait = defer.Deferred()
         yield self._closewait
-
 
     def stop(self):
         assert self.running,"引擎没有运行"
         logger.info("停止引擎")
         self.running = False
+        dfd = self._close_all_spiders()
+        return dfd.addBoth(lambda _: self._finish_stopping_engine())
+
+    def _finish_stopping_engine(self):
         self._closewait.callback(None)
+
+    def pause(self):
+        """
+        Pause the execution engine
+        此时循环还在进行中，只不过限制了_next_request进行下一步操作
+        """
+        self.paused = True
+
+    def unpause(self):
+        """Resume the execution engine"""
+        self.paused = False
 
     def _next_request(self,spider):
         """
         爬虫爬网页的主要运行方法
+        首先是判断slot和引擎的状态，
+        其次是通过scheduler对队列中的request进行下载
+        最后才是通过start_requset不断将request添加到scheduler中去
+        scheduler队列中的request保持在一个，只有下载结束了才会去取新的一个
         :param spider:
         :return:
         """
-        print("不断调用next_request")
+        logger.debug("不断调用next_request")
 
         slot = self.slot
-        ''' 
-        try:
-            self.spider += spider
-            logger.info(self.spider)
+        if not slot:
+            return
 
-            if self.spider == 5:
-                self.flag = True
-            if self.flag:
-                logger.info("心跳停止")
-                self.slot.close()
+        if self.paused:
+            return
 
-        except Exception as e:
-            print(e)
-        '''
         # 是否等待，因为在opeb_spider中通过nextcall中的LoopCall不断的调用
         # _next_requset必须设置flag来保障，每次调用的时候只有前一次的处理结束
         # 后才能继续执行新的任务
         while not self._needs_backout():
             # 从scheduler中获取request
-            # 注意：第一次获取时，是没有的，也就是会break出来
-            # 从而执行下面的逻辑
-            pass
+            # 注意：第一次获取时，是没有的，也就是会break出来从而执行下面的逻辑
+            # 当scheduler的request队列为空后，就break
+            if not self._next_request_from_scheduler(spider):
+                break
 
         # 如果start_requests有数据且不需要等待
         if slot.start_requests and not self._needs_backout():
-            pass
+            try:
+                request = next(slot.start_requests)
+            except StopIteration:
+                slot.start_requests = None
+            except Exception:
+                slot.start_requests = None
+                logger.error('Error while obtaining start requests',
+                             exc_info=True, extra={'spider': spider})
+            #  没有发生异常执行此段代码
+            else:
+                self.crawl(request, spider)
 
     def _needs_backout(self):
         slot = self.slot
         """
         判断爬虫的状态判断是否需要等待：
         只要有一个False返回False,全True返回True
-        1.引擎是否正在运行
-        2.爬虫的状态管理类是否关闭了
-        3.downloader下载超过预设
+        1.引擎是否正在运行,默认是False，执行完start后为True
+        2.slot是否关闭了,默认slot.closing是False
+        3.downloader下载超过预设默认是16个，同时下载的页面超过16个就返回ture
         4.scraper处理response超过预设
         """
         return not self.running \
             or slot.closing \
-            #or self.downloader.needs_backout() \
+            or self.downloader.needs_backout()
             #or self.scraper.slot.needs_backout()
+
+    def _next_request_from_scheduler(self,spider):
+        #  从scheduler队列中获取request
+        #  并进行下载
+        slot = self.slot
+        request = slot.scheduler.next_request()
+        if not request:
+            return
+        d = self._download(request,spider)
+        d.addBoth(self._handle_downloader_output,request,spider)
+        d.addErrback(lambda f: logger.info('Error while handling downloader output',
+                                       extra={'spider': spider}))
+
+        #  移除掉处理过的request
+        d.addBoth(lambda _: slot.remove_request(request))
+        d.addErrback(lambda f: logger.info('Error while scheduling new request',
+                                           extra={'spider': spider}))
+
+        #  进行下一次的处理request
+        d.addBoth(lambda _: slot.nextcall.schedule())
+        d.addErrback(lambda f: logger.info('Error while scheduling new request',
+                                           extra={'spider': spider}))
+        return d
+
+    def _handle_downloader_output(self,response,request,spider):
+        #  得到的是下载后的结果，此方法是将结果输出到其他需要处理结果的地方
+        assert isinstance(response, (Request, Response, Failure)), response
+        if isinstance(response, Request):
+            #  到这一步得到的response还是Request类，表明下载不成功，
+            #  需要重新走一遍流程
+            self.crawl(response, spider)
+            return
+        # 自己添加处理方法
+
+        return response
+
+    def _download(self,request,spider):
+        slot = self.slot
+        #  将取得的requst添加到in_progress中
+        slot.add_requset(request)
+
+        def _on_success(response):
+            #  若得到的是response数据，则就返回response
+            assert isinstance(response,(Response,Request))
+            if isinstance(response,Response):
+                response.requset = request
+                return response
+
+        def _on_complete(_):
+            #  当一个requset处理完后，就进行下一个处理
+            slot.nextcall.schedule()
+            return _
+
+        dwld = self.downloader.fetch(request,spider)
+        dwld.addCallbacks(_on_success)
+        dwld.addBoth(_on_complete)
+        return dwld
+
+    @property
+    def open_spiders(self):
+        return [self.spider] if self.spider else []
+
+    def crawl(self, request, spider):
+        assert spider in self.open_spiders, \
+            "Spider %r not opened when crawling: %s，即%r 没有执行open_spider方法" % (spider.name, request,spider.name)
+        #  添加到队列中去
+        self.schedule(request, spider)
+        self.slot.nextcall.schedule()
+
+    def schedule(self, request, spider):
+        logger.info("%s 进入队列中"%request)
+        self.slot.scheduler._mqpush(request)
+
+
+
+
 
     def print_web(self,content):
 
         for items in content:
             for key,value in items.items():
                 print(key,value)
-
 
     #当一个defer爬虫结束后，将完成的爬虫线程从list中移除去
     def finish_crawl(self,content,req):
@@ -190,22 +288,21 @@ class ExecutionEngine(object):
         # 将_next_request注册到reactor循环圈中，便于slot中loopCall不断的调用
         #  相当于不断调用_next_request(spider)
         try:
-            self.spider = spider
             nextcall = CallLaterOnce(self._next_request,spider)
             #  初始化scheduler
             scheduler = self.scheduler_cls.from_crawler(self.crawler)
             #  调用中间件，就是添加若干个inner_derfer
-            #  start_requests = yield start_requests
+            start_requests = yield start_requests
+            #  封装Slot对象
             slot = Slot(start_requests,close_if_idle,nextcall,scheduler)
             self.slot = slot
-            print("1")
-
-            yield self.scheduler_cls.open(spider)
-
+            self.spider = spider
+            # 调用scheduler的open
+            yield self.scheduler.open(spider)
             #  启动页面读取，进行爬虫工作
             slot.nextcall.schedule()
             #  自动调用启动，每5秒一次调用
-            slot.heartbeat.start(1)
+            slot.heartbeat.start(5)
         except Exception as e:
             logger.error(e)
 
@@ -217,3 +314,49 @@ class ExecutionEngine(object):
         logger.info("finish")
         self._close.callback(None)
 
+    def close_spider(self,spider,reason='cancelled'):
+        """关闭所有的爬虫和未解决的requests"""
+        slot = self.slot
+        if slot.closing:
+            # 不是False，就是Defferred对象，就表明已经关闭了
+            return slot.closing
+        logger.info("关闭爬虫：(%(reason)s)",
+                    {'reason': reason},
+                    extra={'spider': spider})
+        dfd = slot.close()
+
+        def log_failure(msg):
+            def errback(failure):
+                logger.error(
+                    msg,
+                    extra={'spider': spider}
+                )
+            return errback
+        #  关闭下载器
+        dfd.addBoth(lambda _: self.downloader.close())
+        dfd.addErrback(log_failure('Downloader close failure'))
+
+        #  关闭scheduler
+        dfd.addBoth(lambda _: slot.scheduler.close(reason))
+        dfd.addErrback(log_failure('Scheduler close failure'))
+
+        dfd.addBoth(lambda _: logger.info("Spider closed (%(reason)s)",
+                                          {'reason': reason},
+                                          extra={'spider': spider}))
+
+        #  引擎中的slot清空
+        dfd.addBoth(lambda _: setattr(self, 'slot', None))
+        dfd.addErrback(log_failure('Error while unassigning slot'))
+
+        # 引擎中的spider清空
+        dfd.addBoth(lambda _: setattr(self, 'spider', None))
+        dfd.addErrback(log_failure('Error while unassigning spider'))
+
+        dfd.addBoth(lambda _: self._spider_closed_callback(spider))
+
+        return dfd
+
+    def _close_all_spider(self):
+        dfds = [self.close_spider(s, reason='shutdown') for s in self.open_spiders]
+        dlist = defer.DeferredList(dfds)
+        return dlist

@@ -121,6 +121,7 @@ class Downloader(object):
         return dfd.addBoth(_deactivate)
 
     def needs_backout(self):
+        #  进行的下载任务的个数大于等于并发数，默认并发数为0，即只要有任务，就返回True
         return len(self.active) >= self.total_concurrency
 
     #  处理requset
