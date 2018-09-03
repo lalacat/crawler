@@ -90,7 +90,6 @@ class Downloader(object):
         #  如果只是加载一个类不带参数，而这个类的初始化带有参数的时候，使用这个类的时候会报错
         #  XXX missing X required positional argument
         self.handler = load_object(self.settings["DOWNLOAD_HANDLER"])(self.settings)
-        print(self.handler)
         self.slots = {}
         # active是一个活动集合，用于记录当前正在下载的request集合。
         self.active = set()
@@ -223,7 +222,6 @@ class DownloaderMiddlewareManager(MiddlewareManager):
             self.methods['process_exception'].insert(0, mw.process_exception)
 
     def download(self,download_func,request,spider):
-        print(download_func)
         #  将默认处理的三个中间件分别添加到defer链上
         @defer.inlineCallbacks
         def process_request(request):

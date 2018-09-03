@@ -1,10 +1,11 @@
-import time,json,pymongo
+import time,json,pymongo,logging
 from twisted.internet import reactor
 
 def get_smzdm_datas(web_body):
-    #print("get_need_datas")
+    print("get_need_datas")
     datas_list = list()
     if isinstance(web_body,bytes):
+        logging.info("body got is bytes")
         web_body = json.loads(web_body)
     else:
         print("data type is json")

@@ -5,6 +5,9 @@ from test.framework.setting import Setting
 from test.framework.https.request import Request
 from spider.spider1 import Spider1
 from twisted.internet import reactor
+
+from test.public_api.web import get_smzdm_datas, print_smzdm_result
+
 url = 'https://www.smzdm.com/homepage/json_more?p=1'
 headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
                   'content-type':["application/json"]}
@@ -12,7 +15,9 @@ headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20
 
 def request_callback(content):
     print("request_and_response callback")
-    print(content)
+    print(type(content.body))
+
+    return content.body
 
 
 def request_errback(content):
@@ -42,7 +47,9 @@ agent.addCallback(agent_print)
 agent.addErrback(request_errback)
 """
 agent = downloader.fetch(request,spider)
-agent.addBoth(request_callback)
+agent.addCallback(request_callback)
+agent.addCallback(get_smzdm_datas)
+agent.addCallback(print_smzdm_result,url)
 agent.addBoth(lambda _: reactor.stop())
 
 reactor.run()
