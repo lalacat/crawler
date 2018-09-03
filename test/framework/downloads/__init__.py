@@ -83,10 +83,14 @@ def _get_concurrency_delay(concurrency, spider, settings):
 
     return concurrency, delay
 
+
 class Downloader(object):
     def __init__(self,crawler):
         self.settings = crawler.settings
-        self.handler = load_object(self.settings["DOWNLOAD_HANDLER"])
+        #  如果只是加载一个类不带参数，而这个类的初始化带有参数的时候，使用这个类的时候会报错
+        #  XXX missing X required positional argument
+        self.handler = load_object(self.settings["DOWNLOAD_HANDLER"])(self.settings)
+        print(self.handler)
         self.slots = {}
         # active是一个活动集合，用于记录当前正在下载的request集合。
         self.active = set()
@@ -169,7 +173,7 @@ class Downloader(object):
 
     def _download(self, request, spider,slot=None,):
         logger.info("进行下载。。。。。")
-        logger.info("request：%s，spider: %s"%(request,spider))
+        #logger.info("request：%s，spider: %s"%(request,spider))
         try:
             dfd = mustbe_deferred(self.handler.download_request,request,spider)
         except Exception:

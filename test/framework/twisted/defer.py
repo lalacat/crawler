@@ -41,8 +41,12 @@ def mustbe_deferred(f, *args, **kw):
     """Same as twisted.internet.defer.maybeDeferred, but delay calling
     callback/errback to next reactor loop
     """
+    logging.info("进行mustbe_defferred包装")
     try:
+        logging.info(f)
+        logging.info(args)
         result = f(*args, **kw)
+
     # FIXME: Hack to avoid introspecting tracebacks. This to speed up
     # processing of IgnoreRequest errors which are, by far, the most common
     # exception in Scrapy - see #125
