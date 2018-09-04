@@ -69,7 +69,6 @@ class Crawler(object):
     def _create_engine(self):
         logger.info("爬虫引擎已创建")
         return ExecutionEngine(self,lambda _: self.stop())
-        #return ExecutionEngine()
 
     def _create_spider(self,*args, **kwargs):
         logger.info("爬虫：%s 已创建" %self.spidercls.name)

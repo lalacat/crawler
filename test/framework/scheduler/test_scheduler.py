@@ -15,7 +15,7 @@ class Scheduler(object):
 
         return cls(mqclass=mqs)
 
-    def has_unhandler_request(self):
+    def has_unhandler_requests(self):
         return len(self)>0
 
     def open(self,spider):

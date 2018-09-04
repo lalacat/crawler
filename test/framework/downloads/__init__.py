@@ -110,6 +110,7 @@ class Downloader(object):
     #  进行加载中间件，及对requset进行下载
     def fetch(self,request,spider):
         logger.info("加载中间件，准备下载")
+
         def _deactivate(response):
             self.active.remove(request)
             return response

@@ -13,6 +13,7 @@ DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 logger = logging.getLogger(__name__)
 
+
 class Slot(object):
     """
     爬虫过程中，爬虫引擎的插槽
@@ -79,7 +80,7 @@ class ExecutionEngine(object):
         logger.debug("引擎初始化")
         self.crawler =crawler
         self.settings = crawler.settings
-        #获取log的格式
+        # 获取log的格式
         self.logformatter = crawler.logformatter
 
         self.slot = None
@@ -170,6 +171,9 @@ class ExecutionEngine(object):
             else:
                 self.crawl(request, spider)
 
+        if self.spider_is_idle(spider) and slot.close_if_idle:
+            self._spider_idle(spider)
+
     def _needs_backout(self):
         slot = self.slot
         """
@@ -220,6 +224,22 @@ class ExecutionEngine(object):
 
         return response
 
+    def spider_is_idle(self):
+
+        if self.downloader.active:
+            #  判断active队列是否为空，不为空就返回False
+            return False
+
+        if self.slot.start_requests is not None:
+            return False
+
+        if self.slot.scheduler.has_unhandler_requests():
+            return False
+
+        return True
+
+
+
     def _download(self,request,spider):
         slot = self.slot
         #  将取得的requst添加到in_progress中
@@ -253,30 +273,13 @@ class ExecutionEngine(object):
         self.schedule(request, spider)
         self.slot.nextcall.schedule()
 
+    def has_capacity(self):
+        """保证一个engine对应对应处理一个spider,一个slot对应一个spider"""
+        return not bool(self.slot)
+
     def schedule(self, request, spider):
         logger.info("%s 进入队列中"%request)
         self.slot.scheduler._mqpush(request)
-
-
-
-
-
-    def print_web(self,content):
-
-        for items in content:
-            for key,value in items.items():
-                print(key,value)
-
-    #当一个defer爬虫结束后，将完成的爬虫线程从list中移除去
-    def finish_crawl(self,content,req):
-        logger.info("finish")
-        self.crawlling.remove(req)
-        return content
-
-    def crawl_err(self,content,req):
-        logger.error("error found \n",content)
-        self.crawlling.remove(req)
-        return None
 
     @defer.inlineCallbacks
     #将爬虫中的网页读取出来
@@ -306,13 +309,13 @@ class ExecutionEngine(object):
         except Exception as e:
             logger.error(e)
 
-    def has_capacity(self):
-        """保证一个engine对应对应处理一个spider,一个slot对应一个spider"""
-        return not bool(self.slot)
-
     def _finish_stopping_engine(self):
         logger.info("finish")
         self._close.callback(None)
+
+    def _spider_idle(self,spider):
+        if self.spider_is_idle(spider):
+            self.close_spider(spider,reason="finished")
 
     def close_spider(self,spider,reason='cancelled'):
         """关闭所有的爬虫和未解决的requests"""
@@ -360,3 +363,17 @@ class ExecutionEngine(object):
         dfds = [self.close_spider(s, reason='shutdown') for s in self.open_spiders]
         dlist = defer.DeferredList(dfds)
         return dlist
+
+
+    def print_web(self,content):
+
+        for items in content:
+            for key,value in items.items():
+                print(key,value)
+
+
+
+    def crawl_err(self,content,req):
+        logger.error("error found \n",content)
+        self.crawlling.remove(req)
+        return None
