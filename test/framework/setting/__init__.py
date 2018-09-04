@@ -4,7 +4,7 @@ from importlib import import_module
 from test.framework.setting import default_setting
 import logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+#logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
 SETTINGG_PRIORITIES = {
     'default': 0,

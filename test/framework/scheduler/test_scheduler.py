@@ -16,7 +16,7 @@ class Scheduler(object):
         return cls(mqclass=mqs)
 
     def has_unhandler_requests(self):
-        return len(self)>0
+        return len(self) > 0
 
     def open(self,spider):
         logger.info("数据队列已准备")
@@ -28,7 +28,7 @@ class Scheduler(object):
         logger.debug("取下一个数据。。。")
         # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
         try:
-            requset = self.q.get(block=False)
+            requset = self.mqs.get(block=False)
         except Exception as e:
             logger.debug("队列数据已取完")
             requset = None

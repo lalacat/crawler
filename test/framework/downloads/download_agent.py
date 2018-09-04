@@ -43,7 +43,7 @@ class HTTPDownloadHandler(object):
 
 
     def download_request(self,request,spider):
-        logger.info("request：%s，spider: %s"%(request,spider))
+        logger.debug("download_request get a request：%s，spider: %s"%(request,spider))
         """返回一个http download 的 defer"""
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
@@ -74,8 +74,8 @@ class HTTPDownloadHandler(object):
 class DownloadAgent(object):
     _Agent = Agent
 
-    def __init__(self,contextFactory=None, connectTimeout= 10, bindAddress=None,
-                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=True):
+    def __init__(self,contextFactory=None, connectTimeout=10, bindAddress=None,
+                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False):
         self._contextFactory = contextFactory
         self._connectTimeout = connectTimeout
         self._bindAddress = bindAddress
@@ -126,6 +126,7 @@ class DownloadAgent(object):
             #  _RequestBodyProducer中dataReceived方法不会一直占用，数据还没接收到是，是会回到reactor循环的，
             #  当总的接收数据的时间超过了timeout的时候，才会执行d.cancel
             self._timeout_cl = reactor.callLater(timeout,self.fun_cancel,d)
+            d.addErrback(self.fun_err)
             d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
             logger.error(e)
@@ -133,6 +134,10 @@ class DownloadAgent(object):
     """
     测试区
     """
+    def fun_err(self,content):
+        print("接受信息错误")
+        return content
+
     def fun_print(self,content):
         logger.debug("fun_print 成功")
         return content
@@ -301,7 +306,7 @@ class _ResponseReader(Protocol):
 
         #  针对不同的loss connection进行问题的处理
         if reason.check(ResponseDone): #  正常完成数据下载
-            logger.info('Finished receiving body!!')
+            logger.info('%s Finished receiving body!!'%self._request.url)
             # callback(data)调用后，能够向defer数据链中传入一个list数据：
             # [True，传入的参数data]，可以实现将获取的body传输到下一个函数中去
             self._finished.callback((self._transferdata,body,None))
@@ -310,22 +315,23 @@ class _ResponseReader(Protocol):
         #  当body中没有设置Content-Length或者是Transfer-Encoding的时候，
         # response传输完后，会引起这个错误
         if reason.check(PotentialDataLoss):
-            logger.debug("数据有部分丢失")
+            logger.warning("数据有部分丢失")
             self._finished.callback((self._transferdata,body,['partial']))
             return
 
         #  any(x)判断x对象是否为空对象，如果都为空、0、false，则返回false，如果不都为空、0、false，则返回true
         if reason.check(ResponseFailed) and any(r.check(_DataLoss) for r in reason.value.reasons):
-            logger.debug("数据收到错误，%s"%reason.getErrorMessage())
+            logger.info("%s 下载失败，详情在debug模式下查看"%self._request.url)
+            logger.debug("%s 数据收到错误: %s"%(self._request.url,reason.getErrorMessage()))
             if not self._fail_on_dataloss:
                 #  当数据超过下载值得时候，_fail_on_dataloss是用来控制，要不要接收已收的部分数据
                 #  默认是将数据抛掉·
-                logger.debug("接收残缺数据")
+                logger.debug("%s 接收残缺数据"%self._request)
                 self._finished.callback((self._transferdata,body,['dataloss']))
                 return
 
             elif not self._fail_on_dataloss_warned :
-                logger.warning("%s 数据有丢失，如果要处理这个错误的话，在默认设置中"
+                logger.debug("%s 数据有丢失，如果要处理这个错误的话，在默认设置中"
                                "将DOWNLOAD_FAIL_ON_DATALOSS = False"
                                %self._transferdata.request.absoluteURI.decode())
                 self._fail_on_dataloss_warned = True

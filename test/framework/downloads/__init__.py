@@ -109,7 +109,7 @@ class Downloader(object):
 
     #  进行加载中间件，及对requset进行下载
     def fetch(self,request,spider):
-        logger.info("加载中间件，准备下载")
+        logger.debug("加载中间件，准备下载")
 
         def _deactivate(response):
             self.active.remove(request)
@@ -173,7 +173,7 @@ class Downloader(object):
                 break
 
     def _download(self, request, spider,slot=None,):
-        logger.info("进行下载。。。。。")
+        logger.debug("进行下载。。。。。")
         #logger.info("request：%s，spider: %s"%(request,spider))
         try:
             dfd = mustbe_deferred(self.handler.download_request,request,spider)
@@ -190,9 +190,13 @@ class Downloader(object):
         return dfd
 
     def close(self):
+        logger.info("关闭下载器")
         self._slot_gc_loop.stop()
+        ''' 
         for slot in iter(self.slots):
             slot.close()
+        '''
+
 
     #  垃圾回收
     def _slot_gc(self, age=60):
@@ -227,7 +231,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         #  将默认处理的三个中间件分别添加到defer链上
         @defer.inlineCallbacks
         def process_request(request):
-            logger.info("处理process_request")
+            logger.debug("处理process_request")
             for method in self.methods['process_request']:
                 response = yield method(request=request,spider =spider)
                 assert response is None or isinstance(response,(Response,Request)),\
@@ -239,16 +243,18 @@ class DownloaderMiddlewareManager(MiddlewareManager):
             #  如果参数是经过一系列中间件处理过的request，这一步就是对requset进行下载
             #ddf =
             #  返回一个带有result的defer
+            '''
             try:
                 dlf = yield download_func(request=request,spider=spider)
                 defer.returnValue(dlf)
-                #defer.returnValue((yield download_func(request=request,spider=spider)))
             except Exception as e:
                 logger.error("process_request: %s" %e)
+            '''
+            defer.returnValue((yield download_func(request=request,spider=spider)))
 
         @defer.inlineCallbacks
         def process_response(response):
-            logger.info("处理process_response")
+            logger.debug("处理process_response")
             assert response is not None,"process_response接收到的数据是None"
             if isinstance(response,Request):
                 defer.returnValue(response)

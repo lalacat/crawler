@@ -12,6 +12,7 @@ class CallLaterOnce(object):
 
     def schedule(self, delay=0):
         if self._call is None:
+
             # 注册self到callLater中,调用的是func
             # callLater返回的值，可以调用cancel()delay()reset()
             self._call = reactor.callLater(delay, self)

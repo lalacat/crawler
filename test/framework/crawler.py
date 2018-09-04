@@ -10,7 +10,7 @@ from test.framework.setting import overridden_or_new_settings,Setting
 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.DEBUG)
 
 class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
@@ -40,21 +40,18 @@ class Crawler(object):
             self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
-            yield self.engine.start()
             yield self.engine.open_spider(self.spider,start_requests)
             '''
             此函数的功能就是如果作为其参数返回值为defer，那么其不作任何处理，原样将defer返回。
             但如何返回值不是defer而是一个值（正如我们的缓存代理将本地缓冲的诗歌返回一样），那么这个maybeDeferred会将该值重新打包成一个已经激活的deferred返回，注意是已经激活的deferred。
             当然，如果返回的是一个异常，其也会将其打包成一个已经激活的deferred，只不过就不是通过callback而是errback激活的。
             '''
-            yield maybeDeferred(self.engine.start,self.spider)
-            #yield self.timedelay(5)
+            yield maybeDeferred(self.engine.start)
         except Exception as e:
             logger.error(e)
             self.crawling = False
             if self.engine is not None:
                 yield self.engine.close()
-
             raise
 
     def timedelay(self,num):
@@ -64,7 +61,7 @@ class Crawler(object):
             time.sleep(1)
 
     """
-    用户封装调度器以及引擎的...
+    用户封装调度器以及引擎
     """
     def _create_engine(self):
         logger.info("爬虫引擎已创建")
