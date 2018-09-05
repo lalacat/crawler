@@ -15,7 +15,7 @@ class Test_Spider_1(Spider):
     def start_requests(self):
         start_url = list()
 
-        for i in range(10):
+        for i in range(100):
             i = str(i)
             u = self.url + i
             start_url.append(u)

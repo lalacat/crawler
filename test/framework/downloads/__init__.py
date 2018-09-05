@@ -122,8 +122,11 @@ class Downloader(object):
         return dfd.addBoth(_deactivate)
 
     def needs_backout(self):
-        #  进行的下载任务的个数大于等于并发数，默认并发数为0，即只要有任务，就返回True
-        return len(self.active) >= self.total_concurrency
+        #  进行的下载任务的个数大于等于并发数，默认并发数为16，表示下载要延缓一下
+        if len(self.active) >= self.total_concurrency:
+            logger.info("超过最大同时下载数%d"%self.total_concurrency)
+            return True
+        return False
 
     #  处理requset
     def _enqueue_request(self, request, spider):

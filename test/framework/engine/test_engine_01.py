@@ -14,13 +14,31 @@ def finish_crawl( content):
     logging.info("finish")
     return content
 
+def start_request_01():
+    start_url = list()
+    url = 'https://www.smzdm.com/homepage/json_more?p='
+
+    for i in range(100):
+        i = str(i)
+        u = url + i
+        start_url.append(u)
+
+    for url in start_url:
+        #print(url)
+        yield Request(url)
+
 settings = Setting()
 crawler_01 = Crawler(Test_Spider_1,settings)
-crawler_02 = Crawler(Test_Spider_2,settings)
-spider_01 = crawler_01._create_spider()
-spider_02 = crawler_02._create_spider()
-c1 = crawler_01.crawl()
-c2 = crawler_02.crawl()
-dd = defer.DeferredList([c1,c2])
-dd.addBoth(lambda _:reactor.stop())
+spider1 = crawler_01._create_spider()
+
+engine = ExecutionEngine(crawler_01,finish_crawl)
+downloads = []
+for request in start_request_01():
+    #(request.url)
+    agent = engine._download(request,spider1)
+    #agent.addCallback(request_callback)
+    downloads.append(agent)
+dd1 = defer.DeferredList(downloads)
+dd1.addBoth(lambda _: reactor.stop())
+
 reactor.run()

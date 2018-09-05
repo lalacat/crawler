@@ -5,7 +5,7 @@ LOG_FORMATTER = "AAA"
 #B
 
 #C
-CONCURRENT_REQUESTS = 16  # 设置的并发数
+CONCURRENT_REQUESTS = 160  # 设置的并发数(最大下载数)
 CONCURRENT_REQUESTS_PER_IP = 0  # ip并发度:
 CONCURRENT_REQUESTS_PER_DOMAIN = 8  # 设置HTTPConnectionPool最大保持连接个数
 

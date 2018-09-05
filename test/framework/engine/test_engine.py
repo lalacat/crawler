@@ -268,12 +268,11 @@ class ExecutionEngine(object):
 
         return True
 
-
-
     def _download(self,request,spider):
-        slot = self.slot
+
+        #slot = self.slot
         #  将取得的requst添加到in_progress中
-        slot.add_request(request)
+        #slot.add_request(request)
 
         def _on_success(response):
             #  若得到的是response数据，则就返回response
@@ -285,7 +284,7 @@ class ExecutionEngine(object):
 
         def _on_complete(_):
             #  当一个requset处理完后，就进行下一个处理
-            slot.nextcall.schedule()
+            #slot.nextcall.schedule()
             return _
 
         dwld = self.downloader.fetch(request,spider)
@@ -376,17 +375,3 @@ class ExecutionEngine(object):
         dfds = [self.close_spider(s, reason='shutdown') for s in self.open_spiders]
         dlist = defer.DeferredList(dfds)
         return dlist
-
-
-    def print_web(self,content):
-
-        for items in content:
-            for key,value in items.items():
-                print(key,value)
-
-
-
-    def crawl_err(self,content,req):
-        logger.error("error found \n",content)
-        self.crawlling.remove(req)
-        return None
