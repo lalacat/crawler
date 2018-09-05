@@ -50,13 +50,13 @@ class Slot(object):
         self.inprogress.remove(request)
         self._maybe_fire_closing()
 
-    def close(self):
-        logger.info("关闭slot")
+    def close(self,name):
+        logger.info("关闭 %s 的 slot！！"%name)
         self.closing = defer.Deferred()
-        self._maybe_fire_closing()
+        self._maybe_fire_closing(name)
         return self.closing
 
-    def _maybe_fire_closing(self):
+    def _maybe_fire_closing(self,name):
         """
         当执行close方法后，self.closing不为False，而且要保证在执行的爬虫任务都要完成的情况下，
         才能够停止心跳函数
@@ -64,7 +64,7 @@ class Slot(object):
         """
         if self.closing and not self.inprogress:
             if self.nextcall:
-                logger.info("LoopCall关闭")
+                logger.warning("%s 的LoopCall已关闭"%name)
                 self.nextcall.cancel()
                 if self.heartbeat.running:
                     self.heartbeat.stop()
@@ -87,6 +87,9 @@ class ExecutionEngine(object):
         self.spider = None
         self.running = False
         self.paused = False
+        self.engine_name = None
+        self.start_time = None
+        self._closewait = None
 
         # 从settings中找到Scheduler调度器，找到Scheduler类
         self.scheduler_cls = load_object(self.settings["SCHEDULER"])
@@ -99,12 +102,13 @@ class ExecutionEngine(object):
         self.flag = False
 
     @defer.inlineCallbacks
-    #将爬虫中的网页读取出来
+    #  将爬虫中的网页读取出来
     def open_spider(self,spider,start_requests,close_if_idle=True):
         logger.info("爬虫准备工作开始")
         logger.info("Spider正在打开",extra = {'spider':spider})
         assert self.has_capacity(),"此引擎已经在处理爬虫了，所以不能处理%s %r" %\
             spider.name
+        self.engine_name = spider.name + '\'s engine'
         # 将_next_request注册到reactor循环圈中，便于slot中loopCall不断的调用
         #  相当于不断调用_next_request(spider)
         try:
@@ -128,24 +132,23 @@ class ExecutionEngine(object):
 
     @defer.inlineCallbacks
     def start(self):
-        assert not self.running,"引擎已启动" #running为Flase的时候，不报错，为True的时候，报错
+        assert not self.running,"%s 的引擎已启动"%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
         self.start_time = time.time()
-        logger.info("引擎开始时间为: %d" %self.start_time)
+        logger.info("%s 的引擎开始时间为: %d" %(self.spider.name,self.start_time))
         self.running = True
         self._closewait = defer.Deferred()
         yield self._closewait
 
     def stop(self):
         assert self.running,"引擎没有运行"
-        logger.info("停止引擎")
         self.running = False
-        dfd = self._close_all_spider()
-        dfd.addBoth(lambda _:logger.info("引擎运行 %ds"%(time.time()-self.start_time)))
-        dfd.addBoth(lambda _: self._finish_stopping_engine())
-        return dfd
-
-    def _finish_stopping_engine(self):
+        logger.info("%s 引擎关闭,运行时间为 %d 秒" % (self.engine_name,(time.time() - self.start_time)))
         self._closewait.callback(None)
+        '''
+        dfd = self._close_all_spider()
+        dfd.addBoth(lambda _: self._finish_stopping_engine())
+        '''
+        return True
 
     def pause(self):
         """
@@ -202,7 +205,7 @@ class ExecutionEngine(object):
                 self.crawl(request, spider)
 
         if self.spider_is_idle() and slot.close_if_idle:
-            self._spider_idle(spider)
+           self._spider_idle(spider)
 
     def _needs_backout(self):
         slot = self.slot
@@ -270,9 +273,9 @@ class ExecutionEngine(object):
 
     def _download(self,request,spider):
 
-        #slot = self.slot
+        slot = self.slot
         #  将取得的requst添加到in_progress中
-        #slot.add_request(request)
+        slot.add_request(request)
 
         def _on_success(response):
             #  若得到的是response数据，则就返回response
@@ -284,7 +287,7 @@ class ExecutionEngine(object):
 
         def _on_complete(_):
             #  当一个requset处理完后，就进行下一个处理
-            #slot.nextcall.schedule()
+            slot.nextcall.schedule()
             return _
 
         dwld = self.downloader.fetch(request,spider)
@@ -311,16 +314,10 @@ class ExecutionEngine(object):
         logger.debug("%s 进入队列中" %request)
         self.slot.scheduler._mqpush(request)
 
-
-
-    def _finish_stopping_engine(self):
-        logger.info("finish")
-        self._close.callback(None)
-
     def _spider_idle(self,spider):
         if self.spider_is_idle():
             d = self.close_spider(spider,reason="finished")
-            d.addBoth(lambda _:reactor.stop())
+            #d.addBoth(lambda _:reactor.stop())
 
     def close_spider(self,spider,reason='cancelled'):
         """关闭所有的爬虫和未解决的requests"""
@@ -334,7 +331,7 @@ class ExecutionEngine(object):
                         'reason': reason
                     },
                     extra={'spider': spider})
-        dfd = slot.close()
+        dfd = slot.close(spider.name)
 
         def log_failure(msg):
             def errback(failure):
@@ -375,3 +372,8 @@ class ExecutionEngine(object):
         dfds = [self.close_spider(s, reason='shutdown') for s in self.open_spiders]
         dlist = defer.DeferredList(dfds)
         return dlist
+
+    def _finish_stopping_engine(self):
+        logger.info("%s 引擎关闭"%self.engine_name)
+        logger.info("引擎运行 %ds"%(time.time()-self.start_time))
+        self._closewait.callback(None)

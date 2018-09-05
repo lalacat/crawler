@@ -90,6 +90,7 @@ class Downloader(object):
         #  如果只是加载一个类不带参数，而这个类的初始化带有参数的时候，使用这个类的时候会报错
         #  XXX missing X required positional argument
         self.handler = load_object(self.settings["DOWNLOAD_HANDLER"])(self.settings)
+        self.spider = None
         self.slots = {}
         # active是一个活动集合，用于记录当前正在下载的request集合。
         self.active = set()
@@ -110,6 +111,7 @@ class Downloader(object):
     #  进行加载中间件，及对requset进行下载
     def fetch(self,request,spider):
         logger.debug("加载中间件，准备下载")
+        self.spider = spider
 
         def _deactivate(response):
             self.active.remove(request)
@@ -124,7 +126,7 @@ class Downloader(object):
     def needs_backout(self):
         #  进行的下载任务的个数大于等于并发数，默认并发数为16，表示下载要延缓一下
         if len(self.active) >= self.total_concurrency:
-            logger.info("超过最大同时下载数%d"%self.total_concurrency)
+            logger.warning("%s 的下载数超过最大同时下载数%d"%(self.spider.name,self.total_concurrency))
             return True
         return False
 
@@ -193,7 +195,7 @@ class Downloader(object):
         return dfd
 
     def close(self):
-        logger.info("关闭下载器")
+        logger.info("关闭 %s 的下载器"%self.spider.name)
         self._slot_gc_loop.stop()
         ''' 
         for slot in iter(self.slots):
