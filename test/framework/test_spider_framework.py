@@ -1,4 +1,3 @@
-from twisted.internet import reactor,defer
 from twisted.web.client import getPage
 from queue import Queue
 from test.public_api.web import MongoDb
@@ -21,6 +20,7 @@ class HttpResponse(object):
         self.url = request.url
         self.text = request.parse(context,self.url)
 
+from twisted.internet import reactor,defer
 
 class Scheduler(object):
     """
