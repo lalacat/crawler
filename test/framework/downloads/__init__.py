@@ -87,7 +87,7 @@ def _get_concurrency_delay(concurrency, spider, settings):
 
 
 class Downloader(object):
-    def __init__(self,crawler,mw_name=None):
+    def __init__(self,crawler):
         self.settings = crawler.settings
         #  如果只是加载一个类不带参数，而这个类的初始化带有参数的时候，使用这个类的时候会报错
         #  XXX missing X required positional argument
@@ -105,7 +105,7 @@ class Downloader(object):
         # 随机延迟下载时间 默认是True
         self.randomize_delay = self.settings.getbool('RANDOMIZE_DOWNLOAD_DELAY')
         # 初始化下载器中间件
-        self.middleware = DownloaderMiddlewareManager.from_crawler(crawler,mw_name)
+        self.middleware = DownloaderMiddlewareManager.from_crawler(crawler)
         # ask.LoopingCall安装了一个60s的定时心跳函数_slot_gc,这个函数用于对slots中的对象进行定期的回收。
         self._slot_gc_loop = task.LoopingCall(self._slot_gc)
         self._slot_gc_loop.start(60)

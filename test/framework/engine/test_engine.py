@@ -76,7 +76,7 @@ class ExecutionEngine(object):
     引擎：所有调度
     """
 
-    def __init__(self,crawler,spider_closed_callback,mw_name=None):
+    def __init__(self,crawler,spider_closed_callback):
         logger.debug("引擎初始化")
         self.crawler =crawler
         self.settings = crawler.settings
@@ -95,7 +95,7 @@ class ExecutionEngine(object):
         self.scheduler_cls = load_object(self.settings["SCHEDULER"])
         # 同样，找到Downloader下载器类
         downloader_cls = load_object(self.settings["DOWNLOADER"])
-        self.downloader = downloader_cls(crawler,mw_name)
+        self.downloader = downloader_cls(crawler)
         self.crawlling = []
         self._spider_closed_callback = spider_closed_callback
 
@@ -232,7 +232,7 @@ class ExecutionEngine(object):
 
 
         def test_err(content):
-            print(content)
+            print("test_err",content)
             return content
 
         d = self._download(request,spider)
@@ -254,13 +254,14 @@ class ExecutionEngine(object):
 
     def _handle_downloader_output(self,response,request,spider):
         #  得到的是下载后的结果，此方法是将结果输出到其他需要处理结果的地方
-        assert isinstance(response, (Request, Response, Failure)), response
+        #assert isinstance(response, (Request, Response, Failure)), response
         if isinstance(response, Request):
             #  到这一步得到的response还是Request类，表明下载不成功，
             #  需要重新走一遍流程
             self.crawl(response, spider)
             return
         # 自己添加处理方法
+        logging.info(response)
 
         return response
 
@@ -287,10 +288,11 @@ class ExecutionEngine(object):
         def _on_success(response):
             #  若得到的是response数据，则就返回response
             logger.info("%s 下载成功"%request.url)
+
             assert isinstance(response,(Response,Request))
             if isinstance(response,Response):
                 response.requset = request
-                return response
+            return response
 
         def _on_complete(_):
             #  当一个requset处理完后，就进行下一个处理
@@ -319,8 +321,8 @@ class ExecutionEngine(object):
 
     def schedule(self, request, spider):
         logger.debug("%s 进入队列中" %request)
-        self.slot.scheduler._mqpush(request)
-
+        if not self.slot.scheduler.enqueue_request(request):
+            logger.error("%s 进入队列失败" %request)
     def _spider_idle(self,spider):
         if self.spider_is_idle():
             d = self.close_spider(spider,reason="finished")

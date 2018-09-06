@@ -1,16 +1,21 @@
+import logging
+
+
 class Test_MW_D_03(object):
     component_name = "Test_MW_D_03"
 
     def __init__(self,crawler):
         self.crawler = crawler
 
-    def process_request(self):
-        print("mw_d_03 inner test")
-        return "from mw_d_03"
+    def process_request(self,request,spider):
+        if spider.name == "test3":
+            logging.info("mw_d_03 inner test")
+            request.meta["test3"] = "Test_MW_D_03"
+        return
 
     def open_spider(self):
         print("mw_d_03 inner test")
-        return "from mw_d_03"
+        return
 
     @classmethod
     def from_crawler(cls,crawler):

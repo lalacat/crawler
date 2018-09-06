@@ -15,7 +15,7 @@ class Test_Spider_1(Spider):
     def start_requests(self):
         start_url = list()
 
-        for i in range(10):
+        for i in range(3):
             i = str(i)
             u = self.url + i
             start_url.append(u)
@@ -23,6 +23,14 @@ class Test_Spider_1(Spider):
         for url in start_url:
             yield Request(url,callback=self._parse)
 
+
+    def process_request(self,request,spider):
+        logging.info("%s process request!!" %self.name)
+        return request
+
+    def open_spider(self,content):
+        logging.info("%s open spider!!" %self.name)
+        return content
 
     def _parse(self,content):
         logging.info(content)

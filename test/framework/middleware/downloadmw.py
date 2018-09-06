@@ -1,4 +1,5 @@
 import logging
+import pprint
 
 from test.framework.middleware import MiddlewareManager
 from test.framework.objectimport import bulid_component_list
@@ -14,12 +15,8 @@ class DownloaderMiddlewareManager(MiddlewareManager):
 
     component_name = 'downloader middleware'
     @classmethod
-    def _get_mwlist_from_settings(cls,settings,mwname):
-        if mwname:
-            _mwname = "DOWNLOADER_MIDDLEWARE_"+mwname.upper()
-        else:
-            _mwname = "DOWNLOADER_MIDDLEWARE_TEST"
-        return bulid_component_list(settings[_mwname])
+    def _get_mwlist_from_settings(cls,settings):
+        return bulid_component_list(settings["DOWNLOADER_MIDDLEWARE_TEST"])
 
     def _add_middleware(self,mw):
         if hasattr(mw, 'process_request'):
@@ -33,6 +30,9 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         #  将默认处理的三个中间件分别添加到defer链上
         @defer.inlineCallbacks
         def process_request(request):
+            #  处理process_request的方法自定义的时候，要么返回一个处理好的response要么返回一个None,
+            #  返回一个request很容易陷入死循环。
+            #  最大的作用就是处理request，往里添加或者修改内容的
             logger.debug("处理process_request")
             for method in self.methods['process_request']:
                 response = yield method(request=request,spider =spider)
@@ -43,8 +43,8 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                 if response:
                     defer.returnValue(response)
             #  如果参数是经过一系列中间件处理过的request，这一步就是对requset进行下载
-            #  ddf =
             #  返回一个带有result的defer
+            print(request.meta)
             defer.returnValue((yield download_func(request=request,spider=spider)))
 
         @defer.inlineCallbacks

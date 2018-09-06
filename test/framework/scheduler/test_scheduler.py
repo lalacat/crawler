@@ -34,6 +34,13 @@ class Scheduler(object):
             requset = None
         return requset
 
+    def enqueue_request(self, request):
+        try:
+            self._mqpush(request)
+        except Exception:
+            return False
+        return True
+
     def _mqpush(self,requset):
         self.mqs.put(requset)
 
