@@ -15,14 +15,14 @@ DOWNLOADER = "test.framework.downloads.Downloader"
 DOWNLOAD_HANDLER = "test.framework.downloads.download_agent.HTTPDownloadHandler"
 DOWNLOAD_TIMEOUT = 180      # 3mins
 
-#DOWNLOAD_MAXSIZE = 1024  # 1024m 下载网页大小的最大值
 DOWNLOAD_MAXSIZE = 1024*1024*1024   # 1024m 下载网页大小的最大值
-#DOWNLOAD_WARNSIZE = 32    # 32m 下载网页大小的警戒线
 DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
 
 DOWNLOAD_FAIL_ON_DATALOSS = True
 
-
+DOWNLOAD_DELAY = 0
+DOWNLOADER_MIDDLEWARE_TEST = {}
+DOWNLOADER_MIDDLEWARE_TEST1 = {}
 
 #E
 #F

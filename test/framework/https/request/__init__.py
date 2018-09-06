@@ -1,6 +1,6 @@
-from test.framework.record_live_instances import object_ref
+from test.framework.utils.record_live_instances import object_ref
 from twisted.web.http_headers import Headers
-from test.framework.url_convert import safe_url_string,escape_ajax
+from test.framework.utils.url_convert import safe_url_string,escape_ajax
 from test.framework.https.parse_url import to_bytes
 
 

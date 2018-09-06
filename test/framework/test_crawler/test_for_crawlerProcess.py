@@ -1,11 +1,5 @@
-from test.framework.objectimport.spiderloader import SpiderLoader
-from test.framework.crawler import Crawler,CrawlerRunner,CrawlerProcess,_get_spider_loader
-from test.framework.record_live_instances import print_live_refs
-from twisted.internet.defer import DeferredList
-from twisted.internet import reactor
+from test.framework.crawler import CrawlerProcess
 from test.framework.setting import Setting
-import time
-
 
 s = Setting()
 

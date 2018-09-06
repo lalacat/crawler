@@ -31,11 +31,6 @@ def format_live_refs(ignore=NoneType):
             print (i)
         if not wdict:
             continue
-        '''
-        if issubclass(cls, ignore):
-            continue
-        '''
-
 
         oldest = min(wdict.values())
         print("oldest",oldest)

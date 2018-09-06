@@ -32,19 +32,18 @@ class MiddlewareManager(object):
     @classmethod
     #  子类实现该方法，从settings中获得方法，如果子类没呀重写该方法
     #  会报错
-    def _get_mwlist_from_settings(cls,settings):
-        #return bulid_component_list(settings["TEST_MIDDLEWARE"])
+    def _get_mwlist_from_settings(cls,settings,mw_name):
         raise NotImplementedError
 
     @classmethod
-    def from_settings(cls,settings,crawler=None):
+    def from_settings(cls,settings,crawler=None,mw_name=None):
         """
         从default settings中加载默认的中间件
         :param settings:
         :param crawler:
         :return:
         """
-        mwlist = cls._get_mwlist_from_settings(settings)
+        mwlist = cls._get_mwlist_from_settings(settings,mw_name)
         middlewares = []
         clsnames = []
         enabled = []
@@ -78,8 +77,8 @@ class MiddlewareManager(object):
         return cls(clsnames,middlewares)
 
     @classmethod
-    def from_crawler(cls,crawler):
-        return cls.from_settings(crawler.settings,crawler)
+    def from_crawler(cls,crawler,mw_name=None):
+        return cls.from_settings(crawler.settings,crawler,mw_name)
 
     def _add_middleware(self,mw):
         #  如果中间层添加有对spider进行处理的方法，应遵循后处理，先关闭的原则

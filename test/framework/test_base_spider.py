@@ -1,5 +1,5 @@
 
-from test.framework.record_live_instances import object_ref
+from test.framework.utils.record_live_instances import object_ref
 import logging
 
 

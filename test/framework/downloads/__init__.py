@@ -8,14 +8,14 @@ from time import time
 from twisted.internet import defer, task,reactor
 
 from test.framework.crawler import Crawler, _get_spider_loader
-from test.framework.https.request import Request
-from test.framework.https.response import Response
+
 from test.framework.middleware import MiddlewareManager
-from test.framework.objectimport import bulid_component_list
+from test.framework.middleware.downloadmw import DownloaderMiddlewareManager
 from test.framework.setting import Setting
 from test.framework.objectimport.loadobject import load_object
 from test.framework.downloads.download_agent import HTTPDownloadHandler
 from test.framework.twisted.defer import mustbe_deferred
+from test.framework.utils.httpobj import urlparse_cached
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,9 @@ class Slot(object):
         return self.concurrency - len(self.transferring)
 
     def download_delay(self):
+        #  给一个随机时间
         if self.randomize_delay:
+            #  生成下一个实数，它在 [x, y) 范围内
             return random.uniform(0.5 * self.delay, 1.5 * self.delay)
         return self.delay
 
@@ -68,7 +70,7 @@ class Slot(object):
         )
 
 
-#  延迟
+#  延迟，通过spider设置延迟
 def _get_concurrency_delay(concurrency, spider, settings):
     delay = settings.getfloat('DOWNLOAD_DELAY')
     if hasattr(spider, 'DOWNLOAD_DELAY'):
@@ -85,7 +87,7 @@ def _get_concurrency_delay(concurrency, spider, settings):
 
 
 class Downloader(object):
-    def __init__(self,crawler):
+    def __init__(self,crawler,mw_name=None):
         self.settings = crawler.settings
         #  如果只是加载一个类不带参数，而这个类的初始化带有参数的时候，使用这个类的时候会报错
         #  XXX missing X required positional argument
@@ -100,10 +102,10 @@ class Downloader(object):
         self.domain_concurrency = self.settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
         # 同一IP并发数
         self.ip_concurrency = self.settings.getint('CONCURRENT_REQUESTS_PER_IP')
-        # 随机延迟下载时间
+        # 随机延迟下载时间 默认是True
         self.randomize_delay = self.settings.getbool('RANDOMIZE_DOWNLOAD_DELAY')
         # 初始化下载器中间件
-        self.middleware = DownloaderMiddlewareManager.from_crawler(crawler)
+        self.middleware = DownloaderMiddlewareManager.from_crawler(crawler,mw_name)
         # ask.LoopingCall安装了一个60s的定时心跳函数_slot_gc,这个函数用于对slots中的对象进行定期的回收。
         self._slot_gc_loop = task.LoopingCall(self._slot_gc)
         self._slot_gc_loop.start(60)
@@ -130,8 +132,34 @@ class Downloader(object):
             return True
         return False
 
+    def _get_slot(self, request, spider):
+        #  通过slots集合达到了缓存的目的，对于同一个域名的访问策略可以通过slots获取而不用每次都解析配置。
+        #  然后根据key从slots里取对应的Slot对象，如果还没有，则构造一个新的对象。
+        key = self._get_slot_key(request, spider)
+        if key not in self.slots:
+            #  ip_concurrency默认为0，domain_concurrency默认为8，
+            conc = self.ip_concurrency if self.ip_concurrency else self.domain_concurrency
+            #  用spider中的设置来改变默认的conc，delay
+            conc, delay = _get_concurrency_delay(conc, spider, self.settings)
+            self.slots[key] = Slot(conc, delay, self.randomize_delay)
+
+        return key, self.slots[key]
+
+    def _get_slot_key(self, request, spider):
+        #  request对应的域名也增加了缓存机制:urlparse_cached,dnscahe.
+        if 'download_slot' in request.meta:
+            return request.meta['download_slot']
+        #  判断hostname在缓存中是否存在
+        key = urlparse_cached(request).hostname or ''
+        ''' 
+        if self.ip_concurrency:
+            key = dnscache.get(key, key)
+        '''
+        return key
+
     #  处理requset
     def _enqueue_request(self, request, spider):
+        #  key就是hostname
         key, slot = self._get_slot(request, spider)
         request.meta['download_slot'] = key
 
@@ -159,15 +187,18 @@ class Downloader(object):
 
         # Delay queue processing if a download_delay is configured
         now = time()
-        delay = slot.download_delay() #  获取slot对象的延迟时间
+        delay = slot.download_delay()  # 获取slot对象的延迟时间
         if delay:
-            penalty = delay - now + slot.lastseen # 距离上次运行还需要延迟则latercall
+            #  delay在默认情况下为0
+            penalty = delay + slot.lastseen - now  # 距离上次运行还需要延迟则latercall
             if penalty > 0:
                 slot.latercall = reactor.callLater(penalty, self._process_queue, spider, slot)
                 return
 
         # Process enqueued requests if there are free slots to transfer for this slot
-        while slot.queue and slot.free_transfer_slots() > 0:  # 不停地处理slot队列queue中的请求，如果队列非空且有空闲的传输slot,则下载，如果需要延迟则继续调用'_process_queue'
+        while slot.queue and slot.free_transfer_slots() > 0:
+            # 不停地处理slot队列queue中的请求，如果队列非空且slot.transferring中request的个数没有达到下载最大个数,
+            # 则下载，如果需要延迟则继续调用'_process_queue'
             slot.lastseen = now
             request, deferred = slot.queue.popleft()
             dfd = self._download(slot, request, spider)
@@ -177,7 +208,7 @@ class Downloader(object):
                 self._process_queue(spider, slot)
                 break
 
-    def _download(self, request, spider,slot=None,):
+    def _download(self, request, spider,slot=None):
         logger.debug("进行下载。。。。。")
         #logger.info("request：%s，spider: %s"%(request,spider))
         try:
@@ -186,7 +217,7 @@ class Downloader(object):
             raise ValueError("can't find spider")
         '''
         slot.transferring.add(request)
-           def finish_transferring(_):
+        def finish_transferring(_):
             slot.transferring.remove(request)
             self._process_queue(spider, slot)
             return _
@@ -216,83 +247,6 @@ class Downloader(object):
                 self.slots.pop(key).close()
 
 
-
-class DownloaderMiddlewareManager(MiddlewareManager):
-
-    component_name = 'downloader middleware'
-    @classmethod
-    def _get_mwlist_from_settings(cls,settings):
-        return bulid_component_list(settings['TEST_DOWNLOADER_MIDDLEWARE'])
-
-    def _add_middleware(self,mw):
-        if hasattr(mw, 'process_request'):
-            self.methods['process_request'].append(mw.process_request)
-        if hasattr(mw, 'process_response'):
-            self.methods['process_response'].insert(0, mw.process_response)
-        if hasattr(mw, 'process_exception'):
-            self.methods['process_exception'].insert(0, mw.process_exception)
-
-    def download(self,download_func,request,spider):
-        #  将默认处理的三个中间件分别添加到defer链上
-        @defer.inlineCallbacks
-        def process_request(request):
-            logger.debug("处理process_request")
-            for method in self.methods['process_request']:
-                response = yield method(request=request,spider =spider)
-                assert response is None or isinstance(response,(Response,Request)),\
-                '中间件%s.process_request 执行后返回的数据类型必须是 None,Response或者Request'\
-                % method._class__._name__
-                #  如果结果是下载后的，就直接返回
-                if response:
-                    defer.returnValue(response)
-            #  如果参数是经过一系列中间件处理过的request，这一步就是对requset进行下载
-            #ddf =
-            #  返回一个带有result的defer
-            '''
-            try:
-                dlf = yield download_func(request=request,spider=spider)
-                defer.returnValue(dlf)
-            except Exception as e:
-                logger.error("process_request: %s" %e)
-            '''
-            defer.returnValue((yield download_func(request=request,spider=spider)))
-
-        @defer.inlineCallbacks
-        def process_response(response):
-            logger.debug("处理process_response")
-            assert response is not None,"process_response接收到的数据是None"
-            if isinstance(response,Request):
-                defer.returnValue(response)
-
-            for method in self.methods['process_response']:
-                response = yield method(request=request, response=response,
-                                        spider=spider)
-                assert response is None or isinstance(response, (Response, Request)), \
-                    '中间件%s.process_request 执行后返回的数据类型必须是 None,Response或者Request' \
-                    % method._class__._name__
-                if isinstance(response, Request):
-                    defer.returnValue(response)
-            defer.returnValue(response)
-
-        @defer.inlineCallbacks
-        def process_exception(_failure):
-            exception = _failure.value
-            for method in self.methods['process_exception']:
-                response = yield method(request=request, exception=exception,
-                                        spider=spider)
-                assert response is None or isinstance(response, (Response, Request)), \
-                    'Middleware %s.process_exception must return None, Response or Request, got %s' % \
-                    (method.__class__.__name__, type(response))
-                if response:
-                    defer.returnValue(response)
-            defer.returnValue(_failure)
-
-
-        deferred = mustbe_deferred(process_request,request)
-
-        deferred.addErrback(process_exception)
-        deferred.addCallback(process_response)
-        return deferred
 
 '''
 def func_test(result):

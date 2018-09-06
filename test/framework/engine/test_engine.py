@@ -45,10 +45,10 @@ class Slot(object):
         logger.info("%s 添加到inprogress队列中"%request)
         self.inprogress.append(request)
 
-    def remove_request(self, request):
+    def remove_request(self, request,name):
         #  当request处理完后就可以移除掉了
         self.inprogress.remove(request)
-        self._maybe_fire_closing()
+        self._maybe_fire_closing(name)
 
     def close(self,name):
         logger.info("关闭 %s 的 slot！！"%name)
@@ -76,7 +76,7 @@ class ExecutionEngine(object):
     引擎：所有调度
     """
 
-    def __init__(self,crawler,spider_closed_callback):
+    def __init__(self,crawler,spider_closed_callback,mw_name=None):
         logger.debug("引擎初始化")
         self.crawler =crawler
         self.settings = crawler.settings
@@ -95,7 +95,7 @@ class ExecutionEngine(object):
         self.scheduler_cls = load_object(self.settings["SCHEDULER"])
         # 同样，找到Downloader下载器类
         downloader_cls = load_object(self.settings["DOWNLOADER"])
-        self.downloader = downloader_cls(crawler)
+        self.downloader = downloader_cls(crawler,mw_name)
         self.crawlling = []
         self._spider_closed_callback = spider_closed_callback
 
@@ -229,20 +229,27 @@ class ExecutionEngine(object):
         request = slot.scheduler.next_request()
         if not request:
             return
+
+
+        def test_err(content):
+            print(content)
+            return content
+
         d = self._download(request,spider)
         d.addBoth(self._handle_downloader_output,request,spider)
-        d.addErrback(lambda f: logger.info('Error while handling downloader output',
-                                       extra={'spider': spider}))
+        #d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
+        d.addErrback(test_err)
 
         #  移除掉处理过的request
-        d.addBoth(lambda _: slot.remove_request(request))
-        d.addErrback(lambda f: logger.info('Error while scheduling new request',
-                                           extra={'spider': spider}))
+        d.addBoth(lambda _: slot.remove_request(request,spider.name))
+        #d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
+        d.addErrback(test_err)
 
         #  进行下一次的处理request
         d.addBoth(lambda _: slot.nextcall.schedule())
-        d.addErrback(lambda f: logger.info('Error while scheduling new request',
-                                           extra={'spider': spider}))
+        #d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
+        d.addErrback(test_err)
+
         return d
 
     def _handle_downloader_output(self,response,request,spider):
