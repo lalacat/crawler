@@ -1,5 +1,7 @@
 import logging
 
+import six
+
 
 class Test_MW_D_01(object):
     component_name = "Test_MW_D_01"
@@ -27,3 +29,7 @@ def test_fun_D_A(test):
 def test_fun_common(test):
     print("mw_d_01",test)
     return "from mw_d_01"
+
+
+
+assert 5>7, logging.info("False")

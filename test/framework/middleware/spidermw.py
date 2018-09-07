@@ -1,12 +1,15 @@
+import logging
 from twisted.python.failure import Failure
 
 from test.framework.middleware import MiddlewareManager
 from test.framework.objectimport import bulid_component_list
 from test.framework.twisted.defer import mustbe_deferred
 
+logger = logging.getLogger(__name__)
 
 def _isiterable(possible_iterator):
     return hasattr(possible_iterator, '__iter__')
+
 
 class SpiderMiddlewareManager(MiddlewareManager):
     component_name = "spider middlerware"
@@ -28,12 +31,13 @@ class SpiderMiddlewareManager(MiddlewareManager):
             self.methods['process_start_requests'].insert(0, mw.process_start_requests)
 
     def scrape_response(self, scrape_func, response, request, spider):
-
-        fname = lambda f: '%s.%s' % (
-            f.__class__.__name__,
-            f.__name__)
+        #  规范输出格式‘class.fun’
+        fname = lambda f:'%s.%s' % (
+                f.__self__.__class__.__name__,
+                f.__name__)
 
         def process_spider_input(response):
+            #  处理spider的内容，一般处理方法返回为None
             for method in self.methods['process_spider_input']:
                 try:
                     result = method(response=response, spider=spider)
@@ -49,7 +53,7 @@ class SpiderMiddlewareManager(MiddlewareManager):
             exception = _failure.value
             for method in self.methods['process_spider_exception']:
                 result = method(response=response, exception=exception, spider=spider)
-                assert result is None or _isiterable(result), \
+                assert result is None or _isiterable(result),\
                     'Middleware %s must returns None, or an iterable object, got %s ' % \
                     (fname(method), type(result))
                 if result is not None:
