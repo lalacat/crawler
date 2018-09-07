@@ -8,7 +8,7 @@ LOG_FORMATTER = "AAA"
 CONCURRENT_REQUESTS = 16  # 设置的并发数(最大下载数)
 CONCURRENT_REQUESTS_PER_IP = 0  # ip并发度:
 CONCURRENT_REQUESTS_PER_DOMAIN = 8  # 设置HTTPConnectionPool最大保持连接个数
-
+CONCURRENT_ITEMS = 100 #  控制同时处理的爬取到的item的数据数目
 #D
 DOWNLOADER = "test.framework.downloads.Downloader"
 # 默认下载器
