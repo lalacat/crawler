@@ -25,8 +25,9 @@ def defer_succeed(result):
     before attending pending delayed calls, so do not set delay to zero.
     """
     d = defer.Deferred()
-    reactor.callLater(0.1, d.callback, result)
+    reactor.callLater(3, d.callback, result)
     return d
+
 
 def defer_result(result):
     if isinstance(result, defer.Deferred):
@@ -119,7 +120,10 @@ def iter_errback(iterable, errback, *a, **kw):
     """Wraps an iterable calling an errback if an error is caught while
     iterating it.
     """
-    it = iter(iterable)
+    try:
+        it = iter(iterable)
+    except Exception as e :
+        print(e)
     while True:
         try:
             yield next(it)

@@ -3,7 +3,7 @@ from twisted.python.failure import Failure
 
 from test.framework.https.request import Request
 from test.framework.https.response import Response
-from test.framework.twisted.reactor import CallLaterOnce
+from test.framework.utils.reactor import CallLaterOnce
 from test.framework.objectimport.loadobject import load_object
 import logging,time
 

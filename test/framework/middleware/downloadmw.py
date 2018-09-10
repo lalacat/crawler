@@ -1,11 +1,10 @@
 import logging
-import pprint
 
 from test.framework.middleware import MiddlewareManager
 from test.framework.objectimport import bulid_component_list
 from test.framework.https.request import Request
 from test.framework.https.response import Response
-from test.framework.twisted.defer import mustbe_deferred
+from test.framework.utils.defer import mustbe_deferred
 from twisted.internet import defer
 
 logger = logging.getLogger(__name__)
@@ -16,7 +15,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
     component_name = 'downloader middleware'
     @classmethod
     def _get_mwlist_from_settings(cls,settings):
-        return bulid_component_list(settings["DOWNLOADER_MIDDLEWARE_TEST"])
+        return bulid_component_list(settings["DOWNLOADER_MIDDLEWARE_TEST"],cls.component_name)
 
     def _add_middleware(self,mw):
         if hasattr(mw, 'process_request'):
@@ -44,7 +43,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                     defer.returnValue(response)
             #  如果参数是经过一系列中间件处理过的request，这一步就是对requset进行下载
             #  返回一个带有result的defer
-            print(request.meta)
+            logger.info(request.meta)
             defer.returnValue((yield download_func(request=request,spider=spider)))
 
         @defer.inlineCallbacks

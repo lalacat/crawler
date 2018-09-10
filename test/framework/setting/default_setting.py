@@ -33,7 +33,8 @@ DOWNLOADER_MIDDLEWARE_TEST = {
 #F
 #G
 #H
-#I
+#
+ITEM_PIPELINES = {"test.framework.middleware.test_process_item_01.Test_Process_item_A":10}
 #J
 #K
 #L
@@ -75,7 +76,7 @@ RANDOMIZE_DOWNLOAD_DELAY = True  # 随机延迟
 #S
 SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.scheduler.test_scheduler.Scheduler"
-
+SPIDER_MIDDLEWARES_TEST = {}
 #T
 '''
 TEST_MIDDLEWARE = {

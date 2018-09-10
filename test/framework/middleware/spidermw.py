@@ -3,7 +3,7 @@ from twisted.python.failure import Failure
 
 from test.framework.middleware import MiddlewareManager
 from test.framework.objectimport import bulid_component_list
-from test.framework.twisted.defer import mustbe_deferred
+from test.framework.utils.defer import mustbe_deferred
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class SpiderMiddlewareManager(MiddlewareManager):
 
     @classmethod
     def _get_mwlist_from_settings(cls,settings):
-        return bulid_component_list(settings["SPIDER_MIDDLEWARES_TEST"])
+        return bulid_component_list(settings["SPIDER_MIDDLEWARES_TEST"],cls.component_name)
 
     def _add_middleware(self,mw):
         #  父类中含有open_spider,close_spider方法
@@ -73,7 +73,6 @@ class SpiderMiddlewareManager(MiddlewareManager):
         dfd.addCallback(process_spider_output)
         return dfd
 
-
-def process_start_requests(self, start_requests, spider):
-    return self._process_chain('process_start_requests', start_requests, spider)
+    def process_start_requests(self, start_requests, spider):
+        return self._process_chain('process_start_requests', start_requests, spider)
 

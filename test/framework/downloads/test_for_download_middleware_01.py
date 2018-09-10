@@ -30,6 +30,3 @@ def test_fun_common(test):
     print("mw_d_01",test)
     return "from mw_d_01"
 
-
-
-assert 5>7, logging.info("False")

@@ -1,7 +1,9 @@
+import json
 import logging
 
 from spider import Spider,Request,BaseSpider
 from test.framework.https.request import Request
+from test.public_api.web import get_smzdm_datas
 
 
 class Test_Spider_1(Spider):
@@ -32,9 +34,10 @@ class Test_Spider_1(Spider):
         logging.info("%s open spider!!" %self.name)
         return content
 
-    def _parse(self,content):
-        logging.info(content)
-        return content
+    def _parse(self,response):
+        logging.info("通过_parse的处理response")
+        result = get_smzdm_datas(response.body)
+        return result
 
 
 

@@ -41,6 +41,10 @@ class Scheduler(object):
             return False
         return True
 
+    def close(self,reason):
+        logger.debug(reason)
+        return
+
     def _mqpush(self,requset):
         self.mqs.put(requset)
 

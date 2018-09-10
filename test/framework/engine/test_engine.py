@@ -1,9 +1,9 @@
-from twisted.internet import defer,reactor,task
-from twisted.python.failure import Failure
+from twisted.internet import defer, task
 
 from test.framework.https.request import Request
 from test.framework.https.response import Response
-from test.framework.twisted.reactor import CallLaterOnce
+from test.framework.scraper import Scraper
+from test.framework.utils.reactor import CallLaterOnce
 from test.framework.objectimport.loadobject import load_object
 import logging,time
 
@@ -96,6 +96,7 @@ class ExecutionEngine(object):
         # 同样，找到Downloader下载器类
         downloader_cls = load_object(self.settings["DOWNLOADER"])
         self.downloader = downloader_cls(crawler)
+        self.scraper = Scraper(crawler)
         self.crawlling = []
         self._spider_closed_callback = spider_closed_callback
 
@@ -116,17 +117,19 @@ class ExecutionEngine(object):
             #  初始化scheduler
             scheduler = self.scheduler_cls.from_crawler(self.crawler)
             #  调用中间件，就是添加若干个inner_derfer
-            start_requests = yield start_requests
+            start_requests = yield self.scraper.spidermw.process_start_requests(start_requests,spider)
             #  封装Slot对象
             slot = Slot(start_requests,close_if_idle,nextcall,scheduler)
             self.slot = slot
             self.spider = spider
             # 调用scheduler的open
             yield scheduler.open(spider)
+            #  调用scraper的open
+            yield self.scraper.open_spider(spider)
             #  启动页面读取，进行爬虫工作
             slot.nextcall.schedule()
             #  自动调用启动，每5秒一次调用
-            # slot.heartbeat.start(5)
+            slot.heartbeat.start(5)
         except Exception as e:
             logger.error(e)
 
@@ -219,8 +222,8 @@ class ExecutionEngine(object):
         """
         return not self.running \
             or slot.closing \
-            or self.downloader.needs_backout()
-            #or self.scraper.slot.needs_backout()
+            or self.downloader.needs_backout() \
+            or self.scraper.slot.needs_backout()
 
     def _next_request_from_scheduler(self,spider):
         #  从scheduler队列中获取request
@@ -260,12 +263,16 @@ class ExecutionEngine(object):
             #  需要重新走一遍流程
             self.crawl(response, spider)
             return
-        # 自己添加处理方法
-        logging.info(response)
+        # 进入到scraper中进行output的处理
+        d = self.scraper.enqueue_scrape(response,request,spider)
+        d.addErrback(lambda f:logger.error("%s 在处理下载结果的过程中出现错误"%spider.name))
 
-        return response
+        return d
 
     def spider_is_idle(self):
+        if not self.scraper.slot.is_idle():
+            #  scraper的slot是否为None
+            return False
 
         if self.downloader.active:
             #  判断active队列是否为空，不为空就返回False
@@ -354,9 +361,13 @@ class ExecutionEngine(object):
         dfd.addBoth(lambda _: self.downloader.close())
         dfd.addErrback(log_failure('Downloader close failure'))
 
+        # 关闭scraper
+        dfd.addBoth(lambda _: self.scraper.close_spider(spider))
+        dfd.addErrback(log_failure('scraper close failure'))
+
         #  关闭scheduler
-        #dfd.addBoth(lambda _: slot.scheduler.close(reason))
-        #dfd.addErrback(log_failure('Scheduler close failure'))
+        dfd.addBoth(lambda _: slot.scheduler.close(reason))
+        dfd.addErrback(log_failure('Scheduler close failure'))
 
         dfd.addBoth(lambda _: logger.info("爬虫%(name)s已关闭：(%(reason)s)",
                     {

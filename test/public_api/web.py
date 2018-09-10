@@ -1,19 +1,19 @@
 import time,json,pymongo,logging
 from twisted.internet import reactor
-
+logger = logging.getLogger(__name__)
 def get_smzdm_datas(web_body):
-    print("get_need_datas")
+    logger.info("get_need_datas")
     datas_list = list()
     if isinstance(web_body,bytes):
         logging.info("body got is bytes")
         web_body = json.loads(web_body)
     else:
-        print("data type is json")
+        logger.info("data type is json")
     if isinstance(web_body,dict):
         if web_body.__contains__("data"):
             datas = web_body['data']
     else:
-        print("data type is not dict")
+        logger.info("data type is not dict")
     for d in datas:
 
         result = dict()

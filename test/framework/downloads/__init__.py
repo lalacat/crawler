@@ -7,14 +7,10 @@ from time import time
 
 from twisted.internet import defer, task,reactor
 
-from test.framework.crawler import Crawler, _get_spider_loader
-
-from test.framework.middleware import MiddlewareManager
 from test.framework.middleware.downloadmw import DownloaderMiddlewareManager
-from test.framework.setting import Setting
 from test.framework.objectimport.loadobject import load_object
 from test.framework.downloads.download_agent import HTTPDownloadHandler
-from test.framework.twisted.defer import mustbe_deferred
+from test.framework.utils.defer import mustbe_deferred
 from test.framework.utils.httpobj import urlparse_cached
 
 logger = logging.getLogger(__name__)
@@ -247,28 +243,3 @@ class Downloader(object):
                 self.slots.pop(key).close()
 
 
-
-'''
-def func_test(result):
-    print(result)
-s = Setting()
-
-m = DownloaderMiddlewareManager.from_settings(s,"A")
-
-
-m.methods['test_fun_common'].append(m.methods['Test_MW_D_01'][0].process_request)
-for i in m.methods['test_fun_common']:
-    pass
-   # print(i.__name__)
-#print(m.methods['Test_MW_D_01'][0].__class__.__name__)
-print(m.methods["process_request"])
-r = m.download(func_test,"requset","spider")
-
-cls = _get_spider_loader(s)
-
-for name, module in cls._spiders.items():
-    print(name)
-    crawler = Crawler(module,s)
-    d = Downloader(crawler)
-
-'''

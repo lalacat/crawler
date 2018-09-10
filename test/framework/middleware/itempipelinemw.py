@@ -8,7 +8,7 @@ class ItemPipelineManager(MiddlewareManager):
 
     @classmethod
     def _get_mwlist_from_settings(cls, settings):
-        return bulid_component_list(settings['ITEM_PIPELINES'])
+        return bulid_component_list(settings['ITEM_PIPELINES'],cls.component_name)
 
     def _add_middleware(self, pipe):
         super(ItemPipelineManager, self)._add_middleware(pipe)

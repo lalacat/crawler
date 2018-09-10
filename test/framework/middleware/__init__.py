@@ -2,10 +2,9 @@ from collections import defaultdict
 import logging
 import pprint
 
-from test.framework.objectimport import bulid_component_list
-from test.framework.setting import Setting
+
 from test.framework.objectimport.loadobject import load_object
-from test.framework.twisted.defer import process_parallel, process_chain, process_chain_both
+from test.framework.utils.defer import process_parallel, process_chain, process_chain_both
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +19,7 @@ class MiddlewareManager(object):
     component_name = 'father middleware'
 
     def __init__(self,*middlewares):
-        logging.info("初始化中间件............")
+        logger.info("初始化中间件............")
         self.clsnames = middlewares[0]
         self.middlewares = middlewares[1]
 
@@ -69,7 +68,7 @@ class MiddlewareManager(object):
                                    extra={'crawler': crawler})
 
         if len(middlewares)  != len(clsnames):
-            raise ImportError("载入不完整")
+            raise ImportError("%s的中间件载入不完整"%cls.component_name)
         logger.info("生效%(componentname)ss的中间件 :\n%(enabledlist)s",
                     {'componentname': cls.component_name,
                      'enabledlist': pprint.pformat(enabled)},
@@ -107,9 +106,3 @@ class MiddlewareManager(object):
 
 
 
-'''
-s = Setting()
-m = MiddlewareManager.from_settings(s,"A")
-m._process_parallel("test_fun_common","common test")
-pprint.pformat(m.methods["test_fun_common"])
-'''
