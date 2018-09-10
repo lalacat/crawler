@@ -97,8 +97,8 @@ class DownloadAgent(object):
         timeout = request.meta.get('download_timeout') or self._connectTimeout
         logger.debug("download_timeout is %d"%timeout)
         agent = self._getAgent(timeout)
-        #url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
-        # urldefrag去掉fragment
+        #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
+        #  urldefrag去掉fragment
         url = urldefrag(request.url)[0]
         method = to_bytes(request.method)
         headers = request.headers
@@ -309,6 +309,9 @@ class _ResponseReader(Protocol):
             logger.info('%s Finished receiving body!!'%self._request.url)
             # callback(data)调用后，能够向defer数据链中传入一个list数据：
             # [True，传入的参数data]，可以实现将获取的body传输到下一个函数中去
+            print(body)
+            if body == b'':
+                logger.error("%s 取到的数据为空，查看是否header设置错误"%self._request.url)
             self._finished.callback((self._transferdata,body,None))
             return
 

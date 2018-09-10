@@ -1,4 +1,5 @@
 import logging
+import time
 from collections import deque, Iterable
 
 from twisted.internet import defer
@@ -97,7 +98,8 @@ class Scraper(object):
             slot.closing.callback(spider)
 
     def enqueue_scrape(self, response, request, spider):
-        logger.debug("%s.%s的response加入scrapy队列"%(spider.name,request))
+        self.start_time = time.clock()
+        logger.info("%s.%s的response加入scrapy队列,加入时间为：%7.6f"%(spider.name,request,self.start_time))
         slot = self.slot
         dfd = slot.add_response_request(response, request)
         def finish_scraping(_):
@@ -106,8 +108,9 @@ class Scraper(object):
             self._scrape_next(spider, slot)
             return _
         dfd.addBoth(finish_scraping)
-        dfd.addErrback(lambda f: logger.error('Scraper 处理 %(request)s的结果时，出现出现错误',
-                                   {'request': request}
+        dfd.addErrback(lambda f: logger.error('Scraper 处理 %(request)s的结果时，出现出现错误！！\n'
+                                              '错误信息为：%(error)s',
+                                   {'request': request,"error":f}
                                    ))
         self._scrape_next(spider, slot)
         return dfd
@@ -121,11 +124,10 @@ class Scraper(object):
         """Handle the downloaded response or failure through the spider
         callback/errback"""
         assert isinstance(response, (Response, Failure))
-
         #  如果结果没有出错的时候，先进行中间件的处理，然后执行在request中或者是spider中定义的callback或者是_parse来处理结果
         #  结果处理完后执行自定义的规则，将结果进行制定规则的输出
         dfd = self._scrape2(response, request, spider)  # returns spiders processed output
-        dfd.addErrback(self.handle_spider_error, request, response, spider)
+        dfd.addErrback(self.handle_spider_error, request,response,  spider)
         dfd.addCallback(self.handle_spider_output, request, response, spider)
         return dfd
 
@@ -151,16 +153,18 @@ class Scraper(object):
 
     def handle_spider_error(self, _failure, request, response, spider):
         exc = _failure.value
-        logger.error("%(request)s处理结果的时候出现错误：\n%{failure}",
-                     {"request":request,"failure":exc})
-        self.crawler.engine.close_spider(spider,exc.reason or "cancelled")
+        end_time = time.clock()
+        logger.error("%(request)s处理结果的时候出现错误：\n%{failure}s\nprocess item 持续时间"
+                     "为：%{time}s",
+                     {"request":request,"failure":exc,"time":(end_time-self.start_time)})
+        self.crawler.engine.close_spider(spider,exc or "cancelled")
 
     def handle_spider_output(self, result, request, response, spider):
         if not result:
             return defer_succeed(None)
         if not isinstance(result,Iterable):
-            logger.error("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据！！"%(spider.name,type(result)))
-            return defer_succeed(None)
+            logger.error("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
+            return defer_succeed(result)
         #  将自定义处理好的结果，通过这个方法并行执行自定义的rule（pipe process_item）
         #  这里的结果默认是能够迭代的List或者是dict类型的结果，每个结果都是并列的，能够同时符合process_item处理规则
         #  其中list里的结果是两种类型，一种是BaseItem及其子类一种是dict类型，这些都是在requst或者spider中自己
@@ -168,8 +172,11 @@ class Scraper(object):
         logger.info("%s的结果进行process_item处理"%spider.name)
         it = iter_errback(result, self.handle_spider_error, request, response, spider)
         self.outputs = []
-        dfd = parallel(it, self.concurrent_items,
-            self._process_spidermw_output, request, response, spider)
+        if len(result) == 0 :
+            count = 1
+        else:
+            count = len(result)
+        dfd = parallel(it,count,self._process_spidermw_output, request, response, spider)
         dfd.addCallback(self._itemproc_collected,request)
         return dfd
 
@@ -199,26 +206,25 @@ class Scraper(object):
         """ItemProcessor finished for the given ``item`` and returned ``output``
         """
         #  得到的output是一个处理过的items，一般是dict类型的数据
-        # output==item
+        #  output==item
 
         self.slot.itemproc_size -= 1
         if isinstance(output, Failure):
             ex = output.value
             logging.error(ex)
-            #logger.error('process item(%(item)s)过程中出现错误', {'item': item})
+            logger.error('process item(%(item)s)过程中出现错误', {'item': item})
         else:
             logger.debug("process item(%s)处理完毕"%item,extra={'spider': spider})
+            self.outputs.append(output)
             return
 
     def _log_download_errors(self,context,request_result, request, spider):
         logger.error(context)
         return context
 
-    def _itemproc_collected(self,output,request):
-        #print_smzdm_result(output,request.url)
-        try:
-            for i in output:
-                a = i[1]
-        except Exception as e:
-            print(e)
+    def _itemproc_collected(self,_,request):
+        #print_smzdm_result(self.outputs,request.url)
+        end_time = time.clock()
+        logger.info("process item 处理时间持续%7.6f"%(end_time-self.start_time))
+
         return

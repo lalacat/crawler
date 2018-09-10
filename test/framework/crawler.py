@@ -4,7 +4,7 @@ import logging
 from test.framework.objectimport.loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
 from test.framework.interface import ISpiderLoader
-from test.framework.engine.test_engine import ExecutionEngine
+from test.framework.engine.engine import ExecutionEngine
 import time
 from test.framework.setting import overridden_or_new_settings,Setting
 
@@ -35,7 +35,7 @@ class Crawler(object):
     def crawl(self,*args,**kwargs):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
-
+        self.start_time = time.time()
         try:
             self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
@@ -46,7 +46,7 @@ class Crawler(object):
             但如何返回值不是defer而是一个值（正如我们的缓存代理将本地缓冲的诗歌返回一样），那么这个maybeDeferred会将该值重新打包成一个已经激活的deferred返回，注意是已经激活的deferred。
             当然，如果返回的是一个异常，其也会将其打包成一个已经激活的deferred，只不过就不是通过callback而是errback激活的。
             '''
-            yield maybeDeferred(self.engine.start)
+            yield maybeDeferred(self.engine.start,self.start_time)
         except Exception as e:
             logger.error(e)
             self.crawling = False

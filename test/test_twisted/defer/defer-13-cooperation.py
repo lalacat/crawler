@@ -17,8 +17,9 @@ def parallel(iterable, count, callable, *args, **named):
     """
     coop = task.Cooperator()
     work = (callable(elem, *args, **named) for elem in iterable)
+    print(type(work))
     for i in work:
-        print(i)
+        print("i",i)
     return defer.DeferredList([coop.coiterate(work) for _ in range(count)])
 
 def print_fun(content):
@@ -34,27 +35,28 @@ def start_requests():
 
     for url in start_url:
         yield url
-def print_result(content):
-    print(type(content))
-    print(len(content))
-    for i in content:
-        print(i)
-    content[1]
-    return
 
-dd = parallel(start_requests(),10,print_fun)
+
+def print_result(content,start):
+    end = time.clock()
+    print(type(content))
+    print(end-start)
+    for i in content:
+        #print(dir(i)
+        pass
+
+    print(dir(content[0]))
+    print(content[0].__next__())
+    for i in content[0]:
+        print("i",i)
+    return "test"
+start  = time.clock()
+dd = parallel(start_requests(),3,print_fun)
 dd.addCallback(lambda r: [x[1] for x in r])
-dd.addCallback(print_result)
+#dd.addCallback(print_result,start)
+#dd.addCallback(lambda f:print(f))
 dd.addCallback(lambda _:reactor.stop())
 reactor.run()
 
-def test_isintance(a):
-    if isinstance(a,(str,int)):
-        print("true")
-    else:
-        print("false")
-
-test_isintance("a")
-test_isintance(2)
-test_isintance(2.1)
-
+print(time.clock())
+print(time.time())

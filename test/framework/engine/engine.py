@@ -134,24 +134,27 @@ class ExecutionEngine(object):
             logger.error(e)
 
     @defer.inlineCallbacks
-    def start(self):
+    def start(self,start_time):
         assert not self.running,"%s 的引擎已启动"%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
-        self.start_time = time.time()
-        logger.info("%s 的引擎开始时间为: %d" %(self.spider.name,self.start_time))
+        logger.info("%s 的引擎开始时间为: %d" %(self.spider.name,start_time))
         self.running = True
+        engine_start_time = time.clock()
         self._closewait = defer.Deferred()
+        self._closewait.addBoth(self._finish_stopping_engine,engine_start_time)
         yield self._closewait
 
     def stop(self):
         assert self.running,"引擎没有运行"
         self.running = False
-        logger.info("%s 引擎关闭,运行时间为 %d 秒" % (self.engine_name,(time.time() - self.start_time)))
         self._closewait.callback(None)
-        '''
-        dfd = self._close_all_spider()
-        dfd.addBoth(lambda _: self._finish_stopping_engine())
-        '''
+
         return True
+
+    def _finish_stopping_engine(self,_,start_time):
+        end_time = time.clock()
+        logger.info("%s 引擎关闭"%self.engine_name)
+        logger.info("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,(end_time - start_time)))
+        return None
 
     def pause(self):
         """
@@ -393,7 +396,3 @@ class ExecutionEngine(object):
         dlist = defer.DeferredList(dfds)
         return dlist
 
-    def _finish_stopping_engine(self):
-        logger.info("%s 引擎关闭"%self.engine_name)
-        logger.info("引擎运行 %ds"%(time.time()-self.start_time))
-        self._closewait.callback(None)
