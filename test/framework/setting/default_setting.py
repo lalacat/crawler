@@ -12,7 +12,7 @@ CONCURRENT_ITEMS = 100 #  控制同时处理的爬取到的item的数据数目
 #D
 DOWNLOADER = "test.framework.downloads.Downloader"
 # 默认下载器
-DOWNLOAD_HANDLER = "test.framework.downloads.download_agent.HTTPDownloadHandler"
+DOWNLOAD_HANDLER = "test.framework.downloads.download_agent_redirect.HTTPDownloadHandler"
 DOWNLOAD_TIMEOUT = 180      # 3mins
 
 DOWNLOAD_MAXSIZE = 1024*1024*1024   # 1024m 下载网页大小的最大值

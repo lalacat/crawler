@@ -310,7 +310,7 @@ class ExecutionEngine(object):
             return _
 
         dwld = self.downloader.fetch(request,spider)
-        dwld.addCallbacks(_on_success,)
+        dwld.addCallbacks(_on_success)
         dwld.addBoth(_on_complete)
         return dwld
 

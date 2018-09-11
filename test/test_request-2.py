@@ -15,7 +15,7 @@ bs = BeautifulSoup(r.text,'lxml')
 #smzdm_produce = bs.xpath("body/div[@id='content']")
 
 xml = etree.HTML(r.text)
-#print(xml)
+print(xml)
 smzdm_produce = xml.xpath("body/div[@id='content']/div/div[@id='feed-wrap']/div"
                           "/div[@class='feed-main-con']/ul[@id='feed-main-list']")
 ul = smzdm_produce[0].xpath('./li')

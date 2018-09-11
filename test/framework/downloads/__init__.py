@@ -9,7 +9,6 @@ from twisted.internet import defer, task,reactor
 
 from test.framework.middleware.downloadmw import DownloaderMiddlewareManager
 from test.framework.objectimport.loadobject import load_object
-from test.framework.downloads.download_agent import HTTPDownloadHandler
 from test.framework.utils.defer import mustbe_deferred
 from test.framework.utils.httpobj import urlparse_cached
 

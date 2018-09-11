@@ -154,8 +154,8 @@ class Scraper(object):
     def handle_spider_error(self, _failure, request, response, spider):
         exc = _failure.value
         end_time = time.clock()
-        logger.error("%(request)s处理结果的时候出现错误：\n%{failure}s\nprocess item 持续时间"
-                     "为：%{time}s",
+        logger.error("%(request)s处理结果的时候出现错误：\n%(failure)s\nprocess item 持续时间"
+                     "为：%(time)f",
                      {"request":request,"failure":exc,"time":(end_time-self.start_time)})
         self.crawler.engine.close_spider(spider,exc or "cancelled")
 

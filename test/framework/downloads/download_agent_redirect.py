@@ -1,5 +1,5 @@
 from twisted.web.client import Agent,ResponseDone,ResponseFailed, \
-    HTTPConnectionPool
+    HTTPConnectionPool,RedirectAgent
 from twisted.web.http import _DataLoss, PotentialDataLoss
 from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
@@ -73,6 +73,7 @@ class HTTPDownloadHandler(object):
 
 class DownloadAgent(object):
     _Agent = Agent
+    _RedirectAgent = RedirectAgent
 
     def __init__(self,contextFactory=None, connectTimeout=10, bindAddress=None,
                  pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False):
@@ -84,6 +85,7 @@ class DownloadAgent(object):
         self._maxsize = maxsize # 规定最大的下载信息，防止下载的网页内容过大，占资源
         self._warnsize = warnsize# 给下载的网页设置一个警戒线
         self._fail_on_dataloss = fail_on_dataloss
+        self._redirect = False
 
     def _getAgent(self,timeout):
 
@@ -92,11 +94,18 @@ class DownloadAgent(object):
                            bindAddress=self._bindAddress,
                            pool=self._pool)
 
+    def _getRedirectAgent(self,timeout):
+        return self._RedirectAgent(self._getAgent(timeout))
+
     def download_request(self,request):
         logger.info("进入下载download_request")
         timeout = request.meta.get('download_timeout') or self._connectTimeout
+        redirect = request.meta.get('download_redirect') or self._redirect
         logger.debug("download_timeout is %d"%timeout)
-        agent = self._getAgent(timeout)
+        if redirect:
+            agent = self._getRedirectAgent(timeout)
+        else:
+            agent = self._getAgent(timeout)
         #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
         #  urldefrag去掉fragment
         url = urldefrag(request.url)[0]
@@ -125,7 +134,9 @@ class DownloadAgent(object):
             #  只有执行的方法是能够回到reactor主循环的时候，callLater才能执行
             #  _RequestBodyProducer中dataReceived方法不会一直占用，数据还没接收到是，是会回到reactor循环的，
             #  当总的接收数据的时间超过了timeout的时候，才会执行d.cancel
+            #d.addCallback(self.fun_print,request)
             self._timeout_cl = reactor.callLater(timeout,self.fun_cancel,d)
+            d.addErrback(self.fun_err)
             d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
             logger.error(e)
@@ -142,6 +153,7 @@ class DownloadAgent(object):
         logger.info(content)
         if content.status == 301:
             logger.critical("再次下载")
+            self._redirect = True
             content = self.download_request(request)
 
         return content
@@ -219,12 +231,18 @@ class DownloadAgent(object):
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         status = int(txresponse.code)
         header = dict()
-        try:
-            for k,v in txresponse.headers.getAllRawHeaders():
-                header[k] = v
-        except KeyError :
-            logger.error("header is None")
-        response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
+        if status == 301 or status == 302:
+            logger.critical("%s 网页重定向，重新下载")
+            request.meta["download_redirect"] = True
+            response = request
+        else:
+            try:
+                for k,v in txresponse.headers.getAllRawHeaders():
+                    header[k] = v
+            except KeyError :
+                logger.error("header is None")
+            response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
+
         return response
 
 
@@ -310,12 +328,12 @@ class _ResponseReader(Protocol):
 
         #  针对不同的loss connection进行问题的处理
         if reason.check(ResponseDone): #  正常完成数据下载
-            logger.info('%s Finished receiving body!!'%self._request.url)
             # callback(data)调用后，能够向defer数据链中传入一个list数据：
             # [True，传入的参数data]，可以实现将获取的body传输到下一个函数中去
-            #print(body)
             if body == b'':
-                logger.error("%s 取到的数据为空，查看是否header设置错误"%self._request.url)
+                logger.error("%s 取到的数据为空"%self._request.url)
+            else:
+                logger.info('%s Finished receiving body!!' % self._request.url)
             self._finished.callback((self._transferdata,body,None))
             return
 
