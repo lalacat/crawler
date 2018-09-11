@@ -35,7 +35,7 @@ class Crawler(object):
     def crawl(self,*args,**kwargs):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
-        self.start_time = time.time()
+        self.start_time = time.clock()
         try:
             self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()

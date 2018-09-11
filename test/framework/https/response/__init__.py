@@ -70,5 +70,7 @@ class Response(object_ref):
         return urljoin(self.url, url)
 
 
-
+a = ["a",None,"b",None]
+if None in a:
+    print(a.count(None))
 

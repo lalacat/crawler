@@ -1,9 +1,8 @@
-import datetime
 import random
 import warnings
 import logging
 from collections import deque
-from time import time
+import time
 
 from twisted.internet import defer, task,reactor
 
@@ -59,10 +58,8 @@ class Slot(object):
             "<downloader.Slot concurrency=%r delay=%0.2f randomize_delay=%r "
             "len(active)=%d len(queue)=%d len(transferring)=%d lastseen=%s>" % (
                 self.concurrency, self.delay, self.randomize_delay,
-                len(self.active), len(self.queue), len(self.transferring),
-                datetime.fromtimestamp(self.lastseen).isoformat()
+                len(self.active), len(self.queue), len(self.transferring),self.lastseen)
             )
-        )
 
 
 #  延迟，通过spider设置延迟
@@ -116,8 +113,8 @@ class Downloader(object):
 
         self.active.add(request)
         #  调用中间件管理器的download方法，同时传入了自己的_enqueue_request方法。
-        #dfd = self.middleware.download(self._enqueue_request, request, spider)
-        dfd = self.middleware.download(self._download, request, spider)
+        dfd = self.middleware.download(self._enqueue_request, request, spider)
+        #dfd = self.middleware.download(self._download, request, spider)
         return dfd.addBoth(_deactivate)
 
     def needs_backout(self):
@@ -155,6 +152,7 @@ class Downloader(object):
     #  处理requset
     def _enqueue_request(self, request, spider):
         #  key就是hostname
+        logger.info("%s.%s加入download队列，加入时间为%f"%(spider.name,request,time.clock()))
         key, slot = self._get_slot(request, spider)
         request.meta['download_slot'] = key
 
@@ -181,7 +179,7 @@ class Downloader(object):
             return
 
         # Delay queue processing if a download_delay is configured
-        now = time()
+        now = time.time()
         delay = slot.download_delay()  # 获取slot对象的延迟时间
         if delay:
             #  delay在默认情况下为0
@@ -192,6 +190,7 @@ class Downloader(object):
 
         # Process enqueued requests if there are free slots to transfer for this slot
         while slot.queue and slot.free_transfer_slots() > 0:
+            logger.debug(len(slot.queue))
             # 不停地处理slot队列queue中的请求，如果队列非空且slot.transferring中request的个数没有达到下载最大个数,
             # 则下载，如果需要延迟则继续调用'_process_queue'
             slot.lastseen = now
@@ -203,22 +202,23 @@ class Downloader(object):
                 self._process_queue(spider, slot)
                 break
 
-    def _download(self, request, spider,slot=None):
+    def _download(self,slot,request, spider):
         logger.debug("进行下载。。。。。")
         #logger.info("request：%s，spider: %s"%(request,spider))
         try:
             dfd = mustbe_deferred(self.handler.download_request,request,spider)
         except Exception:
             raise ValueError("can't find spider")
-        '''
+
         slot.transferring.add(request)
+
         def finish_transferring(_):
             slot.transferring.remove(request)
             self._process_queue(spider, slot)
             return _
-        '''
-        #return dfd.addBoth(finish_transferring)
-        return dfd
+
+        return dfd.addBoth(finish_transferring)
+        #return dfd
 
     def close(self):
         logger.info("关闭 %s 的下载器"%self.spider.name)

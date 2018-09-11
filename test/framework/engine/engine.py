@@ -153,7 +153,7 @@ class ExecutionEngine(object):
     def _finish_stopping_engine(self,_,start_time):
         end_time = time.clock()
         logger.info("%s 引擎关闭"%self.engine_name)
-        logger.info("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,(end_time - start_time)))
+        logger.info("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,end_time ))
         return None
 
     def pause(self):
@@ -243,8 +243,8 @@ class ExecutionEngine(object):
 
         d = self._download(request,spider)
         d.addBoth(self._handle_downloader_output,request,spider)
-        #d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
-        d.addErrback(test_err)
+        d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
+        #d.addErrback(test_err)
 
         #  移除掉处理过的request
         d.addBoth(lambda _: slot.remove_request(request,spider.name))
@@ -297,10 +297,9 @@ class ExecutionEngine(object):
 
         def _on_success(response):
             #  若得到的是response数据，则就返回response
-            logger.info("%s 下载成功"%request.url)
-
             assert isinstance(response,(Response,Request))
             if isinstance(response,Response):
+                logger.info("%s 下载成功" % request.url)
                 response.requset = request
             return response
 
@@ -344,10 +343,12 @@ class ExecutionEngine(object):
         if slot.closing:
             # 不是False，就是Defferred对象，就表明已经关闭了
             return slot.closing
-        logger.info("将关闭爬虫%(name)s：(%(reason)s)",
+        middle_time = time.clock()
+        logger.info("将关闭爬虫%(name)s：(%(reason)s),时间为：%(time)f",
                     {
                         'name' :spider.name,
-                        'reason': reason
+                        'reason': reason,
+                        'time':middle_time
                     },
                     extra={'spider': spider})
         dfd = slot.close(spider.name)

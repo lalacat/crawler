@@ -232,7 +232,7 @@ class DownloadAgent(object):
         status = int(txresponse.code)
         header = dict()
         if status == 301 or status == 302:
-            logger.critical("%s 网页重定向，重新下载")
+            logger.critical("%s 网页重定向，重新下载"%url)
             request.meta["download_redirect"] = True
             response = request
         else:

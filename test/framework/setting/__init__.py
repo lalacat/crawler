@@ -139,6 +139,9 @@ class BaseSettings(object):
     def getint(self,name,default=0):
         return int(self.get(name,default))
 
+    def getfloat(self, name, default=0.0):
+        return float(self.get(name, default))
+
     def update(self, values, priority='project'):
         """
         为value更新一个新的优先级

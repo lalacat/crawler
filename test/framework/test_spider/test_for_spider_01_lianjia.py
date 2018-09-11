@@ -8,16 +8,18 @@ import logging
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
-def finish_crawl( content):
-    logging.info("finish")
-    return content
+def finish_crawl(content,spider):
+    logging.info("finish===>%d"%spider._item_num)
+    print(spider._total_house)
+    return
 
 
 
 settings = Setting()
 crawler_01 = Crawler(LJSpider,settings)
-spider_01 = crawler_01._create_spider()
+#spider_01 = crawler_01.spidercls()
 c1 = crawler_01.crawl()
 dd = defer.DeferredList([c1])
+dd.addCallback(finish_crawl,crawler_01.spider)
 dd.addBoth(lambda _:reactor.stop())
 reactor.run()

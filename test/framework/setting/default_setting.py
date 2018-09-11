@@ -1,6 +1,3 @@
-TEST1 = "test1"
-TEST2 = "test2"
-LOG_FORMATTER = "AAA"
 #A
 #B
 
@@ -21,11 +18,7 @@ DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
 DOWNLOAD_FAIL_ON_DATALOSS = True
 
 DOWNLOAD_DELAY = 0
-DOWNLOADER_MIDDLEWARE_TEST = {
-    "test.framework.downloads.test_for_download_middleware_01.Test_MW_D_01":100,
-    "test.framework.downloads.test_for_download_middleware_02.Test_MW_D_02":100,
-    "test.framework.downloads.test_for_download_middleware_03.Test_MW_D_03":100,
-}
+DOWNLOADER_MIDDLEWARE_TEST = {}
 #DOWNLOADER_MIDDLEWARE_TEST = {}
 
 

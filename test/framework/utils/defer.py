@@ -1,3 +1,5 @@
+import time
+
 from twisted.internet import defer, reactor, task
 import logging
 
@@ -25,7 +27,7 @@ def defer_succeed(result):
     before attending pending delayed calls, so do not set delay to zero.
     """
     d = defer.Deferred()
-    reactor.callLater(3, d.callback, result)
+    reactor.callLater(0.1, d.callback, result)
     return d
 
 

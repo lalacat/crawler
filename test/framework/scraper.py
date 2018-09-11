@@ -127,7 +127,7 @@ class Scraper(object):
         #  如果结果没有出错的时候，先进行中间件的处理，然后执行在request中或者是spider中定义的callback或者是_parse来处理结果
         #  结果处理完后执行自定义的规则，将结果进行制定规则的输出
         dfd = self._scrape2(response, request, spider)  # returns spiders processed output
-        dfd.addErrback(self.handle_spider_error, request,response,  spider)
+        dfd.addErrback(self.handle_spider_error, request,response, spider)
         dfd.addCallback(self.handle_spider_output, request, response, spider)
         return dfd
 
@@ -135,16 +135,16 @@ class Scraper(object):
         """Handle the different cases of request's result been a Response or a
         Failure"""
         if not isinstance(request_result, Failure):
-            return self.spidermw.scrape_response(
-                self.call_spider, request_result, request, spider)
+            return self.spidermw.scrape_response(self.call_spider, request_result, request, spider)
         else:
             #
             dfd = self.call_spider(request_result, request, spider)
-            return dfd.addErrback(
-                self._log_download_errors, request_result, request, spider)
+            #dfd.addErrback( self._log_download_errors, request_result, request, spider)
+            return dfd
 
     def call_spider(self, result, request, spider):
-        logger.info("通过%s._parse处理结果"%spider.name)
+        middle_time = time.clock()
+        logger.info("通过%s._parse处理结果,时间为：%f"%(spider.name,middle_time))
         result.request = request
         dfd = defer_result(result)
         #  这一步才是真正意义上的处理爬到的结果，之前的都是在过滤错误
@@ -161,6 +161,7 @@ class Scraper(object):
 
     def handle_spider_output(self, result, request, response, spider):
         if not result:
+            logger.info("spider._parse或者request.callback返回的结果为None")
             return defer_succeed(None)
         if not isinstance(result,Iterable):
             logger.error("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
@@ -176,6 +177,7 @@ class Scraper(object):
             count = 1
         else:
             count = len(result)
+        print(count)
         dfd = parallel(it,count,self._process_spidermw_output, request, response, spider)
         dfd.addCallback(self._itemproc_collected,request)
         return dfd
