@@ -1,5 +1,5 @@
 from twisted.internet import defer, task
-
+from twisted.python.log import err
 from test.framework.https.request import Request
 from test.framework.https.response import Response
 from test.framework.scraper import Scraper
@@ -309,7 +309,7 @@ class ExecutionEngine(object):
             return _
 
         dwld = self.downloader.fetch(request,spider)
-        dwld.addCallbacks(_on_success)
+        dwld.addCallbacks(_on_success,err)
         dwld.addBoth(_on_complete)
         return dwld
 
