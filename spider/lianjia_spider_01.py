@@ -15,8 +15,8 @@ class LJSpider(Spider):
         self._total_house = 0
         self.headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0)','Gecko/20100101','Firefox/31.0'],'content-type':['application/json']}
         self._item_num = 0
-        self._maxnum = 2
-        self.download_delay = 5
+        self._maxnum = 100
+        self.download_delay = 1
     def start_requests(self):
         start_url = list()
 

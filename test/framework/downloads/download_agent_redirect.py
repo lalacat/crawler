@@ -85,7 +85,7 @@ class DownloadAgent(object):
         self._maxsize = maxsize # 规定最大的下载信息，防止下载的网页内容过大，占资源
         self._warnsize = warnsize# 给下载的网页设置一个警戒线
         self._fail_on_dataloss = fail_on_dataloss
-        self._redirect = False
+        self._redirect = True
 
     def _getAgent(self,timeout):
 

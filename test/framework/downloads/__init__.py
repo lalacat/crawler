@@ -179,7 +179,7 @@ class Downloader(object):
             return
 
         # Delay queue processing if a download_delay is configured
-        now = time.time()
+        now = time.clock()
         delay = slot.download_delay()  # 获取slot对象的延迟时间
         if delay:
             #  delay在默认情况下为0
