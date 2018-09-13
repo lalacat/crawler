@@ -15,7 +15,7 @@ def request_callback(content):
 
 def request_errback(content):
     print("request_and_response errback")
-    print(content[1])
+    print(content)
     return content
 
 def agent_print(content):
@@ -39,4 +39,3 @@ agent.addErrback(request_errback)
 agent.addBoth(lambda _: reactor.stop())
 
 reactor.run()
-

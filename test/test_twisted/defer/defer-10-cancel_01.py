@@ -51,15 +51,14 @@ from twisted.internet.defer import inlineCallbacks,Deferred,returnValue,Deferred
 import time,random
 
 
-def job():
-    def request():
-        #time.sleep(1)
-        return "task Finish "
+def job(text,id):
+    def _cancel(_):
+        print("job cancel")
+    d = defer.Deferred(_cancel)
+    print(text + str(id))
+    d.callback(random.randint(1, 5))
+    return d
 
-    #print(text + str(id))
-    return defer.succeed(random.randint(1,5))
-
-   # return task.deferLater(reactor, random.randint(1,5), request)
 
 def outer_fun(content,id):
     print(content+str(id))
@@ -81,33 +80,39 @@ def inner_fun(content,i):
 def _cb_timeout(result,d):
     print("called!!!")
     if d.active():
-        print("cancel")
+        print("reactor,cancel")
         d.cancel()
-        return result
-    return result
+        return "active finish"
+    return "finish"
+
+def test_fun(id):
+
+    d = job("test: ",id)
+    print(d)
+    print(type(d))
+    #d.addCallback(outer_fun,1)
+    c = reactor.callLater(1,d.cancel)
+    d.addCallback(_cb_timeout,c)
+    return d
+
+def print_fun(result):
+    print(result)
+    return "stop"
+
+def stop_fun(result):
+    print(result)
+    try:
+        reactor.stop()
+    except Exception as e :
+        print(e)
 
 if __name__ == "__main__":
     start = time.clock()
 
-    ts = list()
-
-    for i in range(2):
-        d = job()
-        d.addCallback(inner_fun,i)
-        ts.append(d)
     try:
-
-        dd = DeferredList(ts)
-        d = reactor.callLater(5,dd.cancel)
-        dd.addCallback(_cb_timeout,d)
-
-        #dd.addErrback(lambda f:print(f))
-        dd.addBoth(lambda _:reactor.stop())
-
-
+        d = test_fun(1)
+        d.addCallback(print_fun)
+        d.addBoth(stop_fun)
         reactor.run()
     except Exception as e :
         print(e)
-
-    end = time.clock()
-    print("运行时间%3.2f" % (end - start))

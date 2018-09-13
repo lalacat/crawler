@@ -133,7 +133,7 @@ class DownloadAgent(object):
             #  只有执行的方法是能够回到reactor主循环的时候，callLater才能执行
             #  _RequestBodyProducer中dataReceived方法不会一直占用，数据还没接收到是，是会回到reactor循环的，
             #  当总的接收数据的时间超过了timeout的时候，才会执行d.cancel
-            #  d.addCallback(self.fun_print,request)
+            d.addErrback(self.fun_err)
             self._timeout_cl = reactor.callLater(2,d.cancel)
             d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
@@ -141,9 +141,10 @@ class DownloadAgent(object):
         return d
     """
     测试区
-    
+    """
     def fun_err(self,content):
-        print("接受信息错误")
+        print("test err")
+        print(content)
         return content
 
     def fun_print(self,content,request):
@@ -157,7 +158,7 @@ class DownloadAgent(object):
         return content
 
     def fun_cancel(self,obj):
-        logger.debug("test cancel")
+        print("test cancel")
         obj.cancel()
 
     def fun_delay(self,content,num):
@@ -168,7 +169,7 @@ class DownloadAgent(object):
         return content
 
 
-    
+    """
     测试区
     """
     def _cb_latency(self,result,request, start_time):
@@ -310,6 +311,7 @@ class _ResponseReader(Protocol):
             注意的是，此defer之后的callbacks都不会被执行
             """
             self._finished.cancel()
+
         if not self._warnsize_flag:
             if self._warnsize and self._bytes_received > self._warnsize:
                 self._reached_warnsize = True

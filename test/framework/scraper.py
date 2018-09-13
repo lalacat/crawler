@@ -162,7 +162,8 @@ class Scraper(object):
     def handle_spider_output(self, result, request, response, spider):
         """
         通过spider._parse或者request.callback处理后的数据，可能会根据需要，返回None或者Request，可迭代型的list,dict,或者是yield 生成器
-        其中生成器是无法测定具体的大小的，所以不能用len()来确定cout的大小
+        其中生成器是无法测定具体的大小的，所以不能用len()来确定并行处理task的数目
+        并行处理task的数目100和20的区别并不大
 
         :param result:
         :param request:
@@ -174,9 +175,10 @@ class Scraper(object):
             logger.info("spider._parse或者request.callback返回的结果为None,不经过自定义process item 处理！！")
             return defer_succeed(None)
         if isinstance(result,Request):
+            self.crawler.engine.crawl(request=result, spider=spider)
             return defer_succeed(result)
         if not isinstance(result,Iterable):
-            logger.error("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
+            logger.warning("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
             return defer_succeed(result)
         #  将自定义处理好的结果，通过这个方法并行执行自定义的rule（pipe process_item）
         #  这里的结果默认是能够迭代的List或者是dict类型的结果，每个结果都是并列的，能够同时符合process_item处理规则
@@ -185,12 +187,8 @@ class Scraper(object):
         logger.info("%s的结果进行process_item处理"%spider.name)
         it = iter_errback(result, self.handle_spider_error, request, response, spider)
         self.outputs = []
-        try:
-            count = len(result) if len(result) else 0
-        except TypeError :
-            count = self.concurrent_items
 
-        dfd = parallel(it,count,self._process_spidermw_output, request, response, spider)
+        dfd = parallel(it,self.concurrent_items,self._process_spidermw_output, request, response, spider)
         dfd.addCallback(self._itemproc_collected,request)
         return dfd
 

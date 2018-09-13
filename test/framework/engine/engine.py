@@ -1,4 +1,5 @@
 from twisted.internet import defer, task
+from twisted.python.failure import Failure
 from twisted.python.log import err
 from test.framework.https.request import Request
 from test.framework.https.response import Response
@@ -241,23 +242,35 @@ class ExecutionEngine(object):
             print("test_err",content)
             return content
 
+        def test_remove_request(_,slot,request,spider):
+            logger.info("test_remove_request")
+            slot.remove_request(request, spider.name)
+            return _
+        def test_next_slot(_,slot):
+            logger.info("test_next_slot")
+            slot.nextcall.schedule()
+            return _
+
         d = self._download(request,spider)
         d.addBoth(self._handle_downloader_output,request,spider)
-        d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
+        d.addErrback(test_err)
+        #d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
 
         #  移除掉处理过的request
-        d.addBoth(lambda _: slot.remove_request(request,spider.name))
+        d.addBoth(test_remove_request,slot,request,spider)
+        #d.addBoth(lambda _: slot.remove_request(request,spider.name))
         d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
 
         #  进行下一次的处理request
-        d.addBoth(lambda _: slot.nextcall.schedule())
+        d.addBoth(test_next_slot,slot)
+        #d.addBoth(lambda _: slot.nextcall.schedule())
         d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
 
         return d
 
     def _handle_downloader_output(self,response,request,spider):
         #  得到的是下载后的结果，此方法是将结果输出到其他需要处理结果的地方
-        #assert isinstance(response, (Request, Response, Failure)), response
+        assert isinstance(response, (Request, Response, Failure)), response
         if isinstance(response, Request):
             #  到这一步得到的response还是Request类，表明下载不成功，
             #  需要重新走一遍流程
