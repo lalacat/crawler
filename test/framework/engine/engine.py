@@ -42,7 +42,7 @@ class Slot(object):
         :param request:
         :return:
         """
-        logger.info("%s 添加到inprogress队列中"%request)
+        logger.debug("%s 添加到inprogress队列中"%request)
         self.inprogress.append(request)
 
     def remove_request(self, request,name):
@@ -244,17 +244,14 @@ class ExecutionEngine(object):
         d = self._download(request,spider)
         d.addBoth(self._handle_downloader_output,request,spider)
         d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
-        #d.addErrback(test_err)
 
         #  移除掉处理过的request
         d.addBoth(lambda _: slot.remove_request(request,spider.name))
-        #d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
-        d.addErrback(test_err)
+        d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
 
         #  进行下一次的处理request
         d.addBoth(lambda _: slot.nextcall.schedule())
-        #d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
-        d.addErrback(test_err)
+        d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
 
         return d
 
@@ -332,10 +329,10 @@ class ExecutionEngine(object):
         logger.debug("%s 进入队列中" %request)
         if not self.slot.scheduler.enqueue_request(request):
             logger.error("%s 进入队列失败" %request)
+
     def _spider_idle(self,spider):
         if self.spider_is_idle():
-            d = self.close_spider(spider,reason="finished")
-            #d.addBoth(lambda _:reactor.stop())
+            self.close_spider(spider,reason="finished")
 
     def close_spider(self,spider,reason='cancelled'):
         """关闭所有的爬虫和未解决的requests"""

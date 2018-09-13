@@ -8,9 +8,6 @@ from test.framework.utils.defer import process_parallel, process_chain, process_
 logger = logging.getLogger(__name__)
 
 
-class Scraper(object):
-    pass
-
 
 class MiddlewareManager(object):
     """
@@ -19,7 +16,7 @@ class MiddlewareManager(object):
     component_name = 'father middleware'
 
     def __init__(self,*middlewares):
-        logger.info("初始化中间件............")
+        logger.debug("初始化中间件............")
         self.clsnames = middlewares[0]
         self.middlewares = middlewares[1]
 
@@ -69,10 +66,11 @@ class MiddlewareManager(object):
 
         if len(middlewares)  != len(clsnames):
             raise ImportError("%s的中间件载入不完整"%cls.component_name)
-        logger.info("生效%(componentname)ss的中间件 :\n%(enabledlist)s",
-                    {'componentname': cls.component_name,
-                     'enabledlist': pprint.pformat(enabled)},
-                    extra={'crawler': crawler})
+        if middlewares and clsnames:
+            logger.info("生效%(componentname)ss的中间件 :\n%(enabledlist)s",
+                        {'componentname': cls.component_name,
+                         'enabledlist': pprint.pformat(enabled)},
+                        extra={'crawler': crawler})
         return cls(clsnames,middlewares)
 
     @classmethod

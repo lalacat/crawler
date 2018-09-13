@@ -139,7 +139,7 @@ class Scraper(object):
         else:
             #
             dfd = self.call_spider(request_result, request, spider)
-            #dfd.addErrback( self._log_download_errors, request_result, request, spider)
+            dfd.addErrback( self._log_download_errors, request_result, request, spider)
             return dfd
 
     def call_spider(self, result, request, spider):
@@ -160,9 +160,21 @@ class Scraper(object):
         self.crawler.engine.close_spider(spider,exc or "cancelled")
 
     def handle_spider_output(self, result, request, response, spider):
+        """
+        通过spider._parse或者request.callback处理后的数据，可能会根据需要，返回None或者Request，可迭代型的list,dict,或者是yield 生成器
+        其中生成器是无法测定具体的大小的，所以不能用len()来确定cout的大小
+
+        :param result:
+        :param request:
+        :param response:
+        :param spider:
+        :return:
+        """
         if not result:
-            logger.info("spider._parse或者request.callback返回的结果为None")
+            logger.info("spider._parse或者request.callback返回的结果为None,不经过自定义process item 处理！！")
             return defer_succeed(None)
+        if isinstance(result,Request):
+            return defer_succeed(result)
         if not isinstance(result,Iterable):
             logger.error("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
             return defer_succeed(result)
@@ -173,11 +185,11 @@ class Scraper(object):
         logger.info("%s的结果进行process_item处理"%spider.name)
         it = iter_errback(result, self.handle_spider_error, request, response, spider)
         self.outputs = []
-        if len(result) == 0 :
-            count = 1
-        else:
-            count = len(result)
-        print(count)
+        try:
+            count = len(result) if len(result) else 0
+        except TypeError :
+            count = self.concurrent_items
+
         dfd = parallel(it,count,self._process_spidermw_output, request, response, spider)
         dfd.addCallback(self._itemproc_collected,request)
         return dfd

@@ -1,7 +1,7 @@
 import logging
 
 from test.framework.middleware import MiddlewareManager
-from test.framework.objectimport import bulid_component_list
+from test.framework.objectimport.bulid_component_list import bulid_component_list
 from test.framework.https.request import Request
 from test.framework.https.response import Response
 from test.framework.utils.defer import mustbe_deferred

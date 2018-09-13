@@ -14,3 +14,6 @@ print(total_house)
 print(len(house_list))
 for i in house_list:
     print(i.find("div",class_="title").a.string)
+
+
+

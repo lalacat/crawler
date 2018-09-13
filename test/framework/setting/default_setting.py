@@ -27,7 +27,9 @@ DOWNLOADER_MIDDLEWARE_TEST = {}
 #G
 #H
 #
-ITEM_PIPELINES = {"test.framework.middleware.test_process_item_01.Test_Process_item_A":10}
+ITEM_PIPELINES = {
+   # "test.framework.middleware.test_process_item_01.Test_Process_item_A":10
+}
 #J
 #K
 #L

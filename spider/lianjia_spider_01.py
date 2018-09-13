@@ -15,8 +15,8 @@ class LJSpider(Spider):
         self._total_house = 0
         self.headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0)','Gecko/20100101','Firefox/31.0'],'content-type':['application/json']}
         self._item_num = 0
-        self._maxnum = 100
-        self.download_delay = 1
+        self._maxnum = 5
+        self.download_delay = 0
     def start_requests(self):
         start_url = list()
 
@@ -48,6 +48,6 @@ class LJSpider(Spider):
         one_page_numeber = len(house_list) - none_num
         self._item_num += one_page_numeber
         print(self._item_num)
-        return None
 
+        yield Request("https://sh.lianjia.com/ershoufang/pudong/",callback=self._parse)
 

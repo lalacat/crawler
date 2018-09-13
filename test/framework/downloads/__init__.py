@@ -236,7 +236,7 @@ class Downloader(object):
         :param age:
         :return:
         """
-        mintime = time() - age
+        mintime = time.clock() - age
         for key, slot in list(self.slots.items()):
             if not slot.active and slot.lastseen + slot.delay < mintime:
                 self.slots.pop(key).close()
