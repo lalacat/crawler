@@ -18,7 +18,7 @@ class LJSpider(Spider):
     def start_requests(self):
         start_url = list()
 
-        for i in range(1,self._maxnum):
+        for i in range(1,self._maxnum+1):
             if i == 1 :
                 url = self._url
             else:
