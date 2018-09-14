@@ -10,9 +10,8 @@ from test.framework.https.response import Response
 from test.framework.item import BaseItem
 from test.framework.middleware.itempipelinemw import ItemPipelineManager
 from test.framework.middleware.spidermw import SpiderMiddlewareManager
-from test.framework.objectimport.loadobject import load_object
 from test.framework.utils.defer import defer_result, defer_succeed, iter_errback, parallel
-from test.public_api.web import print_smzdm_result
+from test.framework.utils.exception import CloseSpider
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +138,7 @@ class Scraper(object):
         else:
             #
             dfd = self.call_spider(request_result, request, spider)
-            dfd.addErrback( self._log_download_errors, request_result, request, spider)
+            dfd.addErrback(self._log_download_errors, request_result, request, spider)
             return dfd
 
     def call_spider(self, result, request, spider):
@@ -157,7 +156,8 @@ class Scraper(object):
         logger.error("%(request)s处理结果的时候出现错误：\n%(failure)s\nprocess item 持续时间"
                      "为：%(time)f",
                      {"request":request,"failure":exc,"time":(end_time-self.start_time)})
-        self.crawler.engine.close_spider(spider,exc or "cancelled")
+        if isinstance(exc,CloseSpider):
+            self.crawler.engine.close_spider(spider,exc or "cancelled")
 
     def handle_spider_output(self, result, request, response, spider):
         """
