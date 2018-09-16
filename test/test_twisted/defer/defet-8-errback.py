@@ -14,7 +14,7 @@ def job(text,id):
             return "task Finish "
         except Exception as e :
              return failure.Failure("数字不能整除")
-    return task.deferLater(reactor, 5, request,id)
+    return task.deferLater(reactor, 1, request,id)
 
 
 def outer_fun(content):
@@ -32,11 +32,11 @@ def print_fun(content):
     print("print callback", content)
     return None
 
-d = job("test",0)
-d.addCallbacks(outer_fun,err_fun)
-d.addTimeout(3,clock=None,onTimeoutCancel=None)
-
-d.addCallbacks(print_fun,print_fun)
+d = job("test",1)
+#d.addCallbacks(outer_fun,err_fun)
+#d.addTimeout(3,clock=None,onTimeoutCancel=None)
+d.addCallback(lambda f:print("print",f))
+d.addCallback(print_fun,print_fun)
 d.addBoth(lambda _:reactor.stop())
 
 reactor.run()

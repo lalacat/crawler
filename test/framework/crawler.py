@@ -35,7 +35,6 @@ class Crawler(object):
     def crawl(self,*args,**kwargs):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
-        self.start_time = time.clock()
         try:
             self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
@@ -46,7 +45,7 @@ class Crawler(object):
             但如何返回值不是defer而是一个值（正如我们的缓存代理将本地缓冲的诗歌返回一样），那么这个maybeDeferred会将该值重新打包成一个已经激活的deferred返回，注意是已经激活的deferred。
             当然，如果返回的是一个异常，其也会将其打包成一个已经激活的deferred，只不过就不是通过callback而是errback激活的。
             '''
-            yield maybeDeferred(self.engine.start,self.start_time)
+            yield maybeDeferred(self.engine.start)
         except Exception as e:
             logger.error(e)
             self.crawling = False

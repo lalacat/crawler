@@ -135,13 +135,13 @@ class ExecutionEngine(object):
             logger.error(e)
 
     @defer.inlineCallbacks
-    def start(self,start_time):
+    def start(self):
         assert not self.running,"%s 的引擎已启动"%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
-        logger.info("%s 的引擎开始时间为: %d" %(self.spider.name,start_time))
         self.running = True
         engine_start_time = time.clock()
+        logger.info("%s 的引擎开始时间为: %d" %(self.spider.name,engine_start_time))
         self._closewait = defer.Deferred()
-        self._closewait.addBoth(self._finish_stopping_engine,engine_start_time)
+        self._closewait.addBoth(self._finish_stopping_engine)
         yield self._closewait
 
     def stop(self):
@@ -151,7 +151,7 @@ class ExecutionEngine(object):
 
         return True
 
-    def _finish_stopping_engine(self,_,start_time):
+    def _finish_stopping_engine(self,_):
         end_time = time.clock()
         logger.info("%s 引擎关闭"%self.engine_name)
         logger.info("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,end_time ))
@@ -242,27 +242,27 @@ class ExecutionEngine(object):
             print("test_err",content)
             return content
 
-        def test_remove_request(_,slot,request,spider):
-            logger.info("test_remove_request")
+        def remove_request(_,slot,request,spider):
+            logger.debug("remove_request")
             slot.remove_request(request, spider.name)
             return _
-        def test_next_slot(_,slot):
-            logger.info("test_next_slot")
+        def next_slot(_,slot):
+            logger.debug("next_slot")
             slot.nextcall.schedule()
             return _
 
         d = self._download(request,spider)
         d.addBoth(self._handle_downloader_output,request,spider)
-        d.addErrback(test_err)
-        #d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
+        #d.addErrback(test_err)
+        d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
 
         #  移除掉处理过的request
-        d.addBoth(test_remove_request,slot,request,spider)
+        d.addBoth(remove_request,slot,request,spider)
         #d.addBoth(lambda _: slot.remove_request(request,spider.name))
         d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
 
         #  进行下一次的处理request
-        d.addBoth(test_next_slot,slot)
+        d.addBoth(next_slot,slot)
         #d.addBoth(lambda _: slot.nextcall.schedule())
         d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
 
@@ -308,20 +308,22 @@ class ExecutionEngine(object):
 
         def _on_success(response):
             #  若得到的是response数据，则就返回response
-            assert isinstance(response,(Response,Request))
+            assert isinstance(response,(Response,Request)),"返回的不是Response or Request类型的数据，而是%s"%type(response)
             if isinstance(response,Response):
                 logger.info("%s 下载成功" % request.url)
                 response.requset = request
             return response
 
-        def _on_complete(_):
+        def _on_complete(_,request):
             #  当一个requset处理完后，就进行下一个处理
+            if isinstance(_,(Failure,Exception)):
+                logger.error("%s 下载失败，失败的原因是%s" % (request.url,_))
             slot.nextcall.schedule()
             return _
 
         dwld = self.downloader.fetch(request,spider)
         dwld.addCallback(_on_success)
-        dwld.addBoth(_on_complete)
+        dwld.addBoth(_on_complete,request)
         return dwld
 
     @property

@@ -107,15 +107,14 @@ class Downloader(object):
         logger.debug("加载中间件，准备下载")
         self.spider = spider
 
-        def _deactivate(response):
+        def _delactivate(response):
             self.active.remove(request)
             return response
 
         self.active.add(request)
         #  调用中间件管理器的download方法，同时传入了自己的_enqueue_request方法。
         dfd = self.middleware.download(self._enqueue_request, request,spider)
-        #dfd = self.middleware.download(self._download, request, spider)
-        return dfd.addBoth(_deactivate)
+        return dfd.addBoth(_delactivate)
 
     def needs_backout(self):
         #  进行的下载任务的个数大于等于并发数，默认并发数为16，表示下载要延缓一下
@@ -156,12 +155,12 @@ class Downloader(object):
         key, slot = self._get_slot(request, spider)
         request.meta['download_slot'] = key
 
-        def _deactivate(response):
+        def _delactivate(response):
             slot.active.remove(request)
             return response
 
         slot.active.add(request)
-        deferred = defer.Deferred().addBoth(_deactivate)
+        deferred = defer.Deferred().addBoth(_delactivate)
         slot.queue.append((request, deferred))
         self._process_queue(spider, slot)
         return deferred
