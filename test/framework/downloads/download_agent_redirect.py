@@ -134,7 +134,7 @@ class DownloadAgent(object):
             #  _RequestBodyProducer中dataReceived方法不会一直占用，数据还没接收到是，是会回到reactor循环的，
             #  当总的接收数据的时间超过了timeout的时候，才会执行d.cancel
             #  d.addCallback(self.fun_print,request)
-            self._timeout_cl = reactor.callLater(2,d.cancel)
+            self._timeout_cl = reactor.callLater(timeout,d.cancel)
             d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
             logger.error(e)
@@ -295,7 +295,6 @@ class _ResponseReader(Protocol):
 
         self._bodybuf.write(datas)
         self._bytes_received += len(datas)
-        time.sleep(1)
 
         if self._maxsize and self._bytes_received > self._maxsize:
             logger.error("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"

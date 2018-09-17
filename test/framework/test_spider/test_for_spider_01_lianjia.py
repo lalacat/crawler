@@ -1,8 +1,6 @@
-from spider.lianjia_spider_01 import LJSpider
-from test.framework.middleware.test_process_item_01 import Test_Process_item_A
+from spider.lianjia_spider_03_db import LJSpider
 from test.framework.setting import Setting
 from test.framework.crawler import Crawler
-from spider.test_Spider_01 import Test_Spider_1
 from twisted.internet import reactor, defer
 import logging
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
@@ -17,7 +15,6 @@ def finish_crawl(content,spider):
 
 settings = Setting()
 crawler_01 = Crawler(LJSpider,settings)
-#spider_01 = crawler_01.spidercls()
 c1 = crawler_01.crawl()
 dd = defer.DeferredList([c1])
 dd.addCallback(finish_crawl,crawler_01.spider)

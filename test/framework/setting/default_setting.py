@@ -49,6 +49,7 @@ HEADER_COLLECTION =[
 #T
 ITEM_PIPELINES = {
    # "test.framework.middleware.test_process_item_01.Test_Process_item_A":10
+    "test.framework.pipelines.MongoDB":10
 }
 #J
 #K
@@ -81,9 +82,13 @@ LOG_LEVEL = 'DEBUG'
 
 
 #M
+MONGODB_URL = "127.0.0.1:27017"
+MONGODB_NAME = "LianJia"
+
 #N
 #O
 #P
+
 #Q
 #R
 REACTOR_THREADPOOL_MAXSIZE = 10

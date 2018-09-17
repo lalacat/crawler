@@ -278,7 +278,6 @@ class ExecutionEngine(object):
             return
         # 进入到scraper中进行output的处理
         d = self.scraper.enqueue_scrape(response,request,spider)
-        #
         d.addErrback(lambda f:logger.error("%s 在处理下载结果的过程中出现错误"%spider.name))
 
         return d
