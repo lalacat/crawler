@@ -175,7 +175,7 @@ class Scraper(object):
             logger.info("spider._parse或者request.callback返回的结果为None,不经过自定义process item 处理！！")
             return defer_succeed(None)
         if isinstance(result,Request):
-            self.crawler.engine.crawl(request=result, spider=spider)
+            # self.crawler.engine.crawl(request=result, spider=spider)
             return defer_succeed(result)
         if not isinstance(result,Iterable):
             logger.warning("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))

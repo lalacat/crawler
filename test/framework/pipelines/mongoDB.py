@@ -3,10 +3,11 @@ import logging
 
 
 logger = logging.getLogger(__name__)
+
 class MongoDB(object):
 
     def __init__(self,settings):
-        self.mongo_url = settings["MONGODB_URL"]
+        self.db_url = settings["MONGODB_URL"]
         self.db_name = settings["MONGODB_NAME"]
         self.collection_name = None
 
@@ -18,14 +19,14 @@ class MongoDB(object):
 
     @classmethod
     def from_crawler(cls,crawler):
-        return cls(crawler)
+        return cls(crawler.settings)
 
     def process_item(self,item,spider):
         logger.info("添加入数据库")
-        _collection = spider.collection
-        _db_collection = self.db[_collection]
-        if not self._db_collection:
-            raise ValueError('没有发现表明%s'%_collection)
-
+        try:
+            _collection = spider.collection
+            _db_collection = self.db[_collection]
+        except Exception as e  :
+            raise ValueError('没有发现表名%s'%_collection)
         _db_collection.insert_one(item)
         return None

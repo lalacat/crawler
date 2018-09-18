@@ -1,4 +1,8 @@
 import json
+from collections import defaultdict
+from urllib.parse import urljoin, urlparse, urlunparse
+
+from lxml import etree
 
 from spider import Spider
 from test.framework.https.request import Request
@@ -12,16 +16,23 @@ class LJSpider(Spider):
     def __init__(self):
         super(LJSpider,self).__init__()
         self._url = self.settings["URL"]
+        _parsed = urlparse(self._url)
+        self.base_url = urlunparse([_parsed.scheme, _parsed.netloc, "", "", "", ""])
+        self.collection = "Total Zone"
         self._total_house = 0
         self.headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0)','Gecko/20100101','Firefox/31.0'],'content-type':['application/json']}
         self._item_num = 0
-        self._maxnum = 5
+        self._maxnum = 1
         self.download_delay = 0
         self.flag = False
+
+        self.part_urls = defaultdict(list)
+
+
     def start_requests(self):
         start_url = list()
 
-        for i in range(1,self._maxnum):
+        for i in range(1,self._maxnum+1):
             if i == 1 :
                 url = self._url
             else:
@@ -35,34 +46,33 @@ class LJSpider(Spider):
                           )
 
     def _parse(self,response):
-        web_body = BeautifulSoup(response.body,"html.parser")
+        #web_body = BeautifulSoup(response.body,"html.parser")
+        seletor = etree.HTML(response.body)
+        total_zone = seletor.xpath("/html/body/div[3]/div/div[1]/dl[2]/dd/div[1]/div/a")
+        total_urls = {}
+        for a in total_zone:
+            path = a.get('href')
+            if path not in ["/ershoufang/chongming/", "/ershoufang/shanghaizhoubian/","/ershoufang/jinshan"]:
+                name = path.split("/")[-2]
+                #print(name)
+                new_url = urljoin(self.base_url, path)
+                #print(new_url)
+                total_urls[name] = new_url
 
-        total_house = web_body.find_all("h2", class_='total fl')[0].span.string
-        if total_house:
-            self._total_house = total_house
+        for name,url in total_urls.items():
+            yield Request(url,callback=self._parse2,headers=self.headers,meta={'part_name':name})
 
-        house_list = web_body.find_all("ul", class_='sellListContent')[0]
-        if None in house_list:
-            none_num = house_list.count(None)
-        else:
-            none_num = 0
-        one_page_numeber = len(house_list) - none_num
-        self._item_num += one_page_numeber
-        print(self._item_num)
+    def _parse2(self,response):
+        name = response.requset.meta["part_name"]
+        seletor = etree.HTML(response.body)
+        part_zone = seletor.xpath("/html/body/div[3]/div/div[1]/dl[2]/dd/div[1]/div[2]/a")
+        parts = []
+        for a in part_zone:
+            path = a.get('href')
+            new_url = urljoin(self.base_url, path)
+            # print(new_url)
+            parts.append((new_url))
 
-        urls = []
-        for i in range(5,10):
-            if i == 1 :
-                url = self._url
-            else:
-                i = str(i)
-                url = self._url +"pg"+i
-                urls.append(url)
-        if not self.flag:
-            self.flag = True
-            for url in urls:
-                yield Request(url,callback=self._parse,headers=self.headers,
-                              #meta={"download_redirect":True}
-                              )
-        else:
-            return None
+        self.part_urls[name].append(parts)
+
+        yield {name:parts}
