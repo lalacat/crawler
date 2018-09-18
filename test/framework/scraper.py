@@ -175,7 +175,7 @@ class Scraper(object):
             logger.info("spider._parse或者request.callback返回的结果为None,不经过自定义process item 处理！！")
             return defer_succeed(None)
         if isinstance(result,Request):
-            # self.crawler.engine.crawl(request=result, spider=spider)
+            #  self.crawler.engine.crawl(request=result, spider=spider)
             return defer_succeed(result)
         if not isinstance(result,Iterable):
             logger.warning("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
@@ -184,7 +184,7 @@ class Scraper(object):
         #  这里的结果默认是能够迭代的List或者是dict类型的结果，每个结果都是并列的，能够同时符合process_item处理规则
         #  其中list里的结果是两种类型，一种是BaseItem及其子类一种是dict类型，这些都是在requst或者spider中自己
         #  处理后的得到的
-        logger.info("%s的结果进行process_item处理"%spider.name)
+        logger.debug("%s的结果%s进行process_item处理"%(spider.name,type(result)))
         it = iter_errback(result, self.handle_spider_error, request, response, spider)
         self.outputs = []
 
@@ -198,6 +198,7 @@ class Scraper(object):
         """
         logger.debug("并行处理")
         if isinstance(output, Request):
+            logger.info("处理的output%(request)s的类型是%(type)s，将添加到下载序列中！！",{"request":output,"type":type(output)})
             self.crawler.engine.crawl(request=output, spider=spider)
         elif isinstance(output, (BaseItem, dict)):
             self.slot.itemproc_size += 1

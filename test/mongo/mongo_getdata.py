@@ -16,9 +16,15 @@ COLLECTION = "Total Zone"
 db_coll = db[COLLECTION ]
 
 projectionFields = {'_id':False}  # 用字典指定
-queryArgs = {}
+queryArgs = {"part_zone_name":"jinshan"}
 
 searchRes = db_coll.find(queryArgs,projectionFields)
+
+if searchRes:
+    print("true")
+    print(searchRes.count())
+else:
+    print("false")
 
 for list in searchRes:
     for name,url in list.items():

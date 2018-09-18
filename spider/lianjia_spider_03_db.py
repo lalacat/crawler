@@ -52,7 +52,7 @@ class LJSpider(Spider):
         total_urls = {}
         for a in total_zone:
             path = a.get('href')
-            if path not in ["/ershoufang/chongming/", "/ershoufang/shanghaizhoubian/","/ershoufang/jinshan"]:
+            if path not in ["/ershoufang/chongming/", "/ershoufang/shanghaizhoubian/","/ershoufang/jinshan/"]:
                 name = path.split("/")[-2]
                 #print(name)
                 new_url = urljoin(self.base_url, path)
@@ -75,4 +75,4 @@ class LJSpider(Spider):
 
         self.part_urls[name].append(parts)
 
-        yield {name:parts}
+        yield {"part_zone_name":name,"part_zone_url":parts}

@@ -22,11 +22,12 @@ class MongoDB(object):
         return cls(crawler.settings)
 
     def process_item(self,item,spider):
-        logger.info("添加入数据库")
+        logger.debug("添加入数据库")
         try:
             _collection = spider.collection
             _db_collection = self.db[_collection]
         except Exception as e  :
             raise ValueError('没有发现表名%s'%_collection)
-        _db_collection.insert_one(item)
+        if _db_collection.find({"part_zone_name":item["part_zone_name"]}).count():
+            _db_collection.insert_one(item)
         return None

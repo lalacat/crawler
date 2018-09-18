@@ -243,8 +243,9 @@ class ExecutionEngine(object):
             return content
 
         def remove_request(_,slot,request,spider):
-            logger.debug("remove_request")
             slot.remove_request(request, spider.name)
+            logger.info("remove_request:%s,inprogress中还剩下%d个任务"%(request,len(slot.inprogress)))
+
             return _
         def next_slot(_,slot):
             logger.debug("next_slot")
@@ -270,6 +271,7 @@ class ExecutionEngine(object):
 
     def _handle_downloader_output(self,response,request,spider):
         #  得到的是下载后的结果，此方法是将结果输出到其他需要处理结果的地方
+        logger.info("处理%s的下载结果"%request)
         assert isinstance(response, (Request, Response, Failure)), response
         if isinstance(response, Request):
             #  到这一步得到的response还是Request类，表明下载不成功，
@@ -309,7 +311,7 @@ class ExecutionEngine(object):
             #  若得到的是response数据，则就返回response
             assert isinstance(response,(Response,Request)),"返回的不是Response or Request类型的数据，而是%s"%type(response)
             if isinstance(response,Response):
-                logger.info("%s 下载成功" % request.url)
+                logger.debug("%s 下载成功" % request.url)
                 response.requset = request
             return response
 
