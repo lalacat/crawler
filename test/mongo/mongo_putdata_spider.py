@@ -1,4 +1,5 @@
 import pymongo
+from test.framework.test.test_spider.lianjia_spider_part_zone import Part_Zone
 
 
 # mongodb服务的地址和端口号
@@ -20,12 +21,8 @@ queryArgs = {"part_zone_name":"pudong"}
 
 searchRes = db_coll.find(queryArgs,projectionFields)
 
-if searchRes:
-    print("true")
-    print(searchRes.count())
-else:
-    print("false")
+#print(type())
+spider = Part_Zone.from_schedule(searchRes.next())
+for name in spider.start_requests():
+    print(name)
 
-for list in searchRes:
-    for name,url in list.items():
-        print(name,":",url)

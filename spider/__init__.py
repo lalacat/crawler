@@ -26,20 +26,19 @@ class Spider(object_ref):
         if name is not None:
             self.name = name
         elif not getattr(self,"name",None):
-            raise ValueError("自定义的%s 必须有个名字name" %type(self).__name__)
+            raise ValueError("自定义的%s 必须有个名字name" % type(self).__name__)
         self.__dict__.update(kwargs)
         if not hasattr(self,'start_urls'):
             self.start_urls = []
     @property
     def logger(self):
         logger = logging.getLogger(self.name)
-        #使用LoggerAdapter类来传递上下文信息到日志事件的信息中
+        #  使用LoggerAdapter类来传递上下文信息到日志事件的信息中
         return logging.LoggerAdapter(logger,{"爬虫":self})
 
     def log(self,message,level=logging.DEBUG,**kw):
 
         self.logger.log(level,message,**kw)
-
 
     @classmethod
     def from_crawler(cls,crawler,*args,**kwargs):
@@ -52,6 +51,9 @@ class Spider(object_ref):
         cls.settings = settings
         settings.setdict(cls.custom_settings or {}, priority='spider')
 
+    @classmethod
+    def from_schedule(cls,schedule):
+        return cls(schedule)
 
     def _set_crawler(self,crawler):
         self.crawler = crawler

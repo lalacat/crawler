@@ -22,12 +22,16 @@ class MongoDB(object):
         return cls(crawler.settings)
 
     def process_item(self,item,spider):
+        assert hasattr(spider,"handler_db"),"Spider(%s)没有设置数据库操作标志<handler_db>"
+        if not spider.handler_db:
+            return
         logger.debug("添加入数据库")
         try:
             _collection = spider.collection
             _db_collection = self.db[_collection]
         except Exception as e  :
-            raise ValueError('没有发现表名%s'%_collection)
-        if _db_collection.find({"part_zone_name":item["part_zone_name"]}).count():
+            raise AttributeError('在Spider(%s)没有发现表名属性<colletction>'%(spider.name))
+        if not _db_collection.find({"part_zone_name":item["part_zone_name"]}).count():
+
             _db_collection.insert_one(item)
         return None

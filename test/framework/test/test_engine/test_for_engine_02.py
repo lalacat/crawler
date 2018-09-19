@@ -1,9 +1,8 @@
 from spider.test_Spider_02 import Test_Spider_2
 from spider.test_Spider_03 import Test_Spider_3
-from test.framework.engine.test_engine_01 import ExecutionEngine
-from test.framework.https.request import Request
+from test.framework.test.test_engine.test_engine_01 import ExecutionEngine
 from test.framework.setting import Setting
-from test.framework.crawler import Crawler
+from test.framework.core.crawler import Crawler
 from test.framework.https.request import Request
 from spider.test_Spider_01 import Test_Spider_1
 from twisted.internet import reactor, defer

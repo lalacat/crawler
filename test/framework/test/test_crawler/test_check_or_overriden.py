@@ -1,4 +1,4 @@
-from test.framework.crawler import _get_spider_loader
+from test.framework.core.crawler import _get_spider_loader
 from test.framework.setting import Setting,overridden_or_new_settings
 import logging
 logging.basicConfig(level=logging.DEBUG)

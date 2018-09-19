@@ -1,13 +1,10 @@
-from test.framework.crawler import Crawler
+from test.framework.core.crawler import Crawler
 from test.framework.downloads import Downloader
-from test.framework.downloads.download_agent import HTTPDownloadHandler
 from test.framework.setting import Setting
 from test.framework.https.request import Request
 from spider.spider1 import Spider1
 from twisted.internet import reactor, defer
 import logging
-
-from test.public_api.web import get_smzdm_datas, print_smzdm_result
 
 headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'],
                   'content-type':["application/json"]}

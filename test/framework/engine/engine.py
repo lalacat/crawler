@@ -1,9 +1,8 @@
 from twisted.internet import defer, task
 from twisted.python.failure import Failure
-from twisted.python.log import err
 from test.framework.https.request import Request
 from test.framework.https.response import Response
-from test.framework.scraper import Scraper
+from test.framework.core.scraper import Scraper
 from test.framework.utils.reactor import CallLaterOnce
 from test.framework.objectimport.loadobject import load_object
 import logging,time
@@ -271,7 +270,7 @@ class ExecutionEngine(object):
 
     def _handle_downloader_output(self,response,request,spider):
         #  得到的是下载后的结果，此方法是将结果输出到其他需要处理结果的地方
-        logger.info("处理%s的下载结果"%request)
+        logger.debug("处理%s的下载结果"%request)
         assert isinstance(response, (Request, Response, Failure)), response
         if isinstance(response, Request):
             #  到这一步得到的response还是Request类，表明下载不成功，

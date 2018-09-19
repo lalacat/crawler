@@ -1,4 +1,4 @@
-from test.framework.crawler import CrawlerProcess
+from test.framework.core.crawler import CrawlerProcess
 from test.framework.setting import Setting
 
 s = Setting()

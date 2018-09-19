@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import pymongo
 
 
@@ -16,11 +18,19 @@ COLLECTION = "getPage_Collection"
 db_coll = db[COLLECTION ]
 
 
-
+"""  
 post_data = {
     'title': 'Python and MongoDB',
     'content': 'PyMongo is fun, you guys',
     'author': 'Scott'
 }
-result = db_coll.insert_one(post_data)
-print('One post: {0}'.format(result.inserted_id))
+"""
+post_data = defaultdict(list)
+post_data["A"] = [x for x in range(3)]
+post_data["B"] = [x for x in range(3,6)]
+post_data["C"] = [x for x in range(6,9)]
+#result = db_coll.insert(post_data)
+a = db_coll.find({})
+for i in a:
+   for l,j in i.items() :
+       print(l,j)

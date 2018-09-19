@@ -3,7 +3,7 @@ from twisted.internet import reactor
 import logging
 from test.framework.objectimport.loadobject import load_object
 from zope.interface.verify import verifyClass,DoesNotImplement
-from test.framework.interface import ISpiderLoader
+from test.framework.core.interface import ISpiderLoader
 from test.framework.engine.engine import ExecutionEngine
 import time
 from test.framework.setting import overridden_or_new_settings,Setting
@@ -121,20 +121,21 @@ class CrawlerRunner(object):
             return result
         return d.addBoth(_done)
 
-
     def create_crawler(self,crawler_or_spidercls):
+
         '''
         先判断传入的参数是不是已经包装成Crawler，如果是，直接返回
         不是的，将传入的参数进行包装，返回成Crawler
         :param crawler_or_spidercls: Crawler的实例，或者是自定义爬虫模块
         :return: Cralwer的实例
         '''
+
         if isinstance(crawler_or_spidercls,Crawler):
             return crawler_or_spidercls
         return self._create_crawler(crawler_or_spidercls)
 
     def _create_crawler(self,spidercls):
-        #判断传入的参数是自定义爬虫的name还是对应的class模块
+        #  判断传入的参数是自定义爬虫的name还是对应的class模块
         if isinstance(spidercls,str):
             spidercls = self.spider_loder.load(spidercls)
         return Crawler(spidercls,self.settings)

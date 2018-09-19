@@ -1,4 +1,4 @@
-from test.framework.crawler import Crawler,_get_spider_loader
+from test.framework.core.crawler import Crawler,_get_spider_loader
 from twisted.internet.defer import DeferredList
 from twisted.internet import reactor
 from test.framework.setting import Setting

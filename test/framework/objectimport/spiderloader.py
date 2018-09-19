@@ -1,11 +1,11 @@
 from importlib import import_module
 from pkgutil import iter_modules
 import inspect
-from spider import BaseSpider,Spider
+from spider import Spider
 import logging
 import traceback
 from collections import defaultdict
-from test.framework.interface import ISpiderLoader
+from test.framework.core.interface import ISpiderLoader
 from zope.interface import implementer
 
 logger = logging.getLogger(__name__)
