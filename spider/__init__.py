@@ -53,6 +53,7 @@ class Spider(object_ref):
 
     @classmethod
     def from_schedule(cls,schedule):
+
         return cls(schedule)
 
     def _set_crawler(self,crawler):

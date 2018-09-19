@@ -24,7 +24,7 @@ class MongoDB(object):
     def process_item(self,item,spider):
         assert hasattr(spider,"handler_db"),"Spider(%s)没有设置数据库操作标志<handler_db>"
         if not spider.handler_db:
-            return
+            return item
         logger.debug("添加入数据库")
         try:
             _collection = spider.collection

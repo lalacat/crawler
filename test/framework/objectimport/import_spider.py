@@ -4,6 +4,8 @@ from importlib import import_module
 from spider import BaseSpider,BaseQylSpider
 import logging
 
+
+
 class Spider(object):
     def __init__(self,projectName,path="spider"):
         self.projectName = projectName

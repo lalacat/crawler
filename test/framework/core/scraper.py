@@ -1,4 +1,5 @@
 import logging
+import pprint
 import time
 from collections import deque, Iterable
 
@@ -128,7 +129,14 @@ class Scraper(object):
         dfd = self._scrape2(response, request, spider)  # returns spiders processed output
         dfd.addErrback(self.handle_spider_error, request,response, spider)
         dfd.addCallback(self.handle_spider_output, request, response, spider)
+        dfd.addCallback(self.print_fun)
         return dfd
+
+
+    def print_fun(self,_):
+        print(pprint.pformat(self.outputs))
+        return _
+
 
     def _scrape2(self, request_result, request, spider):
         """Handle the different cases of request's result been a Response or a
@@ -201,7 +209,7 @@ class Scraper(object):
         if isinstance(output, Request):
             logger.info("处理的output%(request)s的类型是%(type)s，将添加到下载序列中！！",{"request":output,"type":type(output)})
             self.crawler.engine.crawl(request=output, spider=spider)
-        elif isinstance(output, (BaseItem, dict)):
+        elif isinstance(output, (BaseItem, dict,int)):
             self.slot.itemproc_size += 1
             dfd = self.itemproc.process_item(item=output,spider=spider)
             dfd.addBoth(self._itemproc_finished, output, response, spider)
@@ -237,7 +245,7 @@ class Scraper(object):
         return context
 
     def _itemproc_collected(self,_,request):
-        #print_smzdm_result(self.outputs,request.url)
+
         end_time = time.clock()
         logger.info("process item 处理时间持续%7.6f"%(end_time-self.start_time))
 

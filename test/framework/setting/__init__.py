@@ -158,7 +158,7 @@ class BaseSettings(object):
             将类如'{"a":"b"}'的字符串转变为{"a":"b"}字典型
             """
             values = json.loads(values)
-            print("update:",values)
+            logger.info("update:",values)
         if values is not None:
             # 这个条件判断，是满足，其他的命令的setiing能绑定到当前实例的setting
             # 例如public_command.setting中的name:value都绑定好优先级

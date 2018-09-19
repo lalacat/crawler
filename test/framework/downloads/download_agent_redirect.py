@@ -134,7 +134,7 @@ class DownloadAgent(object):
             #  _RequestBodyProducer中dataReceived方法不会一直占用，数据还没接收到是，是会回到reactor循环的，
             #  当总的接收数据的时间超过了timeout的时候，才会执行d.cancel
             #  d.addCallback(self.fun_print,request)
-            self._timeout_cl = reactor.callLater(1000,d.cancel)
+            self._timeout_cl = reactor.callLater(timeout,d.cancel)
             d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
             logger.error(e)

@@ -1,6 +1,7 @@
-from bs4 import BeautifulSoup
-
+import json
+from lxml import etree
 from spider import Spider
+from test.framework.https.request import Request
 
 
 class Part_Zone(Spider):
@@ -14,22 +15,16 @@ class Part_Zone(Spider):
         self.download_delay = 0
         self.start_urls = schedule["part_zone_url"]
         self.collection = schedule["part_zone_name"].upper()
+        self.handler_db = False
 
     def start_requests(self):
         for url in self.start_urls:
-            yield url
-
-
+            yield Request(url,callback=self._parse,headers=self.headers)
 
 
     def _parse(self,response):
-        bs = BeautifulSoup(response.body,'html.parser')
-        total_house = bs.find_all("h2",class_='total fl')[0].span.string
-        house_list = bs.find_all("ul",class_='sellListContent')[0]
-        print(total_house)
-        print(len(house_list))
-        for i in house_list:
-            print(i.find("div",class_="title").a.string)
-
+        seletor = etree.HTML(response.body)
+        page_number = json.loads(seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")[0])["totalPage"]
+        yield {response.url.split("/")[-2]:page_number}
 
 

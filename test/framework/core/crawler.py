@@ -1,12 +1,10 @@
-from twisted.internet.defer import inlineCallbacks,maybeDeferred,DeferredList
-from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks,maybeDeferred
 import logging
 from test.framework.objectimport.loadobject import load_object
-from zope.interface.verify import verifyClass,DoesNotImplement
-from test.framework.core.interface import ISpiderLoader
+
 from test.framework.engine.engine import ExecutionEngine
 import time
-from test.framework.setting import overridden_or_new_settings,Setting
+from test.framework.setting import overridden_or_new_settings
 
 
 logger = logging.getLogger(__name__)
@@ -36,7 +34,8 @@ class Crawler(object):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
         try:
-            self.spider = self._create_spider(*args, **kwargs)
+            self.spider = self._spider
+            #self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
             yield self.engine.open_spider(self.spider,start_requests)
@@ -53,11 +52,6 @@ class Crawler(object):
                 yield self.engine.close()
             raise
 
-    def timedelay(self,num):
-        print("休眠 :%d s"%num)
-        for i in range(num,0,-1):
-            print("倒计时：%d" %i)
-            time.sleep(1)
 
     """
     用户封装调度器以及引擎
@@ -65,6 +59,11 @@ class Crawler(object):
     def _create_engine(self):
         logger.info("爬虫引擎已创建")
         return ExecutionEngine(self,lambda _: self.stop())
+
+    def _create_spider_schedule(self,schedule):
+        logger.info("爬虫：%s 已创建" % self.spidercls.name)
+        self._spider = self.spidercls.from_schedule(schedule)
+
 
     def _create_spider(self,*args, **kwargs):
         logger.info("爬虫：%s 已创建" %self.spidercls.name)
@@ -75,6 +74,13 @@ class Crawler(object):
         logger.info("数据库已创建")
         return MongoDb(db_url,db_name)
     '''
+
+
+    def timedelay(self,num):
+        print("休眠 :%d s"%num)
+        for i in range(num,0,-1):
+            print("倒计时：%d" %i)
+            time.sleep(1)
 
     @inlineCallbacks
     def stop(self):
@@ -90,6 +96,8 @@ defer外层闭环是由CrawlerRunner的_crawl中得到d-->_done
 内部defer是：Cralwer类中crawl方法 yield self.engine.open_spider->yield maybeDeferred(self.engine.start)
 
 '''
+
+"""
 
 
 class CrawlerRunner(object):
@@ -141,30 +149,28 @@ class CrawlerRunner(object):
         return Crawler(spidercls,self.settings)
 
     def stop(self):
-        #停止
-        """
-        Stops simultaneously all the crawling jobs taking place.
-
-        Returns a deferred that is fired when they all have ended.
-        """
+        #  停止
+        # Stops simultaneously all the crawling jobs taking place.
+        # Returns a deferred that is fired when they all have ended.
+        
         return DeferredList([c.stop() for c in list(self._crawlers)])
 
     @inlineCallbacks
     def join(self):
-        """
+        '''
         当所有的crawler完成激活之后，返回已经激活的defer的列表
-        """
+        '''
         while self._active:
             yield DeferredList(self._active)
 
 
 class CrawlerProcess(CrawlerRunner):
-    """
+    '''
     这个类主要是用来完成多个爬虫能够同时进行的功能，核心就是取得DeferredList，然后执行reactor.run()。
     包含了reator的配置，启动，停止，
     各种操作信号在这个类中完成注册。
 
-    """
+    '''
     def __init__(self):
         super(CrawlerProcess,self).__init__()
 
@@ -212,3 +218,4 @@ def _get_spider_loader(settings):
     return loader_cls.from_settings()
 
 
+"""

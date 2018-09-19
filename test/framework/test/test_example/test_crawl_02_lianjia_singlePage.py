@@ -1,5 +1,13 @@
 import pymongo
+
 from test.framework.test.test_spider.lianjia_spider_part_zone import Part_Zone
+from test.framework.setting import Setting
+from test.framework.core.crawler import Crawler
+from twisted.internet import reactor, defer
+import logging
+LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
+DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 
 
 # mongodb服务的地址和端口号
@@ -20,10 +28,13 @@ projectionFields = {'_id':False}  # 用字典指定
 queryArgs = {"part_zone_name":"pudong"}
 
 searchRes = db_coll.find(queryArgs,projectionFields)
+scheduler = searchRes.next()
 
-#print(searchRes.count())
-#d = searchRes.next()
-spider = Part_Zone.from_schedule(searchRes.next())
-for name in spider.start_requests():
-    print(name)
 
+settings = Setting()
+crawler_01 = Crawler(Part_Zone,settings)
+crawler_01._create_spider_schedule(scheduler)
+c1 = crawler_01.crawl()
+#dd = defer.DeferredList([c1])
+c1.addBoth(lambda _:reactor.stop())
+reactor.run()
