@@ -2,7 +2,6 @@ from collections import defaultdict
 
 import pymongo
 
-
 # mongodb服务的地址和端口号
 mongo_url = "127.0.0.1:27017"
 
@@ -29,7 +28,7 @@ post_data = defaultdict(list)
 post_data["A"] = [x for x in range(3)]
 post_data["B"] = [x for x in range(3,6)]
 post_data["C"] = [x for x in range(6,9)]
-#result = db_coll.insert(post_data)
+#  result = db_coll.insert(post_data)
 a = db_coll.find({})
 for i in a:
    for l,j in i.items() :

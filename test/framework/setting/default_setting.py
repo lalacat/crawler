@@ -21,7 +21,6 @@ DOWNLOAD_DELAY = 0
 DOWNLOADER_MIDDLEWARE_TEST = {
     "test.framework.test.test_middleware.test_process_request_01.Change_Request_Header":10
 }
-#DOWNLOADER_MIDDLEWARE_TEST = {}
 
 
 #E
