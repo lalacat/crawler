@@ -1,4 +1,4 @@
-from test.framework.test.test_spider.lianjia_spider_01 import LJSpider
+from spider.lianjia_spider_01 import LJSpider
 from test.framework.core.crawler import Crawler
 from test.framework.downloads import Downloader
 from test.framework.setting import Setting

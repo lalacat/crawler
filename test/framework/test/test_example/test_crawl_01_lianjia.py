@@ -1,4 +1,4 @@
-from test.framework.test.test_spider.lianjia_spider_03_db import LJSpider
+from spider.lianjia_spider_03_db import LJSpider
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
 from twisted.internet import reactor, defer
