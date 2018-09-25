@@ -48,9 +48,9 @@ HEADER_COLLECTION =[
 #T
 ITEM_PIPELINES = {
    # "test.framework.middleware.test_process_item_01.Test_Process_item_A":10
-    #"test.framework.pipelines.mongoDB.MongoDB":20,
+    "test.framework.pipelines.mongoDB.MongoDB":20,
     #"test.framework.pipelines.print_result.Print_Result":10
-    "test.framework.test.test_middleware.test_close_spider_print_01.Spider_Out_print": 10
+    # "test.framework.test.test_middleware.test_close_spider_print_01.Spider_Out_print": 10
 
 }
 #J

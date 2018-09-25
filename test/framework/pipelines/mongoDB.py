@@ -31,7 +31,6 @@ class MongoDB(object):
             _db_collection = self.db[_collection]
         except Exception as e  :
             raise AttributeError('在Spider(%s)没有发现表名属性<colletction>'%(spider.name))
-        if not _db_collection.find({"part_zone_name":item["part_zone_name"]}).count():
-
+        if not _db_collection.find({"total_zone_name":item["total_zone_name"]}).count():
             _db_collection.insert_one(item)
         return None

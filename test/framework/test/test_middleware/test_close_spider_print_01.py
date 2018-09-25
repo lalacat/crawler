@@ -1,3 +1,5 @@
+import pprint
+
 class Spider_Out_print(object):
     def __init__(self,settings):
         self.settings = settings
@@ -7,7 +9,11 @@ class Spider_Out_print(object):
         return cls(crawler)
 
     def close_spider(self,spider):
-        print(spider.total_number_community)
-        for i, v in spider.part_numbers.items():
+        #print(pprint.pformat(spider.all_zones))
+        for i, v in spider.all_zones.items():
             print(i, v)
+
+        for i in spider.all_towns:
+            print(i)
+
         return None

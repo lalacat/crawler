@@ -1,6 +1,6 @@
 import pymongo
 
-from test.framework.test.test_spider.lianjia_spider_community_total import Part_Zone
+from test.framework.test.test_spider.lianjia_spider_one_zone_town_all_community import Part_Zone
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
 from twisted.internet import reactor, defer
@@ -21,11 +21,11 @@ DATABASE = "LianJia"
 db = client[DATABASE]
 
 #连接到集合(表):myDatabase.myCollection
-COLLECTION = "Total Zone"
+COLLECTION = "XiaoQu"
 db_coll = db[COLLECTION ]
 
 projectionFields = {'_id':False}  # 用字典指定
-queryArgs = {"part_zone_name":"pudong"}
+queryArgs = {"total_zone_name":"pudong"}
 
 searchRes = db_coll.find(queryArgs,projectionFields)
 scheduler = searchRes.next()

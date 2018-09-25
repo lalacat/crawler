@@ -12,11 +12,11 @@ DATABASE = "LianJia"
 db = client[DATABASE]
 
 #连接到集合(表):myDatabase.myCollection
-COLLECTION = "Total Zone"
+COLLECTION = "XiaoQu"
 db_coll = db[COLLECTION ]
 
 projectionFields = {'_id':False}  # 用字典指定
-queryArgs = {"part_zone_name":"pudong"}
+queryArgs = {"total_zone_name":"pudong"}
 
 searchRes = db_coll.find(queryArgs,projectionFields)
 

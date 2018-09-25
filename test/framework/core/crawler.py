@@ -1,11 +1,16 @@
-from twisted.internet.defer import inlineCallbacks,maybeDeferred
+from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks, maybeDeferred, DeferredList
 import logging
+
+from zope.interface.exceptions import DoesNotImplement
+from zope.interface.verify import verifyClass
+
+from test.framework.core.interface import ISpiderLoader
 from test.framework.objectimport.loadobject import load_object
 
 from test.framework.engine.engine import ExecutionEngine
 import time
-from test.framework.setting import overridden_or_new_settings
-
+from test.framework.setting import overridden_or_new_settings, Setting
 
 logger = logging.getLogger(__name__)
 #logger.setLevel(logging.DEBUG)
@@ -98,7 +103,6 @@ defer外层闭环是由CrawlerRunner的_crawl中得到d-->_done
 
 '''
 
-"""
 
 
 class CrawlerRunner(object):
@@ -218,5 +222,3 @@ def _get_spider_loader(settings):
 
     return loader_cls.from_settings()
 
-
-"""
