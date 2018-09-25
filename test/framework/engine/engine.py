@@ -374,6 +374,7 @@ class ExecutionEngine(object):
                 )
             return errback
 
+
         #  关闭下载器
         dfd.addBoth(lambda _: self.downloader.close())
         dfd.addErrback(log_failure('Downloader close failure'))

@@ -1,3 +1,4 @@
+import time
 from urllib.parse import urlparse, urlunparse, urljoin
 
 import requests
@@ -6,7 +7,7 @@ from lxml import etree
 header = { 'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'
             ,'content-type':"application/json"}
 url = "https://sh.lianjia.com/xiaoqu/pudong/"
-
+start_time = time.clock()
 _parsed = urlparse(url)
 base_url = urlunparse([_parsed.scheme,_parsed.netloc,"","","",""])
 r = requests.get(url,headers=header)
@@ -35,6 +36,7 @@ total = 0
 for i in part_numbers:
     total += int(i)
 print(total)
+print(time.clock())
 '''
 for name,url in total_urls.items():
     r = requests.get(url, headers=header)

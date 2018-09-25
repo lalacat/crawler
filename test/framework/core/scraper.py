@@ -1,5 +1,4 @@
 import logging
-import pprint
 import time
 from collections import deque, Iterable
 
@@ -73,6 +72,7 @@ class Scraper(object):
         #  单次最多能处理最大的item的个数
         self.concurrent_items = crawler.settings.getint('CONCURRENT_ITEMS')
         self.crawler = crawler
+        self.outputs = []
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
@@ -107,11 +107,13 @@ class Scraper(object):
             self._check_if_closing(spider, slot)
             self._scrape_next(spider, slot)
             return _
+
         dfd.addBoth(finish_scraping)
         dfd.addErrback(lambda f: logger.error('Scraper 处理 %(request)s的结果时，出现出现错误！！\n'
                                               '错误信息为：%(error)s',
                                    {'request': request,"error":f}
                                    ))
+
         self._scrape_next(spider, slot)
         return dfd
 
@@ -129,14 +131,7 @@ class Scraper(object):
         dfd = self._scrape2(response, request, spider)  # returns spiders processed output
         dfd.addErrback(self.handle_spider_error, request,response, spider)
         dfd.addCallback(self.handle_spider_output, request, response, spider)
-        dfd.addCallback(self.print_fun)
         return dfd
-
-
-    def print_fun(self,_):
-        print(pprint.pformat(self.outputs))
-        return _
-
 
     def _scrape2(self, request_result, request, spider):
         """Handle the different cases of request's result been a Response or a
@@ -195,7 +190,6 @@ class Scraper(object):
         #  处理后的得到的
         logger.debug("%s的结果%s进行process_item处理"%(spider.name,type(result)))
         it = iter_errback(result, self.handle_spider_error, request, response, spider)
-        self.outputs = []
 
         dfd = parallel(it,self.concurrent_items,self._process_spidermw_output, request, response, spider)
         dfd.addCallback(self._itemproc_collected,request)
@@ -238,15 +232,13 @@ class Scraper(object):
         else:
             logger.debug("process item(%s)处理完毕"%item,extra={'spider': spider})
             self.outputs.append(output)
-            return
+        return None
 
     def _log_download_errors(self,context,request_result, request, spider):
         logger.error(context)
         return context
 
     def _itemproc_collected(self,_,request):
-
         end_time = time.clock()
         logger.info("process item 处理时间持续%7.6f"%(end_time-self.start_time))
-
-        return
+        return None

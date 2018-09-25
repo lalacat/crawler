@@ -9,7 +9,9 @@ from test.framework.https.request import Request
 class Part_Zone(Spider):
     name = "Part_Zone"
 
-
+    '''
+    测试浦东新区各个分区的总页数
+    '''
     def __init__(self,schedule):
         super(Part_Zone,self).__init__()
         self._total_house = 0

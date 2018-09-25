@@ -67,7 +67,8 @@ class Crawler(object):
 
     def _create_spider(self,*args, **kwargs):
         logger.info("爬虫：%s 已创建" %self.spidercls.name)
-        return self.spidercls.from_crawler(self,*args,**kwargs)
+        self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
+        #return self.spidercls.from_crawler(self,*args,**kwargs)
 
     '''
     def _create_db(self,db_url,db_name):

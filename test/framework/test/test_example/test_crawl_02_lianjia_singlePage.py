@@ -1,6 +1,6 @@
 import pymongo
 
-from test.framework.test.test_spider.lianjia_spider_part_zone import Part_Zone
+from test.framework.test.test_spider.lianjia_spider_community_total import Part_Zone
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
 from twisted.internet import reactor, defer
@@ -35,6 +35,5 @@ settings = Setting()
 crawler_01 = Crawler(Part_Zone,settings)
 crawler_01._create_spider_schedule(scheduler)
 c1 = crawler_01.crawl()
-#dd = defer.DeferredList([c1])
 c1.addBoth(lambda _:reactor.stop())
 reactor.run()
