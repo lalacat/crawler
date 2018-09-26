@@ -21,5 +21,11 @@ projectionFields = {'_id':False}  # 用字典指定
 searchRes = db_coll.find(projection=projectionFields)
 #searchRes = db_coll.find()
 
+
+
 for result in searchRes:
-    print(pprint.pformat(result))
+    for name,info in result.items():
+        if name == "total_zone_name":
+            S = SpiderGetFromSchedlue()
+        else:
+            print(name,info)
