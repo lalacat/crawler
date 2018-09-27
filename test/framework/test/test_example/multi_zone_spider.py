@@ -1,6 +1,7 @@
 # mongodb服务的地址和端口号
 import pprint
 import pymongo
+from test.framework.test.test_spider.lianjia_spider_geturl_from_schedule import SpiderGetFromSchedlue
 
 mongo_url = "127.0.0.1:27017"
 
@@ -22,10 +23,19 @@ searchRes = db_coll.find(projection=projectionFields)
 #searchRes = db_coll.find()
 
 
-
+spiders = []
+''''''
 for result in searchRes:
+    s = SpiderGetFromSchedlue()
+    urls = []
     for name,info in result.items():
         if name == "total_zone_name":
-            S = SpiderGetFromSchedlue()
+            s.name = info[0]
         else:
-            print(name,info)
+            urls.append(info)
+    s.start_urls = urls
+    spiders.append(s)
+
+for spider in spiders:
+    print(spider.name)
+    print(spider.start_urls)

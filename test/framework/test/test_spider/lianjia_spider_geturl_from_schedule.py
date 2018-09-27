@@ -1,39 +1,50 @@
 from urllib.parse import urljoin, urlparse, urlunparse
-
-from lxml import etree
-
-from spider import Spider
 from test.framework.https.request import Request
+from lxml import etree
+from spider import Spider
 
 
 class SpiderGetFromSchedlue(Spider):
-    name = ""
     """
     将所有小区的地址都写入数据库中
     """
-
-    @property
-    def name(self):
-        return self.name
-
-    @name.setter
-    def name(self,name):
-        self.name = "GetUrlTask: "+name
-
-
     def __init__(self):
+        self.name = ""
         super(SpiderGetFromSchedlue,self).__init__()
         self._total_house = 0
 
         self.download_delay = 0
-        self.start_url =  "https://sh.lianjia.com/xiaoqu/"
-        self._parsed = urlparse(self.start_url)
-        self.base_url = urlunparse([self._parsed.scheme, self._parsed.netloc, "", "", "", ""])
+
+        self._start_urls = []
+        #self._parsed = urlparse(self.start_url)
+        #self.base_url = urlunparse([self._parsed.scheme, self._parsed.netloc, "", "", "", ""])
         self.collection = "XiaoQu"
         self.handler_db = True
         self.total_number_community = 0
         self.all_zones = {}
         #self.all_towns = []
+
+    @property
+    def name(self):
+        return self._name
+
+
+    @name.setter
+    def name(self, info):
+        base_name = "GetUrlTask: "
+        self._name = base_name+info
+
+    @property
+    def start_urls(self):
+        return self._start_urls
+
+    @start_urls.setter
+    def start_urls(self,urls):
+        if not isinstance(urls,list):
+            self._start_urls = [urls]
+        else:
+            self._start_urls = urls
+
 
 
     def start_requests(self):
@@ -67,3 +78,4 @@ class SpiderGetFromSchedlue(Spider):
 
         all_towns["total_zone_name"] = [response.requset.meta["total_zone_name"],response.url]
         yield all_towns
+

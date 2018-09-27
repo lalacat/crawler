@@ -1,6 +1,7 @@
 from spider import Spider
 from test.framework.https.request import Request
 from bs4 import BeautifulSoup
+
 class LJSpider(Spider):
     name = "LianJia_01"
     custom_settings = ["URL = https://sh.lianjia.com/ershoufang/"]
