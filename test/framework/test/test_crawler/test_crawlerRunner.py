@@ -1,16 +1,27 @@
 import queue
 
+from twisted.internet import task, reactor
 from twisted.internet.defer import DeferredList, inlineCallbacks
 
-from test.framework.core.crawler import Crawler
+from test.framework.test.test_crawler.test_crawler_for_distribute import Crawler
 from test.framework.setting import Setting
 from test.framework.test.test_spider.simple_spider_01 import SimpleSpider
 import logging
+
+from test.framework.utils.reactor import CallLaterOnce
 
 logger = logging.getLogger(__name__)
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 logging.basicConfig(level=logging.DEBUG,format=LOG_FORMAT,datefmt=DATE_FORMAT)
+
+
+class Slot(object):
+    def __init__(self,nextcall):
+        self.heartbeat = task.LoopingCall(nextcall.schedule)
+
+
+
 
 
 class CrawlerRunner(object):
@@ -27,6 +38,8 @@ class CrawlerRunner(object):
         # 子爬虫的数量
         self._childNum = 3
         self.task_schedule = tasks
+        self.task_finish = False
+        self.slot = None
 
 
     def crawl(self, crawler_or_spidercls, *args, **kwargs):
@@ -42,6 +55,7 @@ class CrawlerRunner(object):
 
         def _done(result):
             # 当已装载的爬虫运行完后，从列表中清除掉
+            logger.debug("从列表中清除掉")
             self._crawlers.discard(crawler)
             self._active.discard(d)
             return result
@@ -76,11 +90,29 @@ class CrawlerRunner(object):
             crawler._create_spider()
             crawler._spider.start_urls = start_urls
             crawler._spider.name = name
+            print(name)
         except Exception as e :
-            print(e)
             logger.debug("task 分配完毕！！！！")
             crawler = None
+            self.task_finish = True
         return crawler
+
+    def needs_backout(self):
+        flag = not self.task_finish and len(self._active) < 3
+        return flag
+
+    def start(self):
+        nextcall = CallLaterOnce(self.next_task_from_schedule)
+        self.slot = Slot(nextcall)
+        self.slot.heartbeat.start(3)
+
+    def next_task_from_schedule(self):
+        logger.debug("调用next_task_from_schedule")
+        if self.needs_backout():
+            self.crawl(SimpleSpider)
+        if self.task_finish:
+            self.slot.heartbeat.stop()
+            reactor.stop()
 
     def stop(self):
         #  停止
@@ -98,16 +130,18 @@ class CrawlerRunner(object):
             yield DeferredList(self._active)
 
 
+
+
 zone_name = "yangpu"
 town_urls = [
     'https://sh.lianjia.com/xiaoqu/anshan/',
     'https://sh.lianjia.com/xiaoqu/dongwaitan/',
     'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',
     'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-    'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-    'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-    'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-    'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
+#    'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+#   'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+#    'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+#    'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
 ]
 
 top_task = queue.Queue()
@@ -120,5 +154,7 @@ def spider_has_task(spider):
 
 s = Setting()
 cr = CrawlerRunner(top_task,s)
-cr.crawl(SimpleSpider)
-print(cr._active)
+cr.start()
+reactor.run()
+
+

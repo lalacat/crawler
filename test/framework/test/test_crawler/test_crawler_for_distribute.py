@@ -8,7 +8,7 @@ from zope.interface.verify import verifyClass
 from test.framework.core.interface import ISpiderLoader
 from test.framework.objectimport.loadobject import load_object
 
-from test.framework.core.engine import ExecutionEngine
+from test.framework.engine.test_engine_for_distribute import ExecutionEngine
 import time
 from test.framework.setting import overridden_or_new_settings, Setting
 
@@ -75,11 +75,6 @@ class Crawler(object):
         self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
         #return self.spidercls.from_crawler(self,*args,**kwargs)
 
-    '''
-    def _create_db(self,db_url,db_name):
-        logger.info("数据库已创建")
-        return MongoDb(db_url,db_name)
-    '''
 
 
     def timedelay(self,num):

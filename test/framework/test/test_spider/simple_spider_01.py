@@ -1,7 +1,12 @@
+import json
+
 from lxml import etree
 
 from spider import Request, Spider
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 class SimpleSpider(Spider):
     """
@@ -41,6 +46,6 @@ class SimpleSpider(Spider):
     def _parse(self,response):
         seletor = etree.HTML(response.body)
         #  获取下属城镇的小区总数
-        part_number_community = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
-        self.part_numbers[response.requset.meta["zone_name"]] = part_number_community
+        page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
+        num = json.loads(page_number[0])["totalPage"]
         return None

@@ -1,4 +1,4 @@
-from test.framework.engine.engine import ExecutionEngine
+from test.framework.core.engine import ExecutionEngine
 from twisted.internet import reactor
 
 try:
