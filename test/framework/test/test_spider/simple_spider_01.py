@@ -2,9 +2,10 @@ import json
 
 from lxml import etree
 
-from spider import Request, Spider
+from spider import  Spider
 import logging
 
+from test.framework.https.request import Request
 
 logger = logging.getLogger(__name__)
 

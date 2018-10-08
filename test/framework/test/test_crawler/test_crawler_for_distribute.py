@@ -15,6 +15,7 @@ from test.framework.setting import overridden_or_new_settings, Setting
 logger = logging.getLogger(__name__)
 #logger.setLevel(logging.DEBUG)
 
+
 class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
     # 装载爬虫，导入爬虫的网页
@@ -30,7 +31,7 @@ class Crawler(object):
         d = dict(overridden_or_new_settings(self.settings))
         logger.info("添加或重写的设置如下：\n %(settings)r",{'settings':d})
 
-        #获取log的格式
+        # 获取log的格式
         lf_cls = load_object(self.settings['LOG_FORMATTER'])
         self.logformatter = lf_cls.from_crawler(self)
 
@@ -38,8 +39,10 @@ class Crawler(object):
     def crawl(self,*args,**kwargs):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
+        self.spider = self._spider
+        yield self.timedelay(2)
+        """ 
         try:
-            self.spider = self._spider
             #self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
@@ -56,7 +59,7 @@ class Crawler(object):
             if self.engine is not None:
                 yield self.engine.close()
             raise
-
+        """
 
     """
     用户封装调度器以及引擎
@@ -68,7 +71,6 @@ class Crawler(object):
     def _create_spider_schedule(self,schedule):
         logger.info("爬虫：%s 已创建" % self.spidercls.name)
         self._spider = self.spidercls.from_schedule(schedule)
-
 
     def _create_spider(self,*args, **kwargs):
         logger.info("爬虫：%s 已创建" %self.spidercls.name)

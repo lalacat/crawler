@@ -11,12 +11,6 @@ class BaseSpider(object):
         self.__dict__.update(kwargs)
 
 
-class Request(object):
-    def __init__(self, url, parse):
-        self.url = url
-        self.parse = parse
-
-
 class Spider(object_ref):
     name = None
     """真对部分爬虫有单独的用户设置，用户设置类型是["key1=value1","key2=value2"]"""
@@ -59,8 +53,5 @@ class Spider(object_ref):
     def _set_crawler(self,crawler):
         self.crawler = crawler
 
-
-class BaseQylSpider(object):
-    pass
 
 

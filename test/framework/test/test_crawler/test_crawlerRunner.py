@@ -1,6 +1,5 @@
-import queue
 
-from twisted.internet import task, reactor
+from twisted.internet import task, reactor, defer
 from twisted.internet.defer import DeferredList, inlineCallbacks
 
 from test.framework.test.test_crawler.test_crawler_for_distribute import Crawler
@@ -18,10 +17,39 @@ logging.basicConfig(level=logging.DEBUG,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 
 class Slot(object):
     def __init__(self,nextcall):
+        self.closing = False
         self.heartbeat = task.LoopingCall(nextcall.schedule)
+        self.nextcall = nextcall
+        self.inprogress = list()
 
 
+    def add_crawl(self,crawl):
+        """
+        记录正在进行的crawl
+        :param crawl:
+        :return:
+        """
+        logger.debug("%s 添加到inprogress队列中" % crawl)
+        self.inprogress.append(crawl)
 
+    def remove_crawl(self,crawl):
+        self.inprogress.remove(crawl)
+        self._maybe_closing()
+
+    def close(self):
+        logger.debug("关闭CrawlerRunner的slot")
+        self.closing = defer.Deferred()
+        self._maybe_closing()
+        return self.closing
+
+    def _maybe_closing(self):
+        if self.closing and not self.inprogress:
+            if self.nextcall:
+                logger.warning("CrawlerRunner的LoopCall已关闭")
+                self.nextcall.cancel()
+                if self.heartbeat.running:
+                    self.heartbeat.stop()
+            self.closing.callback(None)
 
 
 class CrawlerRunner(object):
@@ -105,6 +133,7 @@ class CrawlerRunner(object):
         nextcall = CallLaterOnce(self.next_task_from_schedule)
         self.slot = Slot(nextcall)
         self.slot.heartbeat.start(3)
+        self.next_task_from_schedule()
 
     def next_task_from_schedule(self):
         logger.debug("调用next_task_from_schedule")
@@ -131,30 +160,5 @@ class CrawlerRunner(object):
 
 
 
-
-zone_name = "yangpu"
-town_urls = [
-    'https://sh.lianjia.com/xiaoqu/anshan/',
-    'https://sh.lianjia.com/xiaoqu/dongwaitan/',
-    'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',
-    'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-#    'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-#   'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-#    'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-#    'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
-]
-
-top_task = queue.Queue()
-for url in town_urls:
-    top_task.put(url)
-
-def spider_has_task(spider):
-    return spider.start_urls
-
-
-s = Setting()
-cr = CrawlerRunner(top_task,s)
-cr.start()
-reactor.run()
 
 
