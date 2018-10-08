@@ -1,3 +1,5 @@
+import pprint
+import time
 
 from twisted.internet import task, reactor, defer
 from twisted.internet.defer import DeferredList, inlineCallbacks
@@ -77,18 +79,23 @@ class CrawlerRunner(object):
         return self._crawl(crawler, *args, **kwargs)
 
     def _crawl(self, crawler, *args, **kwargs):
-        self._crawlers.add(crawler)
         d = crawler.crawl(*args, **kwargs)
-        self._active.add(d)
+        self._crawlers.add(crawler.spider.name)
 
         def _done(result):
             # 当已装载的爬虫运行完后，从列表中清除掉
-            logger.debug("从列表中清除掉")
-            self._crawlers.discard(crawler)
+            logger.debug("从列表中清除掉%s"%crawler.spider.name)
+            self._crawlers.discard(crawler.spider.name)
             self._active.discard(d)
             return result
 
-        return d.addBoth(_done)
+        d.addBoth(_done)
+        self._active.add(d)
+
+
+        #return d.addBoth(_done)
+
+
 
     def create_crawler(self, crawler_or_spidercls):
 
@@ -118,7 +125,7 @@ class CrawlerRunner(object):
             crawler._create_spider()
             crawler._spider.start_urls = start_urls
             crawler._spider.name = name
-            print(name)
+            logger.debug("爬虫的名称是%s"%name)
         except Exception as e :
             logger.debug("task 分配完毕！！！！")
             crawler = None
@@ -130,18 +137,29 @@ class CrawlerRunner(object):
         return flag
 
     def start(self):
+        self.start_time = time.clock()
         nextcall = CallLaterOnce(self.next_task_from_schedule)
+        print("start")
         self.slot = Slot(nextcall)
-        self.slot.heartbeat.start(3)
+        self.slot.heartbeat.start(5)
         self.next_task_from_schedule()
 
     def next_task_from_schedule(self):
-        logger.debug("调用next_task_from_schedule")
+        #logger.debug("调用next_task_from_schedule")
         if self.needs_backout():
             self.crawl(SimpleSpider)
-        if self.task_finish:
+            self.next_task_from_schedule()
+        logger.debug("active中存在%d个crawl"%len(self._crawlers))
+        logger.debug(pprint.pformat(self._crawlers))
+        d = DeferredList(self._active)
+        if self.task_finish and d:
+            logger.debug("任务分配完毕，任务停止")
             self.slot.heartbeat.stop()
+            self.end_time = time.clock()
+            logger.debug("运行时间%d"%(self.end_time-self.start_time))
             reactor.stop()
+            return None
+        return d
 
     def stop(self):
         #  停止
@@ -156,6 +174,7 @@ class CrawlerRunner(object):
         当所有的crawler完成激活之后，返回已经激活的defer的列表
         '''
         while self._active:
+            logger.debug("deferlist")
             yield DeferredList(self._active)
 
 

@@ -1,7 +1,11 @@
+import json
+
+from lxml import etree
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, maybeDeferred, DeferredList
 import logging
 
+from twisted.web.client import getPage
 from zope.interface.exceptions import DoesNotImplement
 from zope.interface.verify import verifyClass
 
@@ -29,7 +33,8 @@ class Crawler(object):
         self.settings = settings.copy()
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
-        logger.info("添加或重写的设置如下：\n %(settings)r",{'settings':d})
+        if d:
+            logger.info("添加或重写的设置如下：\n %(settings)r",{'settings':d})
 
         # 获取log的格式
         lf_cls = load_object(self.settings['LOG_FORMATTER'])
@@ -40,7 +45,19 @@ class Crawler(object):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
         self.spider = self._spider
-        yield self.timedelay(2)
+        url = self.spider._start_urls[0].encode("utf-8")
+
+        def _parse(response):
+            seletor = etree.HTML(response)
+            #  获取下属城镇的小区总数
+            page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
+            num = json.loads(page_number[0])["totalPage"]
+            logger.debug("%s的总页数是%d"%(self.spider.name,num))
+            return None
+
+        d = getPage(url)
+        d.addBoth(_parse)
+        yield d
         """ 
         try:
             #self.spider = self._create_spider(*args, **kwargs)
@@ -73,7 +90,7 @@ class Crawler(object):
         self._spider = self.spidercls.from_schedule(schedule)
 
     def _create_spider(self,*args, **kwargs):
-        logger.info("爬虫：%s 已创建" %self.spidercls.name)
+        #logger.info("爬虫：%s 已创建" %self.spidercls.name)
         self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
         #return self.spidercls.from_crawler(self,*args,**kwargs)
 
