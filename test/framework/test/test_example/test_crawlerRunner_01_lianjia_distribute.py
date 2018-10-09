@@ -11,10 +11,10 @@ town_urls = [
     'https://sh.lianjia.com/xiaoqu/dongwaitan/',
     'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',
     'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-    #'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-    #'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-    #'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-    #'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
+    'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+    'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+    'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+    'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
 ]
 
 top_task = queue.Queue()
@@ -28,6 +28,6 @@ def spider_has_task(spider):
 s = Setting()
 cr = CrawlerRunner(top_task,s)
 cr.start()
-#jobs = cr.join()
+# jobs = cr.join()
 reactor.run()
 

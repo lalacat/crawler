@@ -1,12 +1,13 @@
 import pprint
 import time
+from queue import Empty
 
 from twisted.internet import task, reactor, defer
 from twisted.internet.defer import DeferredList, inlineCallbacks
 
 from test.framework.test.test_crawler.test_crawler_for_distribute import Crawler
 from test.framework.setting import Setting
-from test.framework.test.test_spider.simple_spider_01 import SimpleSpider
+from test.framework.test.test_spider.simple_spider_02_xiaoqu import SimpleSpider
 import logging
 
 from test.framework.utils.reactor import CallLaterOnce
@@ -70,9 +71,10 @@ class CrawlerRunner(object):
         self.task_schedule = tasks
         self.task_finish = False
         self.slot = None
-
+        self._closing = None
 
     def crawl(self, crawler_or_spidercls, *args, **kwargs):
+
         crawler = self.check_spider_task(crawler_or_spidercls)
         if crawler is None:
             return None
@@ -89,13 +91,15 @@ class CrawlerRunner(object):
             self._active.discard(d)
             return result
 
+        def _next_slot(_):
+            self.slot.nextcall.schedule()
+            return _
+
         d.addBoth(_done)
+        d.addBoth(_next_slot)
         self._active.add(d)
 
-
-        #return d.addBoth(_done)
-
-
+        #return d.addBoth(_next_slot)
 
     def create_crawler(self, crawler_or_spidercls):
 
@@ -126,10 +130,13 @@ class CrawlerRunner(object):
             crawler._spider.start_urls = start_urls
             crawler._spider.name = name
             logger.debug("爬虫的名称是%s"%name)
-        except Exception as e :
+        except Empty:
             logger.debug("task 分配完毕！！！！")
             crawler = None
             self.task_finish = True
+            self.close_task()
+        except Exception as e :
+            print("check_spider_task",e)
         return crawler
 
     def needs_backout(self):
@@ -141,25 +148,23 @@ class CrawlerRunner(object):
         nextcall = CallLaterOnce(self.next_task_from_schedule)
         print("start")
         self.slot = Slot(nextcall)
+        self.slot.nextcall.schedule()
         self.slot.heartbeat.start(5)
-        self.next_task_from_schedule()
 
     def next_task_from_schedule(self):
         #logger.debug("调用next_task_from_schedule")
-        if self.needs_backout():
+        while self.needs_backout():
             self.crawl(SimpleSpider)
-            self.next_task_from_schedule()
         logger.debug("active中存在%d个crawl"%len(self._crawlers))
         logger.debug(pprint.pformat(self._crawlers))
-        d = DeferredList(self._active)
-        if self.task_finish and d:
-            logger.debug("任务分配完毕，任务停止")
-            self.slot.heartbeat.stop()
-            self.end_time = time.clock()
-            logger.debug("运行时间%d"%(self.end_time-self.start_time))
-            reactor.stop()
-            return None
-        return d
+
+        if self._active:
+            d = DeferredList(self._active)
+            return d
+        elif self._closing:
+            self._closing.callback(None)
+
+
 
     def stop(self):
         #  停止
@@ -167,6 +172,22 @@ class CrawlerRunner(object):
         # Returns a deferred that is fired when they all have ended.
 
         return DeferredList([c.stop() for c in list(self._crawlers)])
+
+    def close_task(self):
+
+        def _maybe_closing(_, slot):
+            logger.debug("任务分配完毕，任务停止")
+            slot = slot
+            slot.heartbeat.stop()
+            end_time = time.clock()
+            logger.debug("运行时间%d" % (end_time))
+            reactor.stop()
+            self.task_finish = False
+            return _
+
+        self._closing = defer.Deferred()
+        self._closing.addBoth(_maybe_closing, self.slot)
+
 
     @inlineCallbacks
     def join(self):

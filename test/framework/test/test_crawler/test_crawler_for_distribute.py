@@ -44,6 +44,8 @@ class Crawler(object):
     def crawl(self,*args,**kwargs):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
+
+        """
         self.spider = self._spider
         url = self.spider._start_urls[0].encode("utf-8")
 
@@ -60,6 +62,7 @@ class Crawler(object):
         yield d
         """ 
         try:
+            self.spider = self._spider
             #self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
@@ -76,7 +79,7 @@ class Crawler(object):
             if self.engine is not None:
                 yield self.engine.close()
             raise
-        """
+
 
     """
     用户封装调度器以及引擎
@@ -90,7 +93,7 @@ class Crawler(object):
         self._spider = self.spidercls.from_schedule(schedule)
 
     def _create_spider(self,*args, **kwargs):
-        #logger.info("爬虫：%s 已创建" %self.spidercls.name)
+        logger.info("爬虫：%s 已创建" %self.spidercls.name)
         self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
         #return self.spidercls.from_crawler(self,*args,**kwargs)
 

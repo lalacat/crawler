@@ -49,4 +49,5 @@ class SimpleSpider(Spider):
         #  获取下属城镇的小区总数
         page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
         num = json.loads(page_number[0])["totalPage"]
+        logger.debug("%s的总页数是%d" % (self.name, num))
         return None

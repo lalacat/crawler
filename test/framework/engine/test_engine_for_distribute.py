@@ -13,7 +13,6 @@ import logging,time
 #logging.basicConfig(level=logging.INFO,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 logger = logging.getLogger(__name__)
 
-
 class Slot(object):
     """
     爬虫过程中，爬虫引擎的插槽
@@ -154,6 +153,12 @@ class ExecutionEngine(object):
         end_time = time.clock()
         logger.info("%s 引擎关闭"%self.engine_name)
         logger.info("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,end_time ))
+
+
+        logging.info("")
+        logging.info("")
+        logging.info("")
+        logging.info("")
         return None
 
     def pause(self):
