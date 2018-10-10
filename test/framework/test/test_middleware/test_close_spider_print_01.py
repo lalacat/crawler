@@ -9,7 +9,7 @@ class Spider_Out_print(object):
         return cls(crawler)
 
     def close_spider(self,spider):
-        #print(pprint.pformat(spider.all_zones))
+
         for i, v in spider.all_zones.items():
             print(i, v)
 

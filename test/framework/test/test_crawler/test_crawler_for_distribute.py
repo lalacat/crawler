@@ -1,18 +1,14 @@
-import json
-
-from lxml import etree
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, maybeDeferred, DeferredList
 import logging
 
-from twisted.web.client import getPage
 from zope.interface.exceptions import DoesNotImplement
 from zope.interface.verify import verifyClass
 
 from test.framework.core.interface import ISpiderLoader
 from test.framework.objectimport.loadobject import load_object
 
-from test.framework.engine.test_engine_for_distribute import ExecutionEngine
+from test.framework.test.test_engine.test_engine_for_distribute import ExecutionEngine
 import time
 from test.framework.setting import overridden_or_new_settings, Setting
 
