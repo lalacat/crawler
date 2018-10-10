@@ -19,6 +19,7 @@ seletor = etree.HTML(r.content)
 #/html/body/div[3]/div[1]/dl[2]/dd/div/div[1]
 total_zone = seletor.xpath("/html/body/div[3]/div[1]/dl[2]/dd/div/div/a")
 part_zone = seletor.xpath("/html/body/div[3]/div/div[1]/dl[2]/dd/div[1]/div[2]/a")
+print(part_zone)
 total_urls = {}
 for a in total_zone:
     path = a.get('href')
@@ -38,7 +39,7 @@ for name,url in total_urls.items():
     page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
     num = json.loads(page_number[0])["totalPage"]
     print(name,num)
-    '''
+
     part_zone = seletor.xpath("/html/body/div[3]/div[1]/dl[2]/dd/div/div[2]/a")
     parts = [] #
     for a in part_zone:
@@ -49,4 +50,4 @@ for name,url in total_urls.items():
     part_urls[name].append(parts)
     print(name,parts)
 
-'''
+''''''

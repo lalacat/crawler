@@ -20,7 +20,7 @@ seletor = etree.HTML(r.content)
 # /html/body/div[3]/div[1]/dl[2]/dd/div/div
 total_zone = seletor.xpath("/html/body/div[3]/div/div[1]/dl[2]/dd/div[1]/div/a")
 part_zone = seletor.xpath("/html/body/div[3]/div/div[1]/dl[2]/dd/div[1]/div[2]/a")
-
+print(part_zone)
 total_urls = {}
 for a in total_zone:
     path = a.get('href')

@@ -1,0 +1,49 @@
+
+二手房：
+total_zone = seletor.xpath("/html/body/div[3]/div/div[1]/dl[2]/dd/div[1]/div/a") #分区下所有的小镇抓取
+
+单个房屋信息：
+#  总价
+total_price = seletor.xpath("/html/body/div[5]/div[2]/div[2]/span[1]")
+print(total_price[0].text)
+#  均价
+unitPrice = seletor.xpath("/html/body/div[5]/div[2]/div[2]/div[1]/div[1]/span")
+print(unitPrice[0].text)
+#  房屋面积
+area = seletor.xpath('/html/body/div[5]/div[2]/div[3]/div[3]/div[1]')[0].text
+area_str = filter(lambda x:str.isdigit(x) or x=='.',area)
+get_area =lambda b: "".join(x for x in b)
+print(get_area(area_str))
+#  房龄
+buildYear = seletor.xpath('/html/body/div[5]/div[2]/div[3]/div[3]/div[2]')[0].text
+buildYear_str = filter(lambda x:str.isdigit(x) or x=='.',buildYear)
+get_year =lambda b: "".join(x for x in b)
+print(get_year(buildYear_str))
+# 小区名称
+communityName = seletor.xpath("/html/body/div[5]/div[2]/div[4]/div[1]/a[1]")
+print(communityName[0].text)
+#  户型
+base_inform = seletor.xpath("//*[@id='introduction']/div/div/div[1]/div[2]/ul/li")
+for i in [base_inform[0],base_inform[2]]:
+    print(i.xpath("./span/text()")[0],i.xpath("./text()")[0])
+#  挂牌时间，上次交易时间
+transaction = seletor.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li')
+for i in [transaction[0],transaction[2]]:
+    print(i.xpath("./span/text()")[0],i.xpath("./span[2]/text()")[0])
+
+
+页码总数
+
+page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
+num = json.loads(page_number[0])["totalPage"]
+
+小区或者房屋总数
+total_number_community = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
+
+
+
+小区：
+total_zone = seletor.xpath("/html/body/div[3]/div[1]/dl[2]/dd/div/div/a") 所有的分区
+part_zone = seletor.xpath("/html/body/div[3]/div[1]/dl[2]/dd/div/div[2]/a") 所有分区下面的城镇
+
+
