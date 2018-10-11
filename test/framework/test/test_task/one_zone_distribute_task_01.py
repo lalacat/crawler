@@ -7,6 +7,7 @@ from test.framework.test.test_spider.simple_spider_getPage_01 import SimpleSpide
 zone_name = "yangpu"
 town_urls = [
     'https://sh.lianjia.com/xiaoqu/anshan/',
+    """
     'https://sh.lianjia.com/xiaoqu/dongwaitan/',
     'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',
     'https://sh.lianjia.com/xiaoqu/kongjianglu/',
@@ -14,6 +15,7 @@ town_urls = [
     'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
     'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
     'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
+    """
 ]
 
 top_task = queue.Queue()

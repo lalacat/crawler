@@ -8,6 +8,7 @@ from test.framework.test.test_crawler.test_crawlerRunner import CrawlerRunner
 zone_name = "yangpu"
 town_urls = [
     'https://sh.lianjia.com/xiaoqu/anshan/',
+
     'https://sh.lianjia.com/xiaoqu/dongwaitan/',
     'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',
     'https://sh.lianjia.com/xiaoqu/kongjianglu/',
@@ -15,6 +16,7 @@ town_urls = [
     'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
     'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
     'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
+
 ]
 
 top_task = queue.Queue()

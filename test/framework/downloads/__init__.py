@@ -189,7 +189,6 @@ class Downloader(object):
 
         # Process enqueued requests if there are free slots to transfer for this slot
         while slot.queue and slot.free_transfer_slots() > 0:
-            logger.debug(len(slot.queue))
             # 不停地处理slot队列queue中的请求，如果队列非空且slot.transferring中request的个数没有达到下载最大个数,
             # 则下载，如果需要延迟则继续调用'_process_queue'
             slot.lastseen = now

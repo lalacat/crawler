@@ -15,7 +15,7 @@ from test.framework.utils.reactor import CallLaterOnce
 logger = logging.getLogger(__name__)
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
-logging.basicConfig(level=logging.DEBUG,format=LOG_FORMAT,datefmt=DATE_FORMAT)
+logging.basicConfig(level=logging.CRITICAL,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 
 
 class Slot(object):
@@ -180,7 +180,7 @@ class CrawlerRunner(object):
             slot = slot
             slot.heartbeat.stop()
             end_time = time.clock()
-            logger.debug("运行时间%d" % (end_time))
+            print("运行时间:%ds" % (end_time))
             reactor.stop()
             self.task_finish = False
             return _
