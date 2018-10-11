@@ -39,8 +39,7 @@ class Crawler(object):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
         try:
-            self.spider = self._spider
-            #self.spider = self._create_spider(*args, **kwargs)
+            self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
             yield self.engine.open_spider(self.spider,start_requests)
@@ -72,8 +71,7 @@ class Crawler(object):
 
     def _create_spider(self,*args, **kwargs):
         logger.info("爬虫：%s 已创建" %self.spidercls.name)
-        self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
-        #return self.spidercls.from_crawler(self,*args,**kwargs)
+        return self.spidercls.from_crawler(self,*args,**kwargs)
 
     '''
     def _create_db(self,db_url,db_name):

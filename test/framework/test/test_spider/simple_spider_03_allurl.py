@@ -16,35 +16,25 @@ class SimpleSpider(Spider):
     将所有小区的地址都写入数据库中
     """
     def __init__(self):
-        self.name = ""
-        self._start_urls = []
+        self.name = "yangpu"
         self.handler_db = True
         self.total_number_community = 0
         self.result = defaultdict(list)
         self.result_len = 0
 
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, info):
-        base_name = "SpiderTask: "
-        self._name = base_name+info
-
-    @property
-    def start_urls(self):
-        return self._start_urls
-
-    @start_urls.setter
-    def start_urls(self,urls):
-        if not isinstance(urls,list):
-            self._start_urls = [urls]
-        else:
-            self._start_urls = urls
-
     def start_requests(self):
+        self.start_urls = [
+            'https://sh.lianjia.com/xiaoqu/anshan/',  # 157 156
+            'https://sh.lianjia.com/xiaoqu/dongwaitan/',  # 144 141
+            'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',  # 159 159
+            'https://sh.lianjia.com/xiaoqu/kongjianglu/',
+            'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+            'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+            'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+            'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
+        ]
         for url in self.start_urls:
+
             yield Request(url, callback=self._parse)
 
     def _parse(self,response):
@@ -57,19 +47,19 @@ class SimpleSpider(Spider):
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
 
         for i in range(1, self.total_page_number + 1):
-            url = self._start_urls[0] + '/pg' + str(i)
+            url = response.requset.url + '/pg' + str(i)
             yield Request(url, callback=self._parse2,meta={"page_num":i})
 
     def _parse2(self,response):
         seletor = etree.HTML(response.body)
         page_num = response.requset.meta["page_num"]
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
-        self.result[str(page_num)]=self.get_onePage(page_num,all_communities)
+        self.result[str(page_num)]=self.get_onePage(all_communities)
         self.result_len += len(self.result[str(page_num)])
 
         return None
 
-    def get_onePage(self,page_num,all_communities):
+    def get_onePage(self,all_communities):
         one_page = list()
         for community in all_communities:
             result = dict()

@@ -7,10 +7,10 @@ from test.framework.test.test_crawler.test_crawlerRunner import CrawlerRunner
 
 zone_name = "yangpu"
 town_urls = [
-    'https://sh.lianjia.com/xiaoqu/anshan/',
+    'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
 
-    'https://sh.lianjia.com/xiaoqu/dongwaitan/',
-    'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',
+    'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+    'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
     'https://sh.lianjia.com/xiaoqu/kongjianglu/',
     'https://sh.lianjia.com/xiaoqu/wujiaochang/',
     'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',

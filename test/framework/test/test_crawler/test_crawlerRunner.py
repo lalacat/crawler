@@ -140,7 +140,7 @@ class CrawlerRunner(object):
         return crawler
 
     def needs_backout(self):
-        flag = not self.task_finish and len(self._active) < 3
+        flag = not self.task_finish and len(self._active) < 9
         return flag
 
     def start(self):
