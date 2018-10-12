@@ -73,18 +73,13 @@ class Crawler(object):
         logger.info("爬虫：%s 已创建" %self.spidercls.name)
         return self.spidercls.from_crawler(self,*args,**kwargs)
 
-    '''
-    def _create_db(self,db_url,db_name):
-        logger.info("数据库已创建")
-        return MongoDb(db_url,db_name)
-    '''
-
 
     def timedelay(self,num):
         print("休眠 :%d s"%num)
         for i in range(num,0,-1):
             print("倒计时：%d" %i)
             time.sleep(1)
+
 
     @inlineCallbacks
     def stop(self):

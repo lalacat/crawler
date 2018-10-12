@@ -1,4 +1,3 @@
-import pprint
 
 class Spider_Out_print(object):
     def __init__(self,settings):

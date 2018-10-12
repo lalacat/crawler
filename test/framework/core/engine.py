@@ -138,7 +138,7 @@ class ExecutionEngine(object):
         assert not self.running,"%s 的引擎已启动"%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
         self.running = True
         engine_start_time = time.clock()
-        logger.info("%s 的引擎开始时间为: %d" %(self.spider.name,engine_start_time))
+        logger.warning("%s 的引擎开始时间为: %d" %(self.spider.name,engine_start_time))
         self._closewait = defer.Deferred()
         self._closewait.addBoth(self._finish_stopping_engine)
         yield self._closewait
@@ -152,8 +152,8 @@ class ExecutionEngine(object):
 
     def _finish_stopping_engine(self,_):
         end_time = time.clock()
-        logger.info("%s 引擎关闭"%self.engine_name)
-        logger.info("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,end_time ))
+        logger.warning("%s 引擎关闭"%self.engine_name)
+        logger.warning("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,end_time ))
         return None
 
     def pause(self):

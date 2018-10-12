@@ -34,7 +34,6 @@ class SimpleSpider(Spider):
             'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
         ]
         for url in self.start_urls:
-
             yield Request(url, callback=self._parse)
 
     def _parse(self,response):
@@ -47,7 +46,7 @@ class SimpleSpider(Spider):
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
 
         for i in range(1, self.total_page_number + 1):
-            url = response.requset.url + '/pg' + str(i)
+            url = response.requset.url + 'pg' + str(i)
             yield Request(url, callback=self._parse2,meta={"page_num":i})
 
     def _parse2(self,response):
@@ -56,8 +55,9 @@ class SimpleSpider(Spider):
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
         self.result[str(page_num)]=self.get_onePage(all_communities)
         self.result_len += len(self.result[str(page_num)])
-
+        print(response.requset.url,self.result_len)
         return None
+        #return self.result[str(page_num)]
 
     def get_onePage(self,all_communities):
         one_page = list()
