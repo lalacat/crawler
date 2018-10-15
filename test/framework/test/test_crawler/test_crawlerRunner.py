@@ -1,4 +1,5 @@
 import pprint
+import queue
 import time
 from queue import Empty
 
@@ -7,7 +8,7 @@ from twisted.internet.defer import DeferredList, inlineCallbacks
 
 from test.framework.test.test_crawler.test_crawler_for_distribute import Crawler
 from test.framework.setting import Setting
-from test.framework.test.test_spider.simple_spider_02_xiaoqu import SimpleSpider
+from test.framework.test.test_spider.simple_spider_04_xiaoqu_db import SimpleSpider
 import logging
 
 from test.framework.utils.reactor import CallLaterOnce
@@ -72,6 +73,8 @@ class CrawlerRunner(object):
         self.task_finish = False
         self.slot = None
         self._closing = None
+        self.searchRes = tasks
+        self.child_task = queue.Queue()
 
     def crawl(self, crawler_or_spidercls, *args, **kwargs):
 
@@ -123,7 +126,8 @@ class CrawlerRunner(object):
 
     def check_spider_task(self,spidercls):
         try:
-            start_urls = self.task_schedule.get(block=False)
+            start_urls = self.child_task.get(block=False)
+            print("当前爬取的网页是:%s"%start_urls)
             name = start_urls.split('/')[-2]
             crawler = self.create_crawler(spidercls)
             crawler._create_spider()
@@ -132,21 +136,43 @@ class CrawlerRunner(object):
             logger.debug("爬虫的名称是%s"%name)
         except Empty:
             logger.debug("task 分配完毕！！！！")
+            self.load_task()
             crawler = None
-            self.task_finish = True
-            self.close_task()
         except Exception as e :
             print("check_spider_task",e)
         return crawler
 
+    def load_task(self):
+        next_task = self.task_scheduke_next()
+        if next_task:
+            task_name = next_task["total_zone_name"][0]
+            print(task_name)
+            for name, url in next_task.items():
+                if name != 'total_zone_name':
+                    self.child_task.put(url)
+            print("========================")
+        else:
+            print("任务取完")
+            self.task_finish = True
+            self.close_task()
+
+    def task_scheduke_next(self):
+        try:
+            result = self.searchRes.next()
+        except StopIteration:
+            result = None
+        return result
+
     def needs_backout(self):
-        flag = not self.task_finish and len(self._active) < 9
+        flag = not self.task_finish and len(self._active) < 4
+        #flag = not self.task_finish
         return flag
 
     def start(self):
         self.start_time = time.clock()
         nextcall = CallLaterOnce(self.next_task_from_schedule)
         print("start")
+        self.load_task()
         self.slot = Slot(nextcall)
         self.slot.nextcall.schedule()
         self.slot.heartbeat.start(5)
@@ -155,8 +181,8 @@ class CrawlerRunner(object):
         #logger.debug("调用next_task_from_schedule")
         while self.needs_backout():
             self.crawl(SimpleSpider)
-        logger.debug("active中存在%d个crawl"%len(self._crawlers))
-        logger.debug(pprint.pformat(self._crawlers))
+        #ogger.debug(pprint.pformat(self._crawlers))
+        #print(pprint.pformat(self._crawlers))
 
         if self._active:
             d = DeferredList(self._active)

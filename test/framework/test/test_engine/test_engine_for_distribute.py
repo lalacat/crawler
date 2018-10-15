@@ -154,9 +154,6 @@ class ExecutionEngine(object):
         logger.info("%s 引擎关闭"%self.engine_name)
         logger.info("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,end_time ))
 
-
-        logging.info("")
-        logging.info("")
         logging.info("")
         logging.info("")
         return None

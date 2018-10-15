@@ -74,7 +74,6 @@ class Crawler(object):
             self.crawling = False
             if self.engine is not None:
                 yield self.engine.close()
-            raise
 
 
     """

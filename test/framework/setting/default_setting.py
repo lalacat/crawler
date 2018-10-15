@@ -51,7 +51,8 @@ ITEM_PIPELINES = {
     #"test.framework.pipelines.mongoDB.MongoDB":20,
     #"test.framework.pipelines.print_result.Print_Result":10
     #"test.framework.test.test_middleware.test_close_spider_print_01.Spider_Out_print": 10
-    "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.Spider_Out_print": 10,
+    #"test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.Spider_Out_print": 10,
+    "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.Spider_Out_print": 10,
     #"test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20
 
 }
