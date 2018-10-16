@@ -72,7 +72,6 @@ class Scraper(object):
         #  单次最多能处理最大的item的个数
         self.concurrent_items = crawler.settings.getint('CONCURRENT_ITEMS')
         self.crawler = crawler
-        self.outputs = []
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
@@ -176,35 +175,36 @@ class Scraper(object):
         :return:
         """
         if not result:
-            logger.info("spider._parse或者request.callback返回的结果为None,不经过自定义process item 处理！！")
+            logger.warning("%s._parse或者request.callback返回的结果为None,不经过自定义process_item 处理！！"%spider.name)
             return defer_succeed(None)
         if isinstance(result,Request):
             #  针对是return 当spider处理后的结果是yield，那么result的类型是generator
             self.crawler.engine.crawl(request=result, spider=spider)
             return defer_succeed(result)
         if not isinstance(result,Iterable):
-            logger.warning("%s._parse 或者 requst.callback处理的结果不是迭代类型，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
+            logger.warning("%s._parse或者requst.callback处理的结果不是<Iterable>，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
             return defer_succeed(result)
         #  将自定义处理好的结果，通过这个方法并行执行自定义的rule（pipe process_item）
         #  这里的结果默认是能够迭代的List或者是dict类型的结果，每个结果都是并列的，能够同时符合process_item处理规则
         #  其中list里的结果是两种类型，一种是BaseItem及其子类一种是dict类型，这些都是在requst或者spider中自己
         #  处理后的得到的
-        logger.debug("%s的结果%s进行process_item处理"%(spider.name,type(result)))
+        logger.debug("%s的parse处理后的结果类型是%s,下一步进行process_item并行处理"%(spider.name,type(result)))
         it = iter_errback(result, self.handle_spider_error, request, response, spider)
 
         dfd = parallel(it,self.concurrent_items,self._process_spidermw_output, request, response, spider)
-        dfd.addCallback(self._itemproc_collected,request)
+        dfd.addCallback(self._process_item_time)
         return dfd
 
     def _process_spidermw_output(self, output, request, response, spider):
         """Process each Request/Item (given in the output parameter) returned
         from the given spider
         """
-        logger.debug("并行处理")
+        logger.debug("在并行处理中。。。。。。。。")
         if isinstance(output, Request):
-            logger.info("处理的output%(request)s的类型是%(type)s，将添加到下载序列中！！",{"request":output,"type":type(output)})
+            logger.info("处理的output%(request)s的类型是<Request>，将添加到下载序列中！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
             self.crawler.engine.crawl(request=output, spider=spider)
         elif isinstance(output, (BaseItem, dict,int)):
+            logger.info("处理的output%(request)s的类型是<BaseItem, dict,int>，将由自定义的process_item方法进行处理！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
             self.slot.itemproc_size += 1
             dfd = self.itemproc.process_item(item=output,spider=spider)
             dfd.addBoth(self._itemproc_finished, output, response, spider)
@@ -232,14 +232,13 @@ class Scraper(object):
             logger.error('process item(%(item)s)过程中出现错误', {'item': item})
         else:
             logger.debug("process item(%s)处理完毕"%item,extra={'spider': spider})
-            self.outputs.append(output)
         return None
 
     def _log_download_errors(self,context,request_result, request, spider):
         logger.error(context)
         return context
 
-    def _itemproc_collected(self,_,request):
+    def _process_item_time(self,_):
         end_time = time.clock()
-        logger.info("process item 处理时间为%f,持续%7.6f"%(end_time,end_time-self.start_time))
+        logger.info("经过process_item处理后，此时时间为%f,完成Scraper模块使用了%7.6f"%(end_time,end_time-self.start_time))
         return None

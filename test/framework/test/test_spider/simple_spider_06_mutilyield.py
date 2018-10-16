@@ -24,7 +24,8 @@ class SimpleSpider(Spider):
 
     def start_requests(self):
         self.start_urls = [
-            "https://sh.lianjia.com/xiaoqu/biyun/"
+            #"https://sh.lianjia.com/xiaoqu/biyun/",
+            "https://sh.lianjia.com/xiaoqu/caolu/"
         ]
         for url in self.start_urls:
             yield Request(url, callback=self._parse)
@@ -38,18 +39,17 @@ class SimpleSpider(Spider):
         logger.debug("%s的总页数是%d" % (self.name, self.total_page_number))
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
 
-        #for i in range(1, self.total_page_number + 1):
-        url = response.requset.url + 'pg' + str(1)
-        yield Request(url, callback=self._parse2,meta={"page_num":1})
-        url = response.requset.url + 'pg' + str(2)
-        yield Request(url, callback=self._parse2,meta={"page_num":2})
+        for i in range(1, self.total_page_number + 1):
+            url = response.requset.url + 'pg' + str(i)
+            yield Request(url, callback=self._parse2,meta={"page_num":i})
+        #url = response.requset.url + 'pg' + str(2)
+        #yield Request(url, callback=self._parse2,meta={"page_num":2})
 
 
 
     def _parse2(self,response):
         seletor = etree.HTML(response.body)
         page_num = response.requset.meta["page_num"]
-        print(page_num)
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
         self.result[str(page_num)]=self.get_onePage(all_communities)
         self.result_len += len(self.result[str(page_num)])

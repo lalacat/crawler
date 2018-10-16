@@ -43,7 +43,7 @@ class HTTPDownloadHandler(object):
 
 
     def download_request(self,request,spider):
-        logger.debug("download_request get a request：%s，spider: %s"%(request,spider))
+        logger.debug("download_request get a request：%s，spider: %s"%(request,spider.name))
         """返回一个http download 的 defer"""
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
@@ -101,7 +101,7 @@ class DownloadAgent(object):
         logger.info("%s进入下载download_request"%request)
         timeout = request.meta.get('download_timeout') or self._connectTimeout
         redirect = request.meta.get('download_redirect') or self._redirect
-        logger.debug("download_timeout is %d"%timeout)
+        #logger.debug("download_timeout is %d"%timeout)
         if redirect:
             agent = self._getRedirectAgent(timeout)
         else:
@@ -174,7 +174,7 @@ class DownloadAgent(object):
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
         request.meta['download_latency'] = time.clock() - start_time
-        logger.debug("记录延迟时间 %d " %request.meta['download_latency'])
+        #logger.debug("记录延迟时间 %d " %request.meta['download_latency'])
         return result
 
     def _cb_timeout(self,result,url,timeout):
