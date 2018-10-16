@@ -21,9 +21,9 @@ COLLECTION = "XiaoQu"
 db_coll = db[COLLECTION ]
 
 projectionFields = {'_id':False}  # 用字典指定
-queryArgs = {"total_zone_name":"pudong"}
+queryArgs = {"total_zone_name":"qingpu"}
 
-searchRes = db_coll.find({},{'_id':False})
+searchRes = db_coll.find(queryArgs,{'_id':False})
 '''
 
 scheduler = searchRes.next()
@@ -60,6 +60,7 @@ def load_task(searchRes,top_task):
 
 s = Setting()
 cr = CrawlerRunner(searchRes,s)
-cr.start()
+d = cr.start()
+d.addBoth(lambda _:reactor.stop())
 reactor.run()
 

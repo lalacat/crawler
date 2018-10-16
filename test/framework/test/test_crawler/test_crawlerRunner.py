@@ -72,7 +72,7 @@ class CrawlerRunner(object):
         self.task_schedule = tasks
         self.task_finish = False
         self.slot = None
-        self._closing = None
+        self.running = False
         self.searchRes = tasks
         self.child_task = queue.Queue()
 
@@ -101,8 +101,6 @@ class CrawlerRunner(object):
         d.addBoth(_done)
         d.addBoth(_next_slot)
         self._active.add(d)
-
-        #return d.addBoth(_next_slot)
 
     def create_crawler(self, crawler_or_spidercls):
 
@@ -154,7 +152,6 @@ class CrawlerRunner(object):
         else:
             print("任务取完")
             self.task_finish = True
-            self.close_task()
 
     def task_scheduke_next(self):
         try:
@@ -164,32 +161,36 @@ class CrawlerRunner(object):
         return result
 
     def needs_backout(self):
-        flag = not self.task_finish and len(self._active) < 4
+        flag = not self.task_finish and len(self._active) < 9
         #flag = not self.task_finish
         return flag
 
+    @inlineCallbacks
     def start(self):
+        assert not self.running,"task载入已启动"
+        self.running = True
         self.start_time = time.clock()
         nextcall = CallLaterOnce(self.next_task_from_schedule)
-        print("start")
         self.load_task()
+
         self.slot = Slot(nextcall)
         self.slot.nextcall.schedule()
         self.slot.heartbeat.start(5)
+
+        self._closewait = defer.Deferred()
+        self._closewait.addBoth(self.stop_task)
+        yield self._closewait
 
     def next_task_from_schedule(self):
         #logger.debug("调用next_task_from_schedule")
         while self.needs_backout():
             self.crawl(SimpleSpider)
-        #ogger.debug(pprint.pformat(self._crawlers))
-        #print(pprint.pformat(self._crawlers))
 
         if self._active:
             d = DeferredList(self._active)
             return d
-        elif self._closing:
-            self._closing.callback(None)
-
+        elif self.running:
+            self._closewait.callback(None)
 
 
     def stop(self):
@@ -199,21 +200,14 @@ class CrawlerRunner(object):
 
         return DeferredList([c.stop() for c in list(self._crawlers)])
 
-    def close_task(self):
-
-        def _maybe_closing(_, slot):
-            logger.debug("任务分配完毕，任务停止")
-            slot = slot
-            slot.heartbeat.stop()
-            end_time = time.clock()
-            print("运行时间:%ds" % (end_time))
-            reactor.stop()
-            self.task_finish = False
-            return _
-
-        self._closing = defer.Deferred()
-        self._closing.addBoth(_maybe_closing, self.slot)
-
+    def stop_task(self,_):
+        logger.debug("任务分配完毕，任务停止")
+        slot = self.slot
+        slot.heartbeat.stop()
+        end_time = time.clock()
+        print("运行时间:%ds" % end_time)
+        self.task_finish = False
+        return None
 
     @inlineCallbacks
     def join(self):

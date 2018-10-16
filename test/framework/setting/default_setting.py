@@ -47,13 +47,13 @@ HEADER_COLLECTION =[
 ]
 #T
 ITEM_PIPELINES = {
-    #"test.framework.middleware.test_process_item_01.Test_Process_item_A":10
     #"test.framework.pipelines.mongoDB.MongoDB":20,
     #"test.framework.pipelines.print_result.Print_Result":10
-    #"test.framework.test.test_middleware.test_close_spider_print_01.Spider_Out_print": 10
-    #"test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.Spider_Out_print": 10,
-    "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.Spider_Out_print": 10,
-    #"test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20
+    #"test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10
+    #"test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
+    #"test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
+    #"test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20,
+    "test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
 
 }
 #J

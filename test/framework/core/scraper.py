@@ -241,5 +241,5 @@ class Scraper(object):
 
     def _itemproc_collected(self,_,request):
         end_time = time.clock()
-        logger.info("process item 处理时间持续%7.6f"%(end_time-self.start_time))
+        logger.info("process item 处理时间为%f,持续%7.6f"%(end_time,end_time-self.start_time))
         return None
