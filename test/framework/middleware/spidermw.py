@@ -19,7 +19,8 @@ class SpiderMiddlewareManager(MiddlewareManager):
         return bulid_component_list(settings["SPIDER_MIDDLEWARES_TEST"],cls.component_name)
 
     def _add_middleware(self,mw):
-        #  父类中含有open_spider,close_spider方法
+        #  父类中含有加载open_spider,close_spider方法
+        #  如果自定的中间件含有open_spider,close_spider需要通过父类的方法加载进去
         super(SpiderMiddlewareManager,self)._add_middleware(mw)
         if hasattr(mw,"process_spider_input"):
             self.methods["process_spider_input"].append(mw.process_spider_input)

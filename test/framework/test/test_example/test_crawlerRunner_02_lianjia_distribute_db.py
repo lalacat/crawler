@@ -24,6 +24,8 @@ projectionFields = {'_id':False}  # 用字典指定
 queryArgs = {"total_zone_name":"qingpu"}
 
 searchRes = db_coll.find(queryArgs,{'_id':False})
+
+print(type(searchRes))
 '''
 
 scheduler = searchRes.next()

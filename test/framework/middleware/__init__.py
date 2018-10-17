@@ -16,7 +16,7 @@ class MiddlewareManager(object):
     component_name = 'father middleware'
 
     def __init__(self,*middlewares):
-        logger.debug("初始化中间件............")
+        logger.debug("初始化%s的中间件！！"%self.component_name)
         self.clsnames = middlewares[0]
         self.middlewares = middlewares[1]
 

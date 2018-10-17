@@ -32,7 +32,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
             #  处理process_request的方法自定义的时候，要么返回一个处理好的response要么返回一个None,
             #  返回一个request很容易陷入死循环。
             #  最大的作用就是处理request，往里添加或者修改内容的
-            logger.debug("处理process_request")
+            logger.debug("加载各个中间件的process_request方法，处理request！！")
             for method in self.methods['process_request']:
                 response = yield method(request=request,spider =spider)
                 assert response is None or isinstance(response,(Response,Request)),\
@@ -47,7 +47,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
 
         @defer.inlineCallbacks
         def process_response(response):
-            logger.debug("处理process_response")
+            logger.debug("加载各个中间件的process_response方法，处理request！！")
             assert response is not None,"process_response接收到的数据是None"
             if isinstance(response,Request):
                 defer.returnValue(response)
