@@ -24,8 +24,10 @@ projectionFields = {'_id':False}  # 用字典指定
 queryArgs = {"total_zone_name":"qingpu"}
 
 searchRes = db_coll.find(queryArgs,{'_id':False})
+if isinstance(searchRes, pymongo.cursor.Cursor):
+    print(type(searchRes))
 
-print(type(searchRes))
+
 '''
 
 scheduler = searchRes.next()

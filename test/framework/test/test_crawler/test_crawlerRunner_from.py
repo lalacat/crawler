@@ -1,7 +1,8 @@
-import pprint
+import pymongo
 import queue
 import time
 from queue import Empty
+from typing import Iterable
 
 from twisted.internet import task, reactor, defer
 from twisted.internet.defer import DeferredList, inlineCallbacks
@@ -14,9 +15,6 @@ import logging
 from test.framework.utils.reactor import CallLaterOnce
 
 logger = logging.getLogger(__name__)
-LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
-DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
-logging.basicConfig(level=logging.CRITICAL,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 
 
 class Slot(object):
@@ -58,7 +56,7 @@ class Slot(object):
 
 class CrawlerRunner(object):
 
-    def __init__(self, tasks,settings=None):
+    def __init__(self,settings=None):
         if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
@@ -70,10 +68,13 @@ class CrawlerRunner(object):
         # 子爬虫的数量
         self.MAX_CHILD_NUM = 9
 
+        '''
         #  从数据库中加载task
         self._task_from_db = None
         #  从iter迭代器加载task
         self._task_from_iter = None
+
+        '''
 
         #  task完成标志位
         self.task_finish = False
@@ -147,6 +148,16 @@ class CrawlerRunner(object):
             print("check_spider_task",e)
         return crawler
 
+    @classmethod
+    def task_from(cls,db_or_iter,setting=None):
+        if isinstance(db_or_iter,Iterable):
+            cls._task_from_iter = db_or_iter
+            cls._task_from_db = None
+        if isinstance(db_or_iter,pymongo.cursor.Cursor):
+            cls._task_from_iter = None
+            cls._task_from_db = db_or_iter
+        return cls(setting)
+
     def _create_task(self):
         if self._task_from_db:
             logger.debug("载入来自db的task!!!!")
@@ -156,21 +167,32 @@ class CrawlerRunner(object):
                 print(task_name)
                 for name, url in next_task.items():
                     if name != 'total_zone_name':
+                        logger.debug("%s加载入任务队列中"%url)
                         self._task_schedule.put(url)
+                return
             except StopIteration:
-                print("来自db的task载入完毕")
+                logger.debug("来自db的task载入完毕")
                 self.task_finish = True
+                return
             except AttributeError:
                 logger.error("task载入类型错误")
 
         if self._task_from_iter:
             logger.debug("载入来自iter的task!!!")
+            if not hasattr(self._task_from_iter,"_next__"):
+                self._task_from_iter = iter(self._task_from_iter)
             while True:
                 try:
                     self._task_schedule.put(self._task_from_iter.__next__())
                 except StopIteration:
                     logger.debug("来自iter的task载入完毕")
-                    self.task_finish = True
+                    self._task_from_iter = None
+                    break
+                except AttributeError:
+                    break
+        else:
+            logger.debug("来自iter的task任务结束")
+            self.task_finish = True
 
     def needs_backout(self):
         flag = not self.task_finish and len(self._active) < self.MAX_CHILD_NUM
@@ -180,23 +202,27 @@ class CrawlerRunner(object):
     @inlineCallbacks
     def start(self):
         assert not self.running,"task载入已启动"
-        self.running = True
-        self.start_time = time.clock()
-        nextcall = CallLaterOnce(self.next_task_from_schedule)
+        try:
+            self.running = True
+            self.start_time = time.clock()
+            logger.debug("开始时间是%f"%self.start_time)
+            nextcall = CallLaterOnce(self.next_task_from_schedule)
 
-        #  将task导入到队列中
-        self._create_task()
+            #  将task导入到队列中
+            self._create_task()
 
-        self.slot = Slot(nextcall)
-        self.slot.nextcall.schedule()
-        self.slot.heartbeat.start(5)
+            self.slot = Slot(nextcall)
+            self.slot.nextcall.schedule()
+            self.slot.heartbeat.start(5)
 
-        self._closewait = defer.Deferred()
-        self._closewait.addBoth(self.stop_task)
-        yield self._closewait
+            self._closewait = defer.Deferred()
+            self._closewait.addBoth(self.stop_task)
+            yield self._closewait
+        except Exception as e:
+            print(e)
 
     def next_task_from_schedule(self):
-        #logger.debug("调用next_task_from_schedule")
+        logger.debug("调用next_task_from_schedule")
         while self.needs_backout():
             self.crawl(SimpleSpider)
 
@@ -205,6 +231,9 @@ class CrawlerRunner(object):
             return d
         elif self.running:
             self._closewait.callback(None)
+
+
+
 
     def stop_task(self,_):
         logger.debug("任务分配完毕，任务停止")
