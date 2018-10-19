@@ -55,6 +55,7 @@ town_urls = [
 s = Setting()
 cr = CrawlerRunner.task_from(searchRes)
 d = cr.start()
+d.addBoth(lambda _:print(_))
 d.addBoth(lambda _:reactor.stop())
 reactor.run()
 

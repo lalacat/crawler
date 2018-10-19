@@ -230,12 +230,13 @@ class CrawlerRunner(object):
             d = DeferredList(self._active)
             return d
         elif self.running:
-            self._closewait.callback(None)
+            self._closewait.callback("Finish")
 
 
 
 
     def stop_task(self,_):
+        print(_)
         logger.debug("任务分配完毕，任务停止")
         slot = self.slot
         slot.heartbeat.stop()
