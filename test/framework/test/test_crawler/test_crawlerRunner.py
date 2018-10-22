@@ -1,14 +1,13 @@
-import pprint
 import queue
 import time
 from queue import Empty
 
-from twisted.internet import task, reactor, defer
+from twisted.internet import task, defer
 from twisted.internet.defer import DeferredList, inlineCallbacks
 
-from test.framework.test.test_crawler.test_crawler_for_distribute import Crawler
+from test.framework.crawlRunner.crawler_for_distribute import Crawler
 from test.framework.setting import Setting
-from test.framework.test.test_spider.simple_spider_04_xiaoqu_db import SimpleSpider
+from test.framework.test.test_spider.simple_spider.simple_spider_04_xiaoqu_db import SimpleSpider
 import logging
 
 from test.framework.utils.reactor import CallLaterOnce

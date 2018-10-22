@@ -1,5 +1,5 @@
 import pymongo
-from test.framework.test.test_spider.lianjia_spider_part_zone import Part_Zone
+from test.framework.test.test_spider.lianjia_spider.lianjia_spider_part_zone import Part_Zone
 
 
 # mongodb服务的地址和端口号

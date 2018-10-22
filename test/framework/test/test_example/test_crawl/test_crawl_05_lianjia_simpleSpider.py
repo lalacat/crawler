@@ -1,7 +1,7 @@
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
 from twisted.internet import reactor
-from test.framework.test.test_spider.simple_spider_06_mutilyield import SimpleSpider_06
+from test.framework.test.test_spider.simple_spider.simple_spider_06_mutilyield import SimpleSpider_06
 
 import logging
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'

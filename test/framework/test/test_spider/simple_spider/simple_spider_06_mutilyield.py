@@ -8,8 +8,8 @@ import logging
 from twisted.internet import defer
 
 from test.framework.https.request import Request
-from test.framework.test.test_crawler.test_crawlerRunner_from import CrawlerRunner
-from test.framework.test.test_spider.simple_spider_07_mutil_crawlrunner import SimpleSpider_07
+from test.framework.crawlRunner.crawlerRunner__for_distribute_from import CrawlerRunner
+from test.framework.test.test_spider.simple_spider.simple_spider_07_mutil_crawlrunner import SimpleSpider_07
 logger = logging.getLogger(__name__)
 
 class SimpleSpider_06(Spider):
