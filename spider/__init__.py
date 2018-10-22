@@ -47,8 +47,14 @@ class Spider(object_ref):
 
     @classmethod
     def from_schedule(cls,schedule):
-
         return cls(schedule)
+
+    @classmethod
+    def from_task(cls,spider_name,spider_start_urls):
+        spider = cls()
+        spider.name = spider_name
+        spider.start_urls = spider_start_urls
+        return spider
 
     def _set_crawler(self,crawler):
         self.crawler = crawler

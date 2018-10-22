@@ -1,19 +1,17 @@
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, maybeDeferred, DeferredList
 import logging
+import time
 
 from zope.interface.exceptions import DoesNotImplement
 from zope.interface.verify import verifyClass
 
 from test.framework.core.interface import ISpiderLoader
 from test.framework.objectimport.loadobject import load_object
-
 from test.framework.test.test_engine.test_engine_for_distribute import ExecutionEngine
-import time
 from test.framework.setting import overridden_or_new_settings, Setting
 
 logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
 
 
 class Crawler(object):
@@ -88,9 +86,13 @@ class Crawler(object):
         self._spider = self.spidercls.from_schedule(schedule)
 
     def _create_spider(self,*args, **kwargs):
-        logger.info("爬虫：%s 已创建" %self.spidercls.__name__)
+        logger.info("爬虫：%s 已创建" %self.spidercls.name)
         self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
-        #return self.spidercls.from_crawler(self,*args,**kwargs)
+
+    def _create_spider_from_task(self,spider_name,spider_start_urls):
+        print(spider_name,spider_start_urls)
+        self._spider = self.spidercls.from_task(spider_name,spider_start_urls)
+        logger.warning("爬虫：%s 已创建" %spider_name)
 
 
 

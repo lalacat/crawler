@@ -136,10 +136,7 @@ class CrawlerRunner(object):
             logger.debug("当前爬取的网页是:%s"%start_urls)
             name = start_urls.split('/')[-2]
             crawler = self.create_crawler(spidercls)
-            crawler._create_spider()
-            crawler._spider.start_urls = start_urls
-            crawler._spider.name = name
-            logger.debug("爬虫的名称是%s"%name)
+            crawler._create_spider_from_task(name,start_urls)
         except Empty:
             logger.debug("task 分配完毕！！！！")
             self._create_task()
@@ -196,7 +193,6 @@ class CrawlerRunner(object):
 
     def needs_backout(self):
         flag = not self.task_finish and len(self._active) < self.MAX_CHILD_NUM
-        #flag = not self.task_finish
         return flag
 
     @inlineCallbacks
@@ -231,9 +227,6 @@ class CrawlerRunner(object):
             return d
         elif self.running:
             self._closewait.callback("Finish")
-
-
-
 
     def stop_task(self,_):
         print(_)

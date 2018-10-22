@@ -11,7 +11,7 @@ from test.framework.test.test_crawler.test_crawlerRunner_from import CrawlerRunn
 
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
-logging.basicConfig(level=logging.CRITICAL,format=LOG_FORMAT,datefmt=DATE_FORMAT)
+logging.basicConfig(level=logging.DEBUG,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 
 
 
@@ -41,19 +41,19 @@ zone_name = "yangpu"
 town_urls = [
     'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
 
-    'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-    'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
-    'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-    'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-    'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-    'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-    'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
+    #'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+    #'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
+    #'https://sh.lianjia.com/xiaoqu/kongjianglu/',
+    #'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+    #'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+    #'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+    #'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
 
 ]
 
 
 s = Setting()
-cr = CrawlerRunner.task_from(searchRes)
+cr = CrawlerRunner.task_from(town_urls)
 d = cr.start()
 d.addBoth(lambda _:print(_))
 d.addBoth(lambda _:reactor.stop())
