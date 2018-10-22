@@ -9,7 +9,7 @@ from twisted.internet.defer import DeferredList, inlineCallbacks
 
 from test.framework.test.test_crawler.test_crawler_for_distribute import Crawler
 from test.framework.setting import Setting
-from test.framework.test.test_spider.simple_spider_04_xiaoqu_db import SimpleSpider
+from test.framework.test.test_spider.simple_spider_07_mutil_crawlrunner import SimpleSpider
 import logging
 
 from test.framework.utils.reactor import CallLaterOnce
@@ -133,7 +133,7 @@ class CrawlerRunner(object):
     def _load_starturl_from_schedule(self,spidercls):
         try:
             start_urls = self._task_schedule.get(block=False)
-            print("当前爬取的网页是:%s"%start_urls)
+            logger.debug("当前爬取的网页是:%s"%start_urls)
             name = start_urls.split('/')[-2]
             crawler = self.create_crawler(spidercls)
             crawler._create_spider()

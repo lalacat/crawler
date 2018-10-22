@@ -3,6 +3,7 @@ import time
 from collections import deque, Iterable
 
 from twisted.internet import defer
+from twisted.internet.defer import Deferred
 from twisted.python.failure import Failure
 
 from test.framework.https.request import Request
@@ -75,7 +76,7 @@ class Scraper(object):
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
-        logger.info("%s Scrapyer 打开"%spider.name)
+        logger.info("%s的Scrapyer已打开"%spider.name)
         self.slot = Slot()
         yield self.itemproc.open_spider(spider)
 
@@ -210,6 +211,8 @@ class Scraper(object):
             dfd.addBoth(self._itemproc_finished, output, response, spider)
 
             return dfd
+        elif isinstance(output,Deferred):
+            output.addBoth(lambda _:print(_))
         elif output is None:
             pass
         else:

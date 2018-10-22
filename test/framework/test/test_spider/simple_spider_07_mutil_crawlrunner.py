@@ -8,7 +8,6 @@ from spider import  Spider
 import logging
 
 from test.framework.https.request import Request
-from test.framework.test.test_crawler.test_crawlerRunner_from import CrawlerRunner
 
 logger = logging.getLogger(__name__)
 
@@ -17,21 +16,38 @@ class SimpleSpider(Spider):
     将所有小区的地址都写入数据库中
     """
     def __init__(self):
-        self.name = "caolu"
+        self.name = ""
+        self._start_urls = []
         self.handler_db = True
         self.total_number_community = 0
         self.result = defaultdict(list)
         self.result_len = 0
 
-    def start_requests(self):
-        self.start_urls = [
-            #"https://sh.lianjia.com/xiaoqu/biyun/",
-            "https://sh.lianjia.com/xiaoqu/caolu/"
-        ]
-        for url in self.start_urls:
-            yield Request(url, callback=self._parse)
+    @property
+    def name(self):
+        return self._name
 
-    def _parse(self,response):
+    @name.setter
+    def name(self, info):
+        base_name = "SpiderTask: "
+        self._name = base_name+info
+
+    @property
+    def start_urls(self):
+        return self._start_urls
+
+    @start_urls.setter
+    def start_urls(self,urls):
+        if not isinstance(urls,list):
+            self._start_urls = [urls]
+        else:
+            self._start_urls = urls
+
+    def start_requests(self):
+        for url in self.start_urls:
+            yield Request(url, callback=self._parse_getCommunityInfo)
+
+    def _parse_getAllCommunity(self,response):
         seletor = etree.HTML(response.body)
         #  获取下属城镇的小区总页数
         page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
@@ -39,21 +55,15 @@ class SimpleSpider(Spider):
         total_xiaoqu_number = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
         logger.debug("%s的总页数是%d" % (self.name, self.total_page_number))
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
-        urls = list()
+
+        return None
+        '''   
         for i in range(1, self.total_page_number + 1):
-            url = response.requset.url + 'pg' + str(i)
-            urls.append(url)
-        cr = CrawlerRunner.task_from(urls)
-        #d = cr.start()
-        #d.addBoth(lambda _: print(_))
-        yield cr.start()
-
-        #url = response.requset.url + 'pg' + str(2)
-        #yield Request(url, callback=self._parse2,meta={"page_num":2})
-
-
-    """
-    def _parse2(self,response):
+            url = self._start_urls[0] + '/pg' + str(i)
+            yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
+        '''
+    def _parse_getCommunityInfo(self,response):
+        print("crawerRunner%s"%response.url)
         seletor = etree.HTML(response.body)
         page_num = response.requset.meta["page_num"]
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
@@ -61,9 +71,13 @@ class SimpleSpider(Spider):
         self.result_len += len(self.result[str(page_num)])
 
         return None
-        #return self.result[str(page_num)]
 
-    def get_onePage(self,all_communities):
+    def _parse_get_HouseInfo(self,response):
+        pass
+
+
+
+    def _get_onePage(self,all_communities):
         one_page = list()
         for community in all_communities:
             result = dict()
@@ -103,4 +117,4 @@ class SimpleSpider(Spider):
             one_page.append(result)
 
         return one_page
-        """
+

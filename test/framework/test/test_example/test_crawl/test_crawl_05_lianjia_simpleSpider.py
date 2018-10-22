@@ -10,9 +10,15 @@ logging.basicConfig(level=logging.DEBUG,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 
 
 
-
+''' 
 settings = Setting()
 crawler_01 = Crawler(SimpleSpider,settings)
 c1 = crawler_01.crawl()
 c1.addBoth(lambda _:reactor.stop())
 reactor.run()
+'''
+
+c = SimpleSpider.__name__
+c2 = SimpleSpider.name
+print(c)
+print(c2)

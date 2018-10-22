@@ -84,11 +84,11 @@ class Crawler(object):
         return ExecutionEngine(self,lambda _: self.stop())
 
     def _create_spider_schedule(self,schedule):
-        logger.info("爬虫：%s 已创建" % self.spidercls.name)
+        logger.info("爬虫：%s 已创建" % self.spidercls.__name__)
         self._spider = self.spidercls.from_schedule(schedule)
 
     def _create_spider(self,*args, **kwargs):
-        logger.info("爬虫：%s 已创建" %self.spidercls.name)
+        logger.info("爬虫：%s 已创建" %self.spidercls.__name__)
         self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
         #return self.spidercls.from_crawler(self,*args,**kwargs)
 
