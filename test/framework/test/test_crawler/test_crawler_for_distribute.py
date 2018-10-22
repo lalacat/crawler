@@ -90,17 +90,8 @@ class Crawler(object):
         self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
 
     def _create_spider_from_task(self,spider_name,spider_start_urls):
-        print(spider_name,spider_start_urls)
         self._spider = self.spidercls.from_task(spider_name,spider_start_urls)
         logger.warning("爬虫：%s 已创建" %spider_name)
-
-
-
-    def timedelay(self,num):
-        print("休眠 :%d s"%num)
-        for i in range(num,0,-1):
-            print("倒计时：%d" %i)
-            time.sleep(1)
 
     @inlineCallbacks
     def stop(self):

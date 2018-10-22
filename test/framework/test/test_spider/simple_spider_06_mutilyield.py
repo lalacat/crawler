@@ -1,18 +1,18 @@
 import json
-import re
 from collections import defaultdict
 
 from lxml import etree
 
-from spider import  Spider
+from spider import Spider
 import logging
+from twisted.internet import defer
 
 from test.framework.https.request import Request
 from test.framework.test.test_crawler.test_crawlerRunner_from import CrawlerRunner
-
+from test.framework.test.test_spider.simple_spider_07_mutil_crawlrunner import SimpleSpider_07
 logger = logging.getLogger(__name__)
 
-class SimpleSpider(Spider):
+class SimpleSpider_06(Spider):
     """
     将所有小区的地址都写入数据库中
     """
@@ -31,6 +31,7 @@ class SimpleSpider(Spider):
         for url in self.start_urls:
             yield Request(url, callback=self._parse)
 
+    @defer.inlineCallbacks
     def _parse(self,response):
         seletor = etree.HTML(response.body)
         #  获取下属城镇的小区总页数
@@ -39,14 +40,24 @@ class SimpleSpider(Spider):
         total_xiaoqu_number = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
         logger.debug("%s的总页数是%d" % (self.name, self.total_page_number))
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
+        '''
         urls = list()
         for i in range(1, self.total_page_number + 1):
             url = response.requset.url + 'pg' + str(i)
             urls.append(url)
-        cr = CrawlerRunner.task_from(urls)
-        #d = cr.start()
-        #d.addBoth(lambda _: print(_))
-        yield cr.start()
+        '''
+
+        urls = [
+            'https://sh.lianjia.com/xiaoqu/anshan/',  # 157 156
+            'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+        ]
+        try:
+            cr = CrawlerRunner.task_from(urls,SimpleSpider_07)
+            #cr.start()
+            #d.addBoth(lambda _: print(_))
+            yield cr.start()
+        except Exception as e :
+            print(e)
 
         #url = response.requset.url + 'pg' + str(2)
         #yield Request(url, callback=self._parse2,meta={"page_num":2})

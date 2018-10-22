@@ -9,7 +9,6 @@ from twisted.internet.defer import DeferredList, inlineCallbacks
 
 from test.framework.test.test_crawler.test_crawler_for_distribute import Crawler
 from test.framework.setting import Setting
-from test.framework.test.test_spider.simple_spider_07_mutil_crawlrunner import SimpleSpider
 import logging
 
 from test.framework.utils.reactor import CallLaterOnce
@@ -56,7 +55,7 @@ class Slot(object):
 
 class CrawlerRunner(object):
 
-    def __init__(self,settings=None):
+    def __init__(self,spidercls=None,settings=None):
         if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
@@ -68,6 +67,8 @@ class CrawlerRunner(object):
         # 子爬虫的数量
         self.MAX_CHILD_NUM = 9
 
+        # 子爬虫的类
+        self.spidercls = spidercls
         '''
         #  从数据库中加载task
         self._task_from_db = None
@@ -142,26 +143,25 @@ class CrawlerRunner(object):
             self._create_task()
             crawler = None
         except Exception as e :
-            print("check_spider_task",e)
+            logger.error(e)
         return crawler
 
     @classmethod
-    def task_from(cls,db_or_iter,setting=None):
+    def task_from(cls,db_or_iter,spidercls=None,setting=None):
         if isinstance(db_or_iter,Iterable):
             cls._task_from_iter = db_or_iter
             cls._task_from_db = None
         if isinstance(db_or_iter,pymongo.cursor.Cursor):
             cls._task_from_iter = None
             cls._task_from_db = db_or_iter
-        return cls(setting)
+        return cls(spidercls,setting)
 
     def _create_task(self):
         if self._task_from_db:
             logger.debug("载入来自db的task!!!!")
             try:
                 next_task = self._task_from_db.next()
-                task_name = next_task["total_zone_name"][0]
-                print(task_name)
+                #  task_name = next_task["total_zone_name"][0]
                 for name, url in next_task.items():
                     if name != 'total_zone_name':
                         logger.debug("%s加载入任务队列中"%url)
@@ -215,12 +215,12 @@ class CrawlerRunner(object):
             self._closewait.addBoth(self.stop_task)
             yield self._closewait
         except Exception as e:
-            print(e)
+            logger.error(e)
 
     def next_task_from_schedule(self):
         logger.debug("调用next_task_from_schedule")
         while self.needs_backout():
-            self.crawl(SimpleSpider)
+            self.crawl(self.spidercls)
 
         if self._active:
             d = DeferredList(self._active)
@@ -229,12 +229,11 @@ class CrawlerRunner(object):
             self._closewait.callback("Finish")
 
     def stop_task(self,_):
-        print(_)
         logger.debug("任务分配完毕，任务停止")
         slot = self.slot
         slot.heartbeat.stop()
         end_time = time.clock()
-        print("运行时间:%ds" % end_time)
+        logger.debug("运行时间:%ds" % end_time)
         self.task_finish = False
         return None
 

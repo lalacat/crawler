@@ -211,10 +211,10 @@ class Scraper(object):
             dfd.addBoth(self._itemproc_finished, output, response, spider)
 
             return dfd
-        elif isinstance(output,Deferred):
-            output.addBoth(lambda _:print(_))
+
         elif output is None:
             pass
+
         else:
             typename = type(output).__name__
             logger.error('Spider must return Request, BaseItem, dict or None, '

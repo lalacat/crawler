@@ -239,9 +239,6 @@ class ExecutionEngine(object):
             return
 
 
-        def test_err(content):
-            print("test_err",content)
-            return content
 
         def remove_request(_,slot,request,spider):
             slot.remove_request(request, spider.name)

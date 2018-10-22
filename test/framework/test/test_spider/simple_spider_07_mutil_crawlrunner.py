@@ -11,7 +11,7 @@ from test.framework.https.request import Request
 
 logger = logging.getLogger(__name__)
 
-class SimpleSpider(Spider):
+class SimpleSpider_07(Spider):
     """
     将所有小区的地址都写入数据库中
     """
@@ -45,7 +45,7 @@ class SimpleSpider(Spider):
 
     def start_requests(self):
         for url in self.start_urls:
-            yield Request(url, callback=self._parse_getCommunityInfo)
+            yield Request(url, callback=self._parse_getAllCommunity)
 
     def _parse_getAllCommunity(self,response):
         seletor = etree.HTML(response.body)
@@ -55,15 +55,9 @@ class SimpleSpider(Spider):
         total_xiaoqu_number = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
         logger.debug("%s的总页数是%d" % (self.name, self.total_page_number))
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
-
         return None
-        '''   
-        for i in range(1, self.total_page_number + 1):
-            url = self._start_urls[0] + '/pg' + str(i)
-            yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
-        '''
+
     def _parse_getCommunityInfo(self,response):
-        print("crawerRunner%s"%response.url)
         seletor = etree.HTML(response.body)
         page_num = response.requset.meta["page_num"]
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
