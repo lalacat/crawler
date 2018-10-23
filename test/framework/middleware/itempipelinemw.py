@@ -4,7 +4,7 @@ from test.framework.objectimport.bulid_component_list import bulid_component_lis
 
 class ItemPipelineManager(MiddlewareManager):
 
-    component_name = 'item pipeline'
+    component_name = 'Item Pipeline'
 
     @classmethod
     def _get_mwlist_from_settings(cls, settings):

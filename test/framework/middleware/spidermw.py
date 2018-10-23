@@ -12,7 +12,7 @@ def _isiterable(possible_iterator):
 
 
 class SpiderMiddlewareManager(MiddlewareManager):
-    component_name = "spider middlerware"
+    component_name = "Spider Middlerware"
 
     @classmethod
     def _get_mwlist_from_settings(cls,settings):

@@ -9,11 +9,9 @@ from test.framework.core.interface import ISpiderLoader
 from test.framework.objectimport.loadobject import load_object
 
 from test.framework.core.engine import ExecutionEngine
-import time
 from test.framework.setting import overridden_or_new_settings, Setting
 
 logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
 
 class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
@@ -61,25 +59,16 @@ class Crawler(object):
     用户封装调度器以及引擎
     """
     def _create_engine(self):
-        logger.info("爬虫引擎已创建")
+        logger.debug("爬虫:%s 的Engine已创建...",self.spider.name)
         return ExecutionEngine(self,lambda _: self.stop())
 
     def _create_spider_schedule(self,schedule):
-        logger.info("爬虫：%s 已创建" % self.spidercls.name)
-        self._spider = self.spidercls.from_schedule(schedule)
-
+        logger.warning("爬虫:%s 已创建..." % self.spidercls.name)
+        return self.spidercls.from_schedule(schedule)
 
     def _create_spider(self,*args, **kwargs):
-        logger.info("爬虫：%s 已创建" %self.spidercls.name)
+        logger.warning("爬虫:%s 已创建..." %self.spidercls.name)
         return self.spidercls.from_crawler(self,*args,**kwargs)
-
-
-    def timedelay(self,num):
-        print("休眠 :%d s"%num)
-        for i in range(num,0,-1):
-            print("倒计时：%d" %i)
-            time.sleep(1)
-
 
     @inlineCallbacks
     def stop(self):
@@ -95,8 +84,6 @@ defer外层闭环是由CrawlerRunner的_crawl中得到d-->_done
 内部defer是：Cralwer类中crawl方法 yield self.engine.open_spider->yield maybeDeferred(self.engine.start)
 
 '''
-
-
 
 class CrawlerRunner(object):
 
@@ -186,7 +173,6 @@ class CrawlerProcess(CrawlerRunner):
         tp = reactor.getThreadPool()
         # 调节线程池的大小adjustPoolsize(self, minthreads=None, maxthreads=None)
         tp.adjustPoolsize(maxthreads=self.settings.getint('REACTOR_THREADPOOL_MAXSIZE'))
-
 
         # 添加系统事件触发事件当系统关闭的时候，系统事件激活之前，reactor将会被激活进行停止的操作
         reactor.addSystemEventTrigger('before', 'shutdown', self.stop)

@@ -16,8 +16,8 @@ class SimpleSpider_06(Spider):
     """
     将所有小区的地址都写入数据库中
     """
+    name = "caolu"
     def __init__(self):
-        self.name = "caolu"
         self.handler_db = True
         self.total_number_community = 0
         self.result = defaultdict(list)

@@ -4,9 +4,9 @@ from twisted.internet import reactor
 from test.framework.test.test_spider.simple_spider.simple_spider_06_mutilyield import SimpleSpider_06
 
 import logging
-LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
+LOG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s'
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
-logging.basicConfig(level=logging.WARNING,format=LOG_FORMAT,datefmt=DATE_FORMAT)
+logging.basicConfig(level=logging.DEBUG,format=LOG_FORMAT,datefmt=DATE_FORMAT)
 
 
 

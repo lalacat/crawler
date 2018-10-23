@@ -80,6 +80,7 @@ def _get_concurrency_delay(concurrency, spider, settings):
 
 class Downloader(object):
     def __init__(self,crawler):
+        logger.debug("Downloader 已初始化...")
         self.settings = crawler.settings
         #  如果只是加载一个类不带参数，而这个类的初始化带有参数的时候，使用这个类的时候会报错
         #  XXX missing X required positional argument
@@ -104,7 +105,7 @@ class Downloader(object):
 
     #  进行加载中间件，及对requset进行下载
     def fetch(self,request,spider):
-        logger.debug("加载中间件，准备下载")
+        logger.debug("Spider:%s 进入Downloader 预备下载...",spider.name)
         self.spider = spider
 
         def _delactivate(response):
@@ -119,7 +120,7 @@ class Downloader(object):
     def needs_backout(self):
         #  进行的下载任务的个数大于等于并发数，默认并发数为16，表示下载要延缓一下
         if len(self.active) >= self.total_concurrency:
-            logger.warning("%s 的下载数超过最大同时下载数%d"%(self.spider.name,self.total_concurrency))
+            logger.warning("Spider:%s 下载数超过最大同时下载数[%d]..."%(self.spider.name,self.total_concurrency))
             return True
         return False
 
@@ -151,7 +152,7 @@ class Downloader(object):
     #  处理requset
     def _enqueue_request(self, request, spider):
         #  key就是hostname
-        logger.info("%s.%s加入download队列，加入时间为%f"%(spider.name,request,time.clock()))
+        logger.info("Spider:%s <%s> 添加进入下载队列时间:[%6.3f]..."%(spider.name,request,time.clock()))
         key, slot = self._get_slot(request, spider)
         request.meta['download_slot'] = key
 
@@ -201,7 +202,7 @@ class Downloader(object):
                 break
 
     def _download(self,slot,request, spider):
-        logger.debug("进行下载。。。。。")
+        logger.debug("Spider:%s <%s> 正在下载...",spider.name,request)
         #logger.info("request：%s，spider: %s"%(request,spider))
         try:
             dfd = mustbe_deferred(self.handler.download_request,request,spider)
@@ -216,10 +217,9 @@ class Downloader(object):
             return _
 
         return dfd.addBoth(finish_transferring)
-        #return dfd
 
     def close(self):
-        logger.info("关闭 %s 的下载器"%self.spider.name)
+        logger.warning("Spider:%s Downloader已关闭..."%self.spider.name)
         self._slot_gc_loop.stop()
         ''' 
         for slot in iter(self.slots):

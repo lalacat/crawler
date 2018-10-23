@@ -76,7 +76,7 @@ class Scraper(object):
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
-        logger.info("%s的Scrapyer已打开"%spider.name)
+        logger.debug("Spider:%s 的Scraper已打开..."%spider.name)
         self.slot = Slot()
         yield self.itemproc.open_spider(spider)
 

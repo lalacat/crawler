@@ -26,7 +26,7 @@ class Slot(object):
         :param nextcall:
         :param scheduler:
         """
-        logger.info("卡槽初始化。。。。。。")
+        logger.debug("Engine:Slot 已初始化...")
 
         self.closing = False
         self.inprogress = list() #存放正在爬虫的网站,保证每个defer都执行完
@@ -42,7 +42,7 @@ class Slot(object):
         :param request:
         :return:
         """
-        logger.debug("%s 添加到inprogress队列中"%request)
+        logger.debug("Engine:Slot <%s> 添加到inprogress中..."%request)
         self.inprogress.append(request)
 
     def remove_request(self, request,name):
@@ -77,7 +77,7 @@ class ExecutionEngine(object):
     """
 
     def __init__(self,crawler,spider_closed_callback):
-        logger.debug("引擎初始化")
+        logger.debug("Engine 已初始化...")
         self.crawler =crawler
         self.settings = crawler.settings
         # 获取log的格式
@@ -105,8 +105,7 @@ class ExecutionEngine(object):
     @defer.inlineCallbacks
     #  将爬虫中的网页读取出来
     def open_spider(self,spider,start_requests,close_if_idle=True):
-        logger.info("爬虫准备工作开始")
-        logger.info("Spider正在打开",extra = {'spider':spider})
+        logger.info("Spider:%s 的Engine已打开..."%spider.name)
         assert self.has_capacity(),"此引擎已经在处理爬虫了，所以不能处理%s %r" %\
             spider.name
         self.engine_name = spider.name + '\'s engine'
@@ -135,10 +134,10 @@ class ExecutionEngine(object):
 
     @defer.inlineCallbacks
     def start(self):
-        assert not self.running,"%s 的引擎已启动"%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
+        assert not self.running,"%s Engine已启动..."%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
         self.running = True
         engine_start_time = time.clock()
-        logger.warning("%s 的引擎开始时间为: %d" %(self.spider.name,engine_start_time))
+        logger.warning("%s Engine开始,时间:[%6.3f]s..." %(self.spider.name,engine_start_time))
         self._closewait = defer.Deferred()
         self._closewait.addBoth(self._finish_stopping_engine)
         yield self._closewait
@@ -152,8 +151,7 @@ class ExecutionEngine(object):
 
     def _finish_stopping_engine(self,_):
         end_time = time.clock()
-        logger.warning("%s 引擎关闭"%self.engine_name)
-        logger.warning("%s 引擎关闭,运行时间为 %7.6f 秒" % (self.engine_name,end_time ))
+        logger.warning("%s Engine关闭,运行时间:[%7.6f]s...",self.engine_name,end_time)
         return None
 
     def pause(self):
@@ -177,7 +175,7 @@ class ExecutionEngine(object):
         :param spider:
         :return:
         """
-        logger.debug("调用next_request")
+        logger.debug("爬虫:%s 调用[_next_request]...",spider.name)
 
         slot = self.slot
         if not slot:
@@ -342,9 +340,9 @@ class ExecutionEngine(object):
         return not bool(self.slot)
 
     def schedule(self, request, spider):
-        logger.debug("%s 进入队列中" %request)
+        logger.debug("Spider:%s <%s>添加到Scheduler中成功..." ,spider.name,request)
         if not self.slot.scheduler.enqueue_request(request):
-            logger.error("%s 进入队列失败" %request)
+            logger.error("Spider:%s <%s>添加到Scheduler中失败...",spider.name,request)
 
     def _spider_idle(self,spider):
         if self.spider_is_idle():

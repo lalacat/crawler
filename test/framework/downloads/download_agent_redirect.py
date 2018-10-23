@@ -43,7 +43,7 @@ class HTTPDownloadHandler(object):
 
 
     def download_request(self,request,spider):
-        logger.debug("download_request get a request：%s，spider: %s"%(request,spider.name))
+        logger.debug("Spider:%s <%s> 执行download_request..."%(spider.name,request))
         """返回一个http download 的 defer"""
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
@@ -77,6 +77,7 @@ class DownloadAgent(object):
 
     def __init__(self,contextFactory=None, connectTimeout=10, bindAddress=None,
                  pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False):
+        logger.debug("DownloadAgent 已初始化...")
         self._contextFactory = contextFactory
         self._connectTimeout = connectTimeout
         self._bindAddress = bindAddress
@@ -98,10 +99,9 @@ class DownloadAgent(object):
         return self._RedirectAgent(self._getAgent(timeout))
 
     def download_request(self,request):
-        logger.info("%s进入下载download_request"%request)
         timeout = request.meta.get('download_timeout') or self._connectTimeout
         redirect = request.meta.get('download_redirect') or self._redirect
-        #logger.debug("download_timeout is %d"%timeout)
+        logger.info("<%s> 执行download_request,延迟时间:%d...",request,timeout)
         if redirect:
             agent = self._getRedirectAgent(timeout)
         else:
@@ -225,7 +225,7 @@ class DownloadAgent(object):
         return finished
 
     def _cb_body_done(self,result,request,url):
-        logger.debug("生成Response")
+        logger.debug("Response 已创建...")
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         status = int(txresponse.code)
         header = dict()
@@ -267,7 +267,7 @@ class _RequestBodyProducer(object):
 @implementer(IBodyProducer)
 class _ResponseReader(Protocol):
     def __init__(self, finished,transferdata,request,maxsize,warnsize,fail_on_dataloss):
-        logger.debug("生成ResponseReader")
+        logger.debug("ResponseReader 已初始化...")
         self._finished = finished
         # 用来保存传输的数据，当数据完整后可以使用json转换为python对象
         self._transferdata = transferdata
@@ -331,32 +331,32 @@ class _ResponseReader(Protocol):
             # callback(data)调用后，能够向defer数据链中传入一个list数据：
             # [True，传入的参数data]，可以实现将获取的body传输到下一个函数中去
             if body == b'':
-                logger.error("%s 取到的数据为空"%self._request.url)
+                logger.error("<%s> 没有下载到数据..."%self._request.url)
             else:
-                logger.info('%s Finished receiving body!!' % self._request.url)
+                logger.warning('<%s> 内容下载完整...' % self._request.url)
             self._finished.callback((self._transferdata,body,None))
             return
 
         #  当body中没有设置Content-Length或者是Transfer-Encoding的时候，
         # response传输完后，会引起这个错误
         if reason.check(PotentialDataLoss):
-            logger.warning("数据有部分丢失")
+            logger.warning("<%s> 内容下载不完整...",self._request.url)
             self._finished.callback((self._transferdata,body,['partial']))
             return
 
         #  any(x)判断x对象是否为空对象，如果都为空、0、false，则返回false，如果不都为空、0、false，则返回true
         if reason.check(ResponseFailed) and any(r.check(_DataLoss) for r in reason.value.reasons):
-            logger.info("%s 下载失败，详情在debug模式下查看"%self._request.url)
-            logger.debug("%s 数据收到错误: %s"%(self._request.url,reason.getErrorMessage()))
+            logger.error("<%s> 内容下载失败，详情在debug模式下查看..."%self._request.url)
+            logger.debug("<%s> 内容下载失败:%s..."%(self._request.url,reason.getErrorMessage()))
             if not self._fail_on_dataloss:
                 #  当数据超过下载值得时候，_fail_on_dataloss是用来控制，要不要接收已收的部分数据
                 #  默认是将数据抛掉·
-                logger.debug("%s 接收残缺数据"%self._request)
+                logger.debug("<%s> 内容下载不完整..."%self._request)
                 self._finished.callback((self._transferdata,body,['dataloss']))
                 return
 
             elif not self._fail_on_dataloss_warned :
-                logger.debug("%s 数据有丢失，如果要处理这个错误的话，在默认设置中"
+                logger.debug("<%s> 内容有丢失，如果要处理这个错误的话，在默认设置中"
                                "将DOWNLOAD_FAIL_ON_DATALOSS = False"
                                %self._transferdata.request.absoluteURI.decode())
                 self._fail_on_dataloss_warned = True

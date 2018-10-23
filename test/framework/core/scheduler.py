@@ -19,18 +19,18 @@ class Scheduler(object):
         return len(self) > 0
 
     def open(self,spider):
-        logger.info("数据队列已准备")
+        logger.debug("Spider:%s 的Scheduler已打开..."%spider.name)
         self.spider = spider
         #self.mqs = self._newfifo()
         return
 
     def next_request(self):
-        logger.debug("取下一个数据。。。")
+        logger.debug("Spider:%s 的Scheduler中取下一个Request...",self.spider.name)
         # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
         try:
             requset = self.mqs.get(block=False)
         except Exception as e:
-            logger.debug("队列数据已取完")
+            logger.debug("Spider:%s 的Scheduler数据已取完...",self.spider.name)
             requset = None
         return requset
 
