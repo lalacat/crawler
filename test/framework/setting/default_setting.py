@@ -78,13 +78,63 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 %(process)d 进程ID。可能没有
 %(message)s 用户输出的消息
 '''
-#LOG_FORMAT = '%(asctime)s [%(name)s] %(levelname)s: %(message)s'
-LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
-#LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S'
-LOG_DATEFORMAT = "%m/%d/%Y %H:%M:%S %p"
-LOG_STDOUT = False
-LOG_LEVEL = 'DEBUG'
+LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
+                  '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
+LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
+LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s'
+LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
+LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
+LOG_CRAWLED_MSG_REQUEST = 'Crawled:[Spdier:%(spider_name)s,Request:<%(request)s>]%(msg)s'
+
+LOGGING_DIC = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'file_format': {
+            'format': LOG_FILE_FORMAT,
+            'datefmt': LOG_DATE_FORMAT
+
+        },
+        'normal_format': {
+            'format': LOG_NORMAL_FORMAT,
+            'datefmt': LOG_DATE_FORMAT
+        },
+        'debug_format': {
+            'format': LOG_DEBUG_FORMAT,
+            'datefmt': LOG_DATE_FORMAT
+        },
+    },
+    'filters': {},
+    'handlers': {
+        #  打印到终端的日志
+        'console': {
+            # 'level': 'DEBUG',
+            'class': 'logging.StreamHandler',  # 打印到屏幕
+            'formatter': 'normal_format',
+        },
+        # 打印到文件的日志,收集info及以上的日志
+
+        # 'file': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件
+        #     'formatter': 'file_format',
+        #     'filename': "test",  # 日志文件
+        #     'maxBytes': 1024 * 1024 * 5,  # 日志大小 5M
+        #     'backupCount': 5,
+        #     'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
+        # },
+
+    },
+    'loggers': {
+        #  logging.getLogger(__name__)拿到的logger配置
+        '': {
+            'handlers': ['console'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'level': 'DEBUG',
+            'propagate': True,  # 向上（更高level的logger）传递
+        },
+    },
+}
 
 #M
 MONGODB_URL = "149.28.192.96:27017"

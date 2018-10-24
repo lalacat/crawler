@@ -14,6 +14,9 @@ simple_format = '[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]: %(messag
 
 id_simple_format = '[%(levelname)s][%(asctime)s] %(message)s'
 
+DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+
+
 # 定义日志输出格式 结束
 '''
 logfile_dir = os.path.dirname(os.path.abspath(__file__))  # log文件的目录
@@ -33,10 +36,13 @@ LOGGING_DIC = {
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format': standard_format
+            'format': standard_format,
+            'datefmt': DATE_FORMAT
+
         },
         'simple': {
-            'format': simple_format
+            'format': simple_format,
+            'datefmt':DATE_FORMAT
         },
     },
     'filters': {},
@@ -45,7 +51,7 @@ LOGGING_DIC = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',  # 打印到屏幕
-            'formatter': 'simple'
+            'formatter': 'simple',
         },
         #打印到文件的日志,收集info及以上的日志
 
@@ -94,14 +100,21 @@ def logformatter_adapter(logkws):
         pass
     level = logkws.get('level', logging.INFO)
     message = logkws.get('format', logkws.get('msg'))
-    # NOTE: This also handles 'args' being an empty dict, that case doesn't
-    # play well in logger.log calls
+
+    #  如果logkws含有'args'，则取 logkws['args']，负责直接为logkws本身
     args = logkws if not logkws.get('args') else logkws['args']
 
-    return (level, message, args)
+    return (message, args)
+
+
+logkws = {'a':"A",'b':"B",'c':"C"}
+args = logkws if not logkws.get('args') else logkws['a']
+print(args)
+
 
 logging.config.dictConfig(LOGGING_DIC)  # 导入上面定义的logging配置
 logger = logging.getLogger(__name__)  # 生成一个log实例
 logger.info('It works!')  # 记录该文件的运行状态
-logger.log(*logformatter_adapter(crawled("Test")))
+logger.info(CRAWLEDMSG,{'spider_name':'Test','msg':"successful"})
+logger.info(*logformatter_adapter(crawled("test")))
 A = Log_A()
