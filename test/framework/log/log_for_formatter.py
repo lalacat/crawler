@@ -4,7 +4,7 @@ logging配置
 
 import os
 import logging.config
-
+from test.framework.log.test_logger_A import Log_A
 # 定义三种日志输出格式 开始
 
 standard_format = '[%(asctime)s][%(threadName)s:%(thread)d][task_id:%(name)s][%(filename)s:%(lineno)d]' \
@@ -15,7 +15,7 @@ simple_format = '[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d]: %(messag
 id_simple_format = '[%(levelname)s][%(asctime)s] %(message)s'
 
 # 定义日志输出格式 结束
-
+'''
 logfile_dir = os.path.dirname(os.path.abspath(__file__))  # log文件的目录
 
 logfile_name = 'all2.log'  # log文件名
@@ -26,7 +26,7 @@ if not os.path.isdir(logfile_dir):
 
 # log文件的全路径
 logfile_path = os.path.join(logfile_dir, logfile_name)
-
+'''
 # log配置字典
 LOGGING_DIC = {
     'version': 1,
@@ -48,31 +48,60 @@ LOGGING_DIC = {
             'formatter': 'simple'
         },
         #打印到文件的日志,收集info及以上的日志
-        'default': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件
-            'formatter': 'standard',
-            'filename': logfile_path,  # 日志文件
-            'maxBytes': 1024*1024*5,  # 日志大小 5M
-            'backupCount': 5,
-            'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
-        },
+
+        #'default': {
+        #    'level': 'DEBUG',
+            #'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件
+        #    'formatter': 'standard',
+            #'filename': logfile_path,  # 日志文件
+        #    'maxBytes': 1024*1024*5,  # 日志大小 5M
+        #    'backupCount': 5,
+        #    'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
+        #},
+
     },
     'loggers': {
         #logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['default', 'console'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': 'DEBUG',
             'propagate': True,  # 向上（更高level的logger）传递
         },
     },
 }
 
+CRAWLEDMSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
+def crawled(name):
+    return {
+        'level': logging.DEBUG,
+        'msg': CRAWLEDMSG,
+        'args': {
+            'spider_name':name,
+            'msg':'successful'
+        }
+    }
+def logformatter_adapter(logkws):
+    """
+    Helper that takes the dictionary output from the methods in LogFormatter
+    and adapts it into a tuple of positional arguments for logger.log calls,
+    handling backward compatibility as well.
+    """
+    if not {'level', 'msg', 'args'} <= set(logkws):
+        #  warnings.warn('Missing keys in LogFormatter method',ScrapyDeprecationWarning)
+        pass
+    if 'format' in logkws:
+        #warnings.warn('`format` key in LogFormatter methods has been ''deprecated, use `msg` instead',ScrapyDeprecationWarning)
+        pass
+    level = logkws.get('level', logging.INFO)
+    message = logkws.get('format', logkws.get('msg'))
+    # NOTE: This also handles 'args' being an empty dict, that case doesn't
+    # play well in logger.log calls
+    args = logkws if not logkws.get('args') else logkws['args']
 
-def load_my_logging_cfg():
-    logging.config.dictConfig(LOGGING_DIC)  # 导入上面定义的logging配置
-    logger = logging.getLogger(__name__)  # 生成一个log实例
-    logger.info('It works!')  # 记录该文件的运行状态
+    return (level, message, args)
 
-if __name__ == '__main__':
-    load_my_logging_cfg()
+logging.config.dictConfig(LOGGING_DIC)  # 导入上面定义的logging配置
+logger = logging.getLogger(__name__)  # 生成一个log实例
+logger.info('It works!')  # 记录该文件的运行状态
+logger.log(*logformatter_adapter(crawled("Test")))
+A = Log_A()

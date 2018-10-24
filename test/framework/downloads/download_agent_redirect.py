@@ -225,7 +225,7 @@ class DownloadAgent(object):
         return finished
 
     def _cb_body_done(self,result,request,url):
-        logger.debug("Response 已创建...")
+        logger.debug("Request:<%s> Response 已创建..."%request)
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         status = int(txresponse.code)
         header = dict()

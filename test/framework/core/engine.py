@@ -175,7 +175,7 @@ class ExecutionEngine(object):
         :param spider:
         :return:
         """
-        logger.debug("爬虫:%s 调用[_next_request]...",spider.name)
+        logger.debug("Spdier:%s 调用[_next_request]...",spider.name)
 
         slot = self.slot
         if not slot:

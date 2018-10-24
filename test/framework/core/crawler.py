@@ -59,15 +59,15 @@ class Crawler(object):
     用户封装调度器以及引擎
     """
     def _create_engine(self):
-        logger.debug("爬虫:%s 的Engine已创建...",self.spider.name)
+        logger.debug("Spider:%s 的Engine已创建...",self.spider.name)
         return ExecutionEngine(self,lambda _: self.stop())
 
     def _create_spider_schedule(self,schedule):
-        logger.warning("爬虫:%s 已创建..." % self.spidercls.name)
+        logger.warning("Spider:%s 已创建..." % self.spidercls.name)
         return self.spidercls.from_schedule(schedule)
 
     def _create_spider(self,*args, **kwargs):
-        logger.warning("爬虫:%s 已创建..." %self.spidercls.name)
+        logger.warning("Spider:%s 已创建..." %self.spidercls.name)
         return self.spidercls.from_crawler(self,*args,**kwargs)
 
     @inlineCallbacks
