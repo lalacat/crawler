@@ -1,6 +1,7 @@
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, maybeDeferred, DeferredList
 import logging
+from test.framework.log.log import LogFormat
 
 from zope.interface.exceptions import DoesNotImplement
 from zope.interface.verify import verifyClass
@@ -21,16 +22,20 @@ class Crawler(object):
         self.crawling = False
         self.spider = None
         self.engine = None
+
         #导入的是爬虫对应的模块，不是名称
         self.spidercls = spidercls
         self.settings = settings.copy()
+
+        #获取log的格式
+        #lf_cls = load_object(self.settings['LOG_FORMATTER'])
+        self.logformatter = LogFormat.from_crawler(self)
+
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
         logger.info("添加或重写的设置如下：\n %(settings)r",{'settings':d})
 
-        #获取log的格式
-        lf_cls = load_object(self.settings['LOG_FORMATTER'])
-        self.logformatter = lf_cls.from_crawler(self)
+
 
     @inlineCallbacks
     def crawl(self,*args,**kwargs):
@@ -48,7 +53,7 @@ class Crawler(object):
             '''
             yield maybeDeferred(self.engine.start)
         except Exception as e:
-            logger.error(e)
+            logger.error(e,exc_info = True)
             self.crawling = False
             if self.engine is not None:
                 yield self.engine.close()

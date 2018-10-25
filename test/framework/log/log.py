@@ -28,10 +28,12 @@ class LogFormat(object):
         logfile_path = os.path.join(logfile_dir, logfile_name)
         '''
         self.settings =settings
+        self._load_format()
 
     @classmethod
     def from_crawler(cls,crawler):
-        return (crawler.settings)
+        return cls(crawler.settings)
+
     def _crawled(self,spider_name='spider',msg='Nothing',request=None):
         if not request:
             return {
@@ -70,14 +72,14 @@ class LogFormat(object):
 
         return (message, args)
 
-    def load_format(self):
+    def _load_format(self):
         logging.config.dictConfig(self.settings['LOGGING_DIC'])  # 导入上面定义的logging配置
+
 
 s = Setting()
 
 a = LogFormat(s)
-a.load_format()
 
 logger = logging.getLogger(__name__)  # 生成一个log实例
-logger.info('It works!')  # 记录该文件的运行状态
+logger.info('It works!',extra='ssa')  # 记录该文件的运行状态
 logger.info(*a.crawled("test",'works'))

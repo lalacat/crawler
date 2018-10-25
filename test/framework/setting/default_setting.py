@@ -81,7 +81,7 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
 LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
-LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s'
+LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s ：%(extra)s'
 LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
 LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
@@ -111,7 +111,7 @@ LOGGING_DIC = {
         'console': {
             # 'level': 'DEBUG',
             'class': 'logging.StreamHandler',  # 打印到屏幕
-            'formatter': 'normal_format',
+            'formatter': 'debug_format',
         },
         # 打印到文件的日志,收集info及以上的日志
 
