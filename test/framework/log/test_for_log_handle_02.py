@@ -1,5 +1,4 @@
 import logging
-
 logger = logging.getLogger(__name__)
 LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s %(eee)s'
 
@@ -13,12 +12,12 @@ class StreamHandler_DIY(logging.StreamHandler):
     #每进行一次log.info就会调用这个方法，从而可以计算出调用多少次
 
     def emit(self, record):
-        if hasattr(record,'extra_information'):
+        if hasattr(record,'eee'):
             print('true')
         else:
-            record.exc_text = 'test'
+            record.__dict__['eee']  = "AAA"
         # print(record.__dict__)
-        # print(record.args)
+        print()
         msg = self.format(record)
         print(msg)
 
@@ -31,6 +30,6 @@ if __name__ == "__main__":
     logger.setLevel(level=logging.INFO)
 
     logger.info('this is 1 loggging info message',extra={'eee':"ddd"})
-    logger.info('this is 2 loggging info message')
+    # logger.info('this is 2 loggging info message')
     logger.info('this is 3 loggging info message')
 

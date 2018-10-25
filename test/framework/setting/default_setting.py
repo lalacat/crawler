@@ -81,11 +81,18 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
 LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
-LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s ：%(extra)s'
+LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s %(extra_info)s'
 LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
-LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
-LOG_CRAWLED_MSG_REQUEST = 'Crawled:[Spdier:%(spider_name)s,Request:<%(request)s>]%(msg)s'
+#LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
+LOG_CRAWLED_MSG = 'Crawled:[%(module)s:%(name)s] %(msg)s'
+LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s:%(name)s-%(extra_model)s] %(msg)s'
+
+LOG_CRAWLED_TIME = 'Crawled:[%(module)s:%(name)s] %(msg)s:%(time)6.3fs'
+LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s-%(extra_model)s] %(msg)s:%(time)6.3fs'
+
+LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s <%(request)s>]%(msg)s'
+LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s-%(function)s <%(request)s>] %(msg)s'
 
 LOGGING_DIC = {
     'version': 1,
@@ -110,7 +117,8 @@ LOGGING_DIC = {
         #  打印到终端的日志
         'console': {
             # 'level': 'DEBUG',
-            'class': 'logging.StreamHandler',  # 打印到屏幕
+            # 'class': 'logging.StreamHandler',  # 打印到屏幕
+            'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
             'formatter': 'debug_format',
         },
         # 打印到文件的日志,收集info及以上的日志

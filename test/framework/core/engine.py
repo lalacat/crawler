@@ -18,7 +18,7 @@ class Slot(object):
     """
     爬虫过程中，爬虫引擎的插槽
     """
-    def __init__(self,start_requests,close_if_idle,nextcall,scheduler):
+    def __init__(self,logformatter,start_requests,close_if_idle,nextcall,scheduler):
         """
 
         :param start_requests: 获取Spider中的爬虫网站
@@ -26,7 +26,9 @@ class Slot(object):
         :param nextcall:
         :param scheduler:
         """
-        logger.debug("Engine:Slot 已初始化...")
+        self.lmf = logformatter
+        # logger.debug("Engine:Slot 已初始化...")
+        logger.debug(*self.lfm.crawled("Engine",Slot,'已初始化...'))
 
         self.closing = False
         self.inprogress = list() #存放正在爬虫的网站,保证每个defer都执行完
@@ -42,7 +44,8 @@ class Slot(object):
         :param request:
         :return:
         """
-        logger.debug("Engine:Slot <%s> 添加到inprogress中..."%request)
+        # logger.debug("Engine:Slot <%s> 添加到inprogress中..."%request)
+        logger.debug(*self.lfm.crawled("Engine",Slot,'添加到inprogress中...',request))
         self.inprogress.append(request)
 
     def remove_request(self, request,name):
@@ -51,7 +54,8 @@ class Slot(object):
         self._maybe_fire_closing(name)
 
     def close(self,name):
-        logger.info("关闭 %s 的 slot！！"%name)
+        # logger.info("关闭 %s 的 slot！！"%name)
+        logger.info(*self.lfm.crawled("Engine",Slot,'关闭...',name))
         self.closing = defer.Deferred()
         self._maybe_fire_closing(name)
         return self.closing
@@ -64,7 +68,8 @@ class Slot(object):
         """
         if self.closing and not self.inprogress:
             if self.nextcall:
-                logger.warning("%s 的LoopCall已关闭"%name)
+                # logger.warning("%s 的LoopCall已关闭"%name)
+                logger.warning(*self.lfm.crawled("Engine", Slot, 'LoopCall已关闭...', name))
                 self.nextcall.cancel()
                 if self.heartbeat.running:
                     self.heartbeat.stop()
@@ -77,11 +82,13 @@ class ExecutionEngine(object):
     """
 
     def __init__(self,crawler,spider_closed_callback):
-        logger.debug("Engine 已初始化...")
+        self.lfm = crawler.logformatter
+        # logger.debug("Engine 已初始化...")
+        logger.debug(*self.lfm.crawled("Spider",crawler.spider.name,
+                                               '已初始化...','Engine'))
         self.crawler =crawler
         self.settings = crawler.settings
         # 获取log的格式
-        self.logformatter = crawler.logformatter
 
         self.slot = None
         self.spider = None
@@ -105,7 +112,9 @@ class ExecutionEngine(object):
     @defer.inlineCallbacks
     #  将爬虫中的网页读取出来
     def open_spider(self,spider,start_requests,close_if_idle=True):
-        logger.info("Spider:%s 的Engine已打开..."%spider.name)
+        # logger.info("Spider:%s 的Engine已打开..."%spider.name)
+        logger.info(*self.lfm.crawled("Spider", spider.name,
+                                       '已打开...', 'Engine'))
         assert self.has_capacity(),"此引擎已经在处理爬虫了，所以不能处理%s %r" %\
             spider.name
         self.engine_name = spider.name + '\'s engine'
@@ -118,7 +127,7 @@ class ExecutionEngine(object):
             #  调用中间件，就是添加若干个inner_derfer
             start_requests = yield self.scraper.spidermw.process_start_requests(start_requests,spider)
             #  封装Slot对象
-            slot = Slot(start_requests,close_if_idle,nextcall,scheduler)
+            slot = Slot(self.lfm,start_requests,close_if_idle,nextcall,scheduler)
             self.slot = slot
             self.spider = spider
             # 调用scheduler的open
@@ -137,7 +146,10 @@ class ExecutionEngine(object):
         assert not self.running,"%s Engine已启动..."%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
         self.running = True
         engine_start_time = time.clock()
-        logger.warning("%s Engine开始,时间:[%6.3f]s..." %(self.spider.name,engine_start_time))
+        # logger.warning("%s Engine开始,时间:[%6.3f]s..." %(self.spider.name,engine_start_time))
+        logger.warning(*self.lfm.crawled_time("Spider", self.spider.name,
+                                       '开始时间',engine_start_time, 'Engine'))
+
         self._closewait = defer.Deferred()
         self._closewait.addBoth(self._finish_stopping_engine)
         yield self._closewait
@@ -151,7 +163,9 @@ class ExecutionEngine(object):
 
     def _finish_stopping_engine(self,_):
         end_time = time.clock()
-        logger.warning("%s Engine关闭,运行时间:[%7.6f]s...",self.engine_name,end_time)
+        # logger.warning("%s Engine关闭,运行时间:[%7.6f]s...",self.engine_name,end_time)
+        logger.warning(*self.lfm.crawled_time("Spider", self.spider.name,
+                                              '关闭时间', end_time, 'Engine'))
         return None
 
     def pause(self):
@@ -175,8 +189,9 @@ class ExecutionEngine(object):
         :param spider:
         :return:
         """
-        logger.debug("Spdier:%s 调用[_next_request]...",spider.name)
-
+        # logger.debug("Spdier:%s 调用[_next_request]...",spider.name)
+        logger.info(*self.lfm.crawled("Spider", spider.name,
+                                       '调用[_next_request]', 'Engine'))
         slot = self.slot
         if not slot:
             return
@@ -234,18 +249,16 @@ class ExecutionEngine(object):
         if not request:
             return
 
-
-        def test_err(content):
-            print("test_err",content)
-            return content
-
         def remove_request(_,slot,request,spider):
             slot.remove_request(request, spider.name)
-            logger.info("remove_request:%s,inprogress中还剩下%d个任务"%(request,len(slot.inprogress)))
-
+            # logger.info("remove_request:%s,inprogress中还剩下%d个任务"%(request,len(slot.inprogress)))
+            logger.info(*self.lfm.crawled("Spider", spider.name,
+                                          'inprogress中还剩下', 'Engine'),extra={"{:d}个任务".format(len(slot.inprogress))})
             return _
         def next_slot(_,slot):
-            logger.debug("next_slot")
+            # logger.debug("next_slot")
+            logger.debug(*self.lfm.crawled("Spider", spider.name,
+                                          '调用[next_slot]', 'Engine'))
             slot.nextcall.schedule()
             return _
 

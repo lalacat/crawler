@@ -13,6 +13,7 @@ from test.framework.setting import Setting
 class LogFormat(object):
     # log配置字典
 
+
     def __init__(self,settings=None):
         # 定义日志输出格式 结束
         '''
@@ -34,27 +35,80 @@ class LogFormat(object):
     def from_crawler(cls,crawler):
         return cls(crawler.settings)
 
-    def _crawled(self,spider_name='spider',msg='Nothing',request=None):
-        if not request:
+    def crawled(self, module, name, msg, extra=None):
+        return self.logformatter_adapter(self._crawled(module, name, msg, extra))
+
+    def _crawled(self,module,name,msg,extra=None):
+        if not extra:
             return {
                 'msg': self.settings['LOG_CRAWLED_MSG'],
                 'args': {
-                    'spider_name':spider_name,
+                    'module':module,
+                    'name':name,
                     'msg':msg
                 }
             }
+        elif isinstance(extra,dict):
+            if extra.get('request'):
+                if extra.get('function'):
+                    return {
+                        'msg': self.settings['LOG_CRAWLED_REQUEST_EXTRA'],
+                        'args': {
+                            'module': module,
+                            'name': name,
+                            'function': extra['function'],
+                            'request': extra['request'],
+                            'msg': msg,
+                        }
+                    }
+                else:
+                    return {
+                    'msg': self.settings['LOG_CRAWLED_REQUEST'],
+                    'args': {
+                        'module': module,
+                        'name':name,
+                        'request':extra['request'],
+                        'msg':msg,
+                    }
+                }
         else:
             return {
-                'msg': self.settings['LOG_CRAWLED_MSG'],
+                'msg': self.settings['LOG_CRAWLED_EXTRA'],
                 'args': {
-                    'spider_name':spider_name,
-                    'request':request,
+                    'module': module,
+                    'name':name,
+                    'extra_model':extra,
                     'msg':msg
                 }
             }
 
-    def crawled(self,spider_name='spider',msg='Nothing',request=None):
-        return self.logformatter_adapter(self._crawled(spider_name,msg,request))
+    def _crawled_time(self,module,name,msg,time,extra=None):
+        if not extra:
+            return {
+                'msg': self.settings['LOG_CRAWLED_TIME'],
+                'args': {
+                    'module':module,
+                    'name':name,
+                    'msg':msg,
+                    'time':time
+                }
+            }
+        else:
+            return {
+                'msg': self.settings['LOG_CRAWLED_TIME_EXTRA'],
+                'args': {
+                    'module': module,
+                    'name':name,
+                    'extra_model':extra,
+                    'msg':msg,
+                    'time':time
+
+                }
+            }
+
+
+    def crawled_time(self,module,name,msg,time,extra=None):
+        return self.logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
 
     def logformatter_adapter(self,logkws):
         """
@@ -76,10 +130,20 @@ class LogFormat(object):
         logging.config.dictConfig(self.settings['LOGGING_DIC'])  # 导入上面定义的logging配置
 
 
+#
+#
 s = Setting()
-
+#
 a = LogFormat(s)
-
+#
 logger = logging.getLogger(__name__)  # 生成一个log实例
-logger.info('It works!',extra='ssa')  # 记录该文件的运行状态
-logger.info(*a.crawled("test",'works'))
+# # logger.info('It works!',extra={'extra_info':"lala"})  # 记录该文件的运行状态
+# logger.info(*a.crawled("test",'works','lala'),extra={"extra_info":"inprogress中还剩下{:d}个任务".format(3)})
+# # logger.info(*a.crawled("test",'works',"lala","Engine"))
+# logger.info(*a.crawled("test",'works',"lala","Engine"))
+# logger.info(*a.crawled_time("test",'works',"lala",6.7777777))
+# logger.info(*a.crawled_time("test",'works',"lala",6.7777777,"engine"),extra={"extra_info":"inprogress中还剩下{:d}个任务".format(3)})
+#
+logger.info(*a.crawled("test",'works','lala',{'request':'www.baidu.com'}))  # 记录该文件的运行状态
+logger.info(*a.crawled("test",'works','lala',{'function':'haha','request':'www.baidu.com'}))  # 记录该文件的运行状态
+
