@@ -11,6 +11,7 @@ from test.framework.objectimport.loadobject import load_object
 
 from test.framework.core.engine import ExecutionEngine
 from test.framework.setting import overridden_or_new_settings, Setting
+from test.framework.utils.defer import defer_succeed
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +57,9 @@ class Crawler(object):
             logger.error(e,exc_info = True)
             self.crawling = False
             if self.engine is not None:
-                yield self.engine.close()
-            raise
+                yield self.engine.stop()
+                # yield self.stop()
+            yield defer_succeed('crawl stop')
 
 
     """

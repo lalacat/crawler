@@ -28,7 +28,7 @@ class Slot(object):
         """
         self.lmf = logformatter
         # logger.debug("Engine:Slot 已初始化...")
-        logger.debug(*self.lfm.crawled("Engine",Slot,'已初始化...'))
+        logger.debug(*self.lfm.crawled("Engine","Slot",'已初始化...'))
 
         self.closing = False
         self.inprogress = list() #存放正在爬虫的网站,保证每个defer都执行完
@@ -55,7 +55,7 @@ class Slot(object):
 
     def close(self,name):
         # logger.info("关闭 %s 的 slot！！"%name)
-        logger.info(*self.lfm.crawled("Engine",Slot,'关闭...',name))
+        logger.info(*self.lfm.crawled("Engine",'Slot','关闭...',name))
         self.closing = defer.Deferred()
         self._maybe_fire_closing(name)
         return self.closing
@@ -126,10 +126,10 @@ class ExecutionEngine(object):
             scheduler = self.scheduler_cls.from_crawler(self.crawler)
             #  调用中间件，就是添加若干个inner_derfer
             start_requests = yield self.scraper.spidermw.process_start_requests(start_requests,spider)
+            self.spider = spider
             #  封装Slot对象
             slot = Slot(self.lfm,start_requests,close_if_idle,nextcall,scheduler)
             self.slot = slot
-            self.spider = spider
             # 调用scheduler的open
             yield scheduler.open(spider)
             #  调用scraper的open
@@ -139,7 +139,8 @@ class ExecutionEngine(object):
             #  自动调用启动，每5秒一次调用
             slot.heartbeat.start(5)
         except Exception as e:
-            logger.error(e)
+            logger.error(e,exc_info=True)
+            raise
 
     @defer.inlineCallbacks
     def start(self):
@@ -155,11 +156,13 @@ class ExecutionEngine(object):
         yield self._closewait
 
     def stop(self):
-        assert self.running,"引擎没有运行"
+        # assert self.running,"引擎没有运行"
         self.running = False
-        self._closewait.callback(None)
+        if self._closewait:
+            self._closewait.callback(None)
 
         return True
+
 
     def _finish_stopping_engine(self,_):
         end_time = time.clock()
