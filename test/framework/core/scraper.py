@@ -65,6 +65,10 @@ class Slot(object):
 class Scraper(object):
 
     def __init__(self,crawler):
+        self.crawler = crawler
+        self.lfm = crawler.logformatter
+        logger.debug(*self.lfm.crawled("Spider", crawler.spider.name,
+                                       '已初始化...', 'Scraper'))
         self.slot = None
         self.spidermw = SpiderMiddlewareManager.from_crawler(crawler)
         #  itemproc_cls = load_object(crawler.settings['ITEM_PROCESSOR'])
@@ -76,12 +80,17 @@ class Scraper(object):
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
-        logger.debug("Spider:%s 的Scraper已打开..."%spider.name)
+        # logger.debug("Spider:%s 的Scraper已打开..."%spider.name)
+        logger.debug(*self.lfm.crawled("Spider", spider.name,
+                                       '已打开...', 'Scraper'))
         self.slot = Slot()
+        self.spider = spider
         yield self.itemproc.open_spider(spider)
 
     def close_spider(self, spider):
-        logger.info("关闭 %s 的Scraper！！"%spider.name)
+        # logger.info("关闭 %s 的Scraper！！"%spider.name)
+        logger.warning(*self.lfm.crawled("Spider", spider.name,
+                                       '已关闭...', 'Scraper'))
         slot = self.slot
         slot.closing = defer.Deferred()
         #  对所有的itemproc进行并行关闭
@@ -99,7 +108,8 @@ class Scraper(object):
 
     def enqueue_scrape(self, response, request, spider):
         self.start_time = time.clock()
-        logger.info("%s.%s的response加入scrapy队列,加入时间为：%7.6f"%(spider.name,request,self.start_time))
+        # logger.info("%s.%s的response加入scrapy队列,加入时间为：%7.6f"%(spider.name,request,self.start_time))
+        logger.info(*self.lfm.crawled_time("Spider", spider.name, 'response加入队列时间', time.clock(), 'Scraper'))
         slot = self.slot
         dfd = slot.add_response_request(response, request)
 
@@ -110,10 +120,13 @@ class Scraper(object):
             return _
 
         dfd.addBoth(finish_scraping)
-        dfd.addErrback(lambda f: logger.error('Scraper 处理 %(request)s的结果时，出现出现错误！！\n'
-                                              '错误信息为：%(error)s',
-                                   {'request': request,"error":f}
-                                   ))
+        # dfd.addErrback(lambda f: logger.error('Scraper 处理 %(request)s的结果时，出现出现错误！！\n'
+        #                                       '错误信息为：%(error)s',
+        #                            {'request': request,"error":f}
+        #                            ))
+        dfd.addErrback(lambda f: logger.error(*self.lfm.crawled("Spider",self.spider.name,
+                                       '处理错误:',{'function':'Scraper','request':request}),
+                                       extra={'extra_info':f}))
 
         self._scrape_next(spider, slot)
         return dfd
@@ -147,7 +160,8 @@ class Scraper(object):
 
     def call_spider(self, result, request, spider):
         middle_time = time.clock()
-        logger.info("通过%s._parse处理结果,时间为：%f"%(spider.name,middle_time))
+        # logger.info("通过%s._parse处理结果,时间为：%f"%(spider.name,middle_time))
+
         result.request = request
         dfd = defer_result(result)
         #  这一步才是真正意义上的处理爬到的结果，之前的都是在过滤错误

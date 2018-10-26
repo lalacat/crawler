@@ -47,17 +47,18 @@ class SimpleSpider_06(Spider):
             urls.append(url)
         '''
 
-        urls = [
-            'https://sh.lianjia.com/xiaoqu/anshan/',  # 157 156
-            'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-        ]
-        try:
-            cr = CrawlerRunner.task_from(urls,SimpleSpider_07)
-            #cr.start()
-            #d.addBoth(lambda _: print(_))
-            yield cr.start()
-        except Exception as e :
-            print(e)
+        # urls = [
+        #     'https://sh.lianjia.com/xiaoqu/anshan/',  # 157 156
+        #     'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+        # ]
+        # try:
+        #     cr = CrawlerRunner.task_from(urls,SimpleSpider_07)
+        #     #cr.start()
+        #     #d.addBoth(lambda _: print(_))
+        #     yield cr.start()
+        # except Exception as e :
+        #     print(e)
+        return None
 
         #url = response.requset.url + 'pg' + str(2)
         #yield Request(url, callback=self._parse2,meta={"page_num":2})

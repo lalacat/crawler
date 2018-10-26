@@ -80,10 +80,13 @@ def _get_concurrency_delay(concurrency, spider, settings):
 
 class Downloader(object):
     def __init__(self,crawler):
-        logger.debug("Downloader 已初始化...")
         self.settings = crawler.settings
+        self.lfm = crawler.logformatter
         #  如果只是加载一个类不带参数，而这个类的初始化带有参数的时候，使用这个类的时候会报错
         #  XXX missing X required positional argument
+        # logger.debug("Downloader 已初始化...")
+        logger.debug(*self.lfm.crawled("Spider", crawler.spider.name,
+                                       '已初始化...', 'Downloader'))
         self.handler = load_object(self.settings["DOWNLOAD_HANDLER"])(self.settings)
         self.spider = None
         self.slots = {}
@@ -105,7 +108,9 @@ class Downloader(object):
 
     #  进行加载中间件，及对requset进行下载
     def fetch(self,request,spider):
-        logger.debug("Spider:%s 进入Downloader 预备下载...",spider.name)
+        # logger.debug("Spider:%s 进入Downloader 预备下载...",spider.name)
+        logger.debug(*self.lfm.crawled("Spider", spider.name,
+                                       '下载前准备...', 'Downloader'))
         self.spider = spider
 
         def _delactivate(response):
@@ -120,7 +125,9 @@ class Downloader(object):
     def needs_backout(self):
         #  进行的下载任务的个数大于等于并发数，默认并发数为16，表示下载要延缓一下
         if len(self.active) >= self.total_concurrency:
-            logger.warning("Spider:%s 下载数超过最大同时下载数[%d]..."%(self.spider.name,self.total_concurrency))
+            # logger.warning("Spider:%s 下载数超过最大同时下载数[%d]..."%(self.spider.name,self.total_concurrency))
+            logger.warning(*self.logformatter.crawled('Spider', self.spider.name, "已超过最大下载数:",'Downloader'),
+                           extra = {'extra_info':'{:d}'.format(self.total_concurrency)})
             return True
         return False
 
@@ -152,7 +159,8 @@ class Downloader(object):
     #  处理requset
     def _enqueue_request(self, request, spider):
         #  key就是hostname
-        logger.info("Spider:%s <%s> 添加进入下载队列时间:[%6.3f]..."%(spider.name,request,time.clock()))
+        # logger.info("Spider:%s <%s> 添加进入下载队列时间:[%6.3f]..."%(spider.name,request,time.clock()))
+        logger.warning(*self.lfm.crawled_time('Spider', self.spider.name, "添加进入下载队列时间:", time.clock(),request))
         key, slot = self._get_slot(request, spider)
         request.meta['download_slot'] = key
 
@@ -202,8 +210,9 @@ class Downloader(object):
                 break
 
     def _download(self,slot,request, spider):
-        logger.debug("Spider:%s <%s> 正在下载...",spider.name,request)
-        #logger.info("request：%s，spider: %s"%(request,spider))
+        # logger.debug("Spider:%s <%s> 正在下载...",spider.name,request)
+        logger.debug(*self.lfm.crawled("Spider", spider.name,
+                                       '正在下载', request))
         try:
             dfd = mustbe_deferred(self.handler.download_request,request,spider)
         except Exception:
@@ -219,7 +228,9 @@ class Downloader(object):
         return dfd.addBoth(finish_transferring)
 
     def close(self):
-        logger.warning("Spider:%s Downloader已关闭..."%self.spider.name)
+        # logger.warning("Spider:%s Downloader已关闭..."%self.spider.name)
+        logger.warning(*self.lfm.crawled("Spider", self.spider.name,
+                                      '已关闭...', 'Downloader'))
         self._slot_gc_loop.stop()
         ''' 
         for slot in iter(self.slots):
