@@ -91,7 +91,7 @@ LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s'
 LOG_CRAWLED_TIME = 'Crawled:[%(module)s:%(name)s] %(msg)s:%(time)6.3fs'
 LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s:%(time)6.3fs'
 
-LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s <%(request)s>]%(msg)s'
+LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s %(request)s]%(msg)s'
 LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
 
 LOGGING_DIC = {
@@ -119,7 +119,7 @@ LOGGING_DIC = {
             # 'level': 'DEBUG',
             # 'class': 'logging.StreamHandler',  # 打印到屏幕
             'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
-            'formatter': 'normal_format',
+            'formatter': 'debug_format',
         },
         # 打印到文件的日志,收集info及以上的日志
 

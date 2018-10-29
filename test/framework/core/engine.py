@@ -45,7 +45,7 @@ class Slot(object):
         :return:
         """
         # logger.debug("Engine:Slot <%s> 添加到inprogress中..."%request)
-        logger.debug(*self.lfm.crawled("Engine",Slot,'添加到inprogress中...',request))
+        logger.debug(*self.lfm.crawled("Engine",'Slot','添加到inprogress中...',request))
         self.inprogress.append(request)
 
     def remove_request(self, request,name):
