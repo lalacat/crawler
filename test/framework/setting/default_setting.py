@@ -84,6 +84,9 @@ LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
 LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
 LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
+LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s]{line:%(lineno)d}: %(message)s%(extra_info)s'
+
+
 #LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
 LOG_CRAWLED_MSG = 'Crawled:[%(module)s:%(name)s] %(msg)s'
 LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s'
@@ -111,15 +114,32 @@ LOGGING_DIC = {
             'format': LOG_DEBUG_FORMAT,
             'datefmt': LOG_DATE_FORMAT
         },
+        'error_format': {
+            'format': LOG_ERROR_FORMAT,
+            'datefmt': LOG_DATE_FORMAT
+        },
+
     },
-    'filters': {},
+    'filters': {
+        'error_filter':
+            {
+            'format':'test.framework.log.logfilter.ErrorFilter'
+            }
+    },
     'handlers': {
         #  打印到终端的日志
-        'console': {
-            # 'level': 'DEBUG',
+        'console_info': {
+            'level': 'DEBUG',
             # 'class': 'logging.StreamHandler',  # 打印到屏幕
             'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
             'formatter': 'debug_format',
+            'filter':'error_filter'
+        },
+        'console_error': {
+            'level': 'ERROR',
+            # 'class': 'logging.StreamHandler',  # 打印到屏幕
+            'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
+            'formatter': 'error_format',
         },
         # 打印到文件的日志,收集info及以上的日志
 
@@ -137,7 +157,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_info',"console_error"],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': 'DEBUG',
             'propagate': True,  # 向上（更高level的logger）传递
         },
