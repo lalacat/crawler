@@ -106,6 +106,37 @@ class LogFormat(object):
                 }
             }
 
+    def _error(self,module, name, function,msg):
+        error_msg = msg if msg else ''
+        error_fun = function if function else ''
+        if isinstance(error_fun,str):
+            return {
+                'msg': self.settings['LOG_ERROR_MSG'],
+                'args': {
+                    'module': module,
+                    'name': name,
+                    'msg': error_msg,
+                    'function': error_fun
+                }
+            }
+        elif isinstance(error_fun,dict):
+            return {
+                'msg': self.settings['LOG_ERROR_MSG'],
+                'args': {
+                    'module': module,
+                    'name': name,
+                    'msg': error_msg,
+                    'function': error_fun['function'],
+                    'request' : error_fun['request']
+                }
+            }
+        else:
+            raise AttributeError("log输出参数错误")
+
+
+    def error(self, module, name,function, msg):
+        return self.logformatter_adapter(self._error(module, name,function, msg))
+
 
     def crawled_time(self,module,name,msg,time,extra=None):
         return self.logformatter_adapter(self._crawled_time(module, name, msg,time, extra))

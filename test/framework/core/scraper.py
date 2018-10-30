@@ -119,14 +119,18 @@ class Scraper(object):
             self._scrape_next(spider, slot)
             return _
 
+        def log_error(_):
+            # print(_.getErrorMessage())
+            logger.error(*self.lfm.error("Spider", self.spider.name,
+                                           '处理错误:', {'function': 'Scraper', 'request': request}),
+                         extra={'exception':_.getErrorMessage()})
+
         dfd.addBoth(finish_scraping)
         # dfd.addErrback(lambda f: logger.error('Scraper 处理 %(request)s的结果时，出现出现错误！！\n'
         #                                       '错误信息为：%(error)s',
         #                            {'request': request,"error":f}
         #                            ))
-        dfd.addErrback(lambda f: logger.error(*self.lfm.crawled("Spider",self.spider.name,
-                                       '处理错误:',{'function':'Scraper','request':request}),
-                                       extra={'extra_info':f}))
+        dfd.addErrback(log_error)
 
         self._scrape_next(spider, slot)
         return dfd

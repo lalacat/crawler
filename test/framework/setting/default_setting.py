@@ -84,7 +84,7 @@ LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
 LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
 LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
-LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s]{line:%(lineno)d}: %(message)s%(extra_info)s'
+LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s \n %(exception)s %(time)s'
 
 
 #LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
@@ -96,6 +96,10 @@ LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s:
 
 LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s %(request)s]%(msg)s'
 LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
+
+LOG_ERROR_MSG = 'Error:[%(module)s:%(name)s %(function)s]%(msg)s'
+LOG_CRAWLED_REQUEST_EXTRA = 'Error:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
+
 
 LOGGING_DIC = {
     'version': 1,
@@ -123,7 +127,7 @@ LOGGING_DIC = {
     'filters': {
         'error_filter':
             {
-                'name':'test.framework.log.logfilter.ErrorFilter'
+                '()':'test.framework.log.logfilter.ErrorFilter'
                 }
     },
     'handlers': {
@@ -133,14 +137,15 @@ LOGGING_DIC = {
             # 'class': 'logging.StreamHandler',  # 打印到屏幕
             'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
             'formatter': 'debug_format',
-            'filters':[],
+            'filters': ['error_filter'],
+
         },
-        # 'console_error': {
-        #     'level': 'ERROR',
-        #     # 'class': 'logging.StreamHandler',  # 打印到屏幕
-        #     'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
-        #     'formatter': 'error_format',
-        # },
+        'console_error': {
+            'level': 'ERROR',
+            # 'class': 'logging.StreamHandler',  # 打印到屏幕
+            'class': 'test.framework.log.loghandler.ConsoleErrorHandler',  # 自定义打印到屏幕
+            'formatter': 'error_format',
+        },
         # 打印到文件的日志,收集info及以上的日志
 
         # 'file': {
@@ -157,7 +162,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console_info'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': 'DEBUG',
             'propagate': True,  # 向上（更高level的logger）传递
         },
