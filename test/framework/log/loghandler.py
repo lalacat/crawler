@@ -28,6 +28,8 @@ class ConsoleErrorHandler(logging.StreamHandler):
     def emit(self, record):
         if not hasattr(record, 'time'):
             record.__dict__['time'] = ' '
+        if not hasattr(record, 'exception'):
+            record.__dict__['exception'] = ' '
         try:
             msg = self.format(record)
             stream = self.stream

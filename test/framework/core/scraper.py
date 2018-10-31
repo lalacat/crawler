@@ -122,7 +122,12 @@ class Scraper(object):
         def log_error(_):
             # print(_.getErrorMessage())
             logger.error(*self.lfm.error("Spider", self.spider.name,
-                                           '处理错误:', {'function': 'Scraper', 'request': request}),
+                                            {
+                                                'function': 'Scraper',
+                                                'request': request
+                                            },
+                                            '处理出现错误:'),
+                         exc_info = True,
                          extra={'exception':_.getErrorMessage()})
 
         dfd.addBoth(finish_scraping)
@@ -179,7 +184,15 @@ class Scraper(object):
         #              "为：%(time)f",
         #              {"request":request,"failure":exc,"time":(end_time-self.start_time)})
 
-        logger.error(*self.lfm.crawled_time)
+        logger.error(*self.lfm.error('Spider',self.spider.name,
+                                     {
+                                         'function':'Scraper',
+                                         'request':request
+                                     },'处理结果的时候出现错误')
+                     ,extra={
+                        'exception':exc,
+                        'time':'处理结果时间为：{:6.3f}s'.format(end_time-self.start_time)
+                    })
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")
 
@@ -196,14 +209,20 @@ class Scraper(object):
         :return:
         """
         if not result:
-            logger.warning("%s._parse或者request.callback返回的结果为None,不经过自定义process_item 处理！！"%spider.name)
+            # logger.warning("%s._parse或者request.callback返回的结果为None,不经过自定义process_item 处理！！"%spider.name)
+            logger.warning(*self.lfm.crawled('Spider',spider.name,
+                                             '_parse(callback)',
+                                             '返回的结果为<None>,不经过自定义{process_item}处理'))
             return defer_succeed(None)
         if isinstance(result,Request):
             #  针对是return 当spider处理后的结果是yield，那么result的类型是generator
             self.crawler.engine.crawl(request=result, spider=spider)
             return defer_succeed(result)
         if not isinstance(result,Iterable):
-            logger.warning("%s._parse或者requst.callback处理的结果不是<Iterable>，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
+            # logger.warning("%s._parse或者requst.callback处理的结果不是<Iterable>，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
+            logger.warning(*self.lfm.crawled('Spider', spider.name,
+                                             '_parse(callback)',
+                                             '处理的结果是{1}类型,不是<Iterable>,不能经过自定义<pipe>处理'.format(type(result))))
             return defer_succeed(result)
         #  将自定义处理好的结果，通过这个方法并行执行自定义的rule（pipe process_item）
         #  这里的结果默认是能够迭代的List或者是dict类型的结果，每个结果都是并列的，能够同时符合process_item处理规则
@@ -220,12 +239,22 @@ class Scraper(object):
         """Process each Request/Item (given in the output parameter) returned
         from the given spider
         """
-        logger.debug("在并行处理中。。。。。。。。")
+        # logger.debug("在并行处理中。。。。。。。。")
+        logger.debug(*self.lfm.crawled("Spider", "lala",
+                               '出现出现错误',
+                               {
+                                   'function': 'Scraper',
+                                   'request': "baba"
+                               }),
+                    extra={'extra_info': 'error'})
         if isinstance(output, Request):
-            logger.info("处理的output%(request)s的类型是<Request>，将添加到下载序列中！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
+            # logger.info("处理的output%(request)s的类型是<Request>，将添加到下载序列中！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
+            logger.info(*self.lfm.crawled_time('Spider',spider.name,'Output的类型是<Request>,将添加到下载队列中,加入时间:',time.clock(),output))
             self.crawler.engine.crawl(request=output, spider=spider)
         elif isinstance(output, (BaseItem, dict,int)):
-            logger.info("处理的output%(request)s的类型是<BaseItem, dict,int>，将由自定义的process_item方法进行处理！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
+            # logger.info("处理的output%(request)s的类型是<BaseItem, dict,int>，将由自定义的process_item方法进行处理！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
+            logger.info(*self.lfm.crawled_time('Spider',spider.name,'Output的类型是<BaseItem, dict,int>,将通过自定义的process_item方法进行处理,处理时间:',time.clock(),output))
+
             self.slot.itemproc_size += 1
             dfd = self.itemproc.process_item(item=output,spider=spider)
             dfd.addBoth(self._itemproc_finished, output, response, spider)
@@ -237,10 +266,16 @@ class Scraper(object):
 
         else:
             typename = type(output).__name__
-            logger.error('Spider must return Request, BaseItem, dict or None, '
-                         'got %(typename)r in %(request)s',
-                         {'request': request, 'typename': typename},
-                         extra={'spider': spider})
+            # logger.error('Spider must return Request, BaseItem, dict or None, '
+            #              'got %(typename)r in %(request)s',
+            #              {'request': request, 'typename': typename},
+            #              extra={'spider': spider})
+            logger.error(*self.lfm.error('Spider',spider.name,
+                                       {
+                                           'function':'Scraper',
+                                           'request':request
+                                       },'处理的结果的类型必须是<Request>,<BaseItem>,<dict>,<None>。返回的类型是:')
+                         ,extra={'exception':typename})
 
     def _itemproc_finished(self, output, item, response, spider):
         """ItemProcessor finished for the given ``item`` and returned ``output``
@@ -251,17 +286,41 @@ class Scraper(object):
         self.slot.itemproc_size -= 1
         if isinstance(output, Failure):
             ex = output.value
-            logging.error(ex)
-            logger.error('process item(%(item)s)过程中出现错误', {'item': item})
+            # logging.error(ex)
+            # logger.error('process item(%(item)s)过程中出现错误', {'item': item})
+            logger.error(*self.lfm.error('Spider',spider.name,
+                                       {
+                                           'function':'Scraper',
+                                           'request':item
+                                       },'处理过程中出现错误:')
+                         ,extra={'exception':ex})
         else:
-            logger.debug("process item(%s)处理完毕"%item,extra={'spider': spider})
+            # logger.debug("process item(%s)处理完毕"%item,extra={'spider': spider})
+            logger.debug(*self.lfm.crawled('Spider',spider.name,'处理完毕',
+                                           {
+                                               'function': 'Scraper',
+                                               'request': item
+                                           }
+                                           ))
         return None
 
     def _log_download_errors(self,context,request_result, request, spider):
-        logger.error(context)
+        # logger.error(context)
+        logger.error(*self.lfm.error("Spider", spider.name,
+                              {
+                                  'function': 'Scraper',
+                                  'request': request
+                              },
+                              '出现错误', ),
+                     extra=
+                     {
+                         'exception': context,
+                         'time': "\n时间是{:d}".format(34)
+                     })
         return context
 
     def _process_item_time(self,_):
         end_time = time.clock()
-        logger.info("经过process_item处理后，此时时间为%f,完成Scraper模块使用了%7.6f"%(end_time,end_time-self.start_time))
+        # logger.info("经过process_item处理后，此时时间为%f,完成Scraper模块使用了%7.6f"%(end_time,end_time-self.start_time))
+
         return None

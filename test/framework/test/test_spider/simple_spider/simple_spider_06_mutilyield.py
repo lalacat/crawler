@@ -31,7 +31,7 @@ class SimpleSpider_06(Spider):
         for url in self.start_urls:
             yield Request(url, callback=self._parse)
 
-    @defer.inlineCallbacks
+    # @defer.inlineCallbacks
     def _parse(self,response):
         seletor = etree.HTML(response.body)
         #  获取下属城镇的小区总页数
@@ -58,7 +58,7 @@ class SimpleSpider_06(Spider):
         #     yield cr.start()
         # except Exception as e :
         #     print(e)
-        return None
+        return "lala"
 
         #url = response.requset.url + 'pg' + str(2)
         #yield Request(url, callback=self._parse2,meta={"page_num":2})

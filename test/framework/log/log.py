@@ -38,6 +38,13 @@ class LogFormat(object):
     def crawled(self, module, name, msg, extra=None):
         return self.logformatter_adapter(self._crawled(module, name, msg, extra))
 
+    def error(self, module, name,function, msg):
+        return self.logformatter_adapter(self._error(module, name,function, msg))
+
+
+    def crawled_time(self,module,name,msg,time,extra=None):
+        return self.logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
+
     def _crawled(self,module,name,msg,extra=None):
         if not extra:
             return {
@@ -49,26 +56,15 @@ class LogFormat(object):
                 }
             }
         elif isinstance(extra,dict):
-            if extra.get('request'):
-                if extra.get('function'):
-                    return {
-                        'msg': self.settings['LOG_CRAWLED_REQUEST_EXTRA'],
-                        'args': {
-                            'module': module,
-                            'name': name,
-                            'function': extra['function'],
-                            'request': extra['request'],
-                            'msg': msg,
-                        }
-                    }
-                else:
-                    return {
-                    'msg': self.settings['LOG_CRAWLED_REQUEST'],
+            if isinstance(extra,dict):
+                return {
+                    'msg': self.settings['LOG_CRAWLED_REQUEST_EXTRA'],
                     'args': {
                         'module': module,
-                        'name':name,
-                        'request':extra['request'],
-                        'msg':msg,
+                        'name': name,
+                        'function': extra['function'],
+                        'request': extra['request'],
+                        'msg': msg,
                     }
                 }
         else:
@@ -91,6 +87,19 @@ class LogFormat(object):
                     'name':name,
                     'msg':msg,
                     'time':time
+                }
+            }
+        elif isinstance(extra,dict):
+            return {
+                'msg': self.settings['LOG_ERROR_REQUEST_EXTRA'],
+                'args': {
+                    'module': module,
+                    'name': name,
+                    'msg': msg,
+                    'function': extra['function'],
+                    'request': extra['request'],
+                    'time':time
+
                 }
             }
         else:
@@ -121,7 +130,7 @@ class LogFormat(object):
             }
         elif isinstance(error_fun,dict):
             return {
-                'msg': self.settings['LOG_ERROR_MSG'],
+                'msg': self.settings['LOG_ERROR_REQUEST_EXTRA'],
                 'args': {
                     'module': module,
                     'name': name,
@@ -134,12 +143,6 @@ class LogFormat(object):
             raise AttributeError("log输出参数错误")
 
 
-    def error(self, module, name,function, msg):
-        return self.logformatter_adapter(self._error(module, name,function, msg))
-
-
-    def crawled_time(self,module,name,msg,time,extra=None):
-        return self.logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
 
     def logformatter_adapter(self,logkws):
         """

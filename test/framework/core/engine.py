@@ -285,7 +285,7 @@ class ExecutionEngine(object):
         #  得到的是下载后的结果，此方法是将结果输出到其他需要处理结果的地方
         # logger.debug("处理%s的下载结果"%request)
         logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                       '处理下载结果', {'request':request}))
+                                       '处理下载结果', request))
         assert isinstance(response, (Request, Response, Failure)), response
         if isinstance(response, Request):
             #  到这一步得到的response还是Request类，表明下载不成功，
@@ -327,14 +327,22 @@ class ExecutionEngine(object):
             if isinstance(response,Response):
                 # logger.debug("%s 下载成功" % request.url)
                 logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                               '下载成功', {'request': request}))
+
+                                               '下载成功', request))
                 response.requset = request
             return response
 
         def _on_complete(_,request):
             #  当一个requset处理完后，就进行下一个处理
             if isinstance(_,(Failure,Exception)):
-                logger.error("%s 下载失败，失败的原因是%s" % (request.url,_))
+                # logger.error(*self."%s 下载失败，失败的原因是%s" % (request.url,_))
+                logger.error(*self.lfm.error("Spider",spider.name,
+                      {
+                          'function':'Engine',
+                          'request':request.url
+                      },
+                          '下载失败，失败的原因'),
+             extra={'exception':_})
             slot.nextcall.schedule()
             return _
 
@@ -361,11 +369,11 @@ class ExecutionEngine(object):
     def schedule(self, request, spider):
         # logger.debug("Spider:%s <%s>添加到Scheduler中成功..." ,spider.name,request)
         logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                       '添加到Scheduler中成功...', {'request':request}))
+                                       '添加到Scheduler中成功...',request))
         if not self.slot.scheduler.enqueue_request(request):
             # logger.error("Spider:%s <%s>添加到Scheduler中失败...",spider.name,request)
             logger.error(*self.lfm.crawled("Spider", spider.name,
-                                           '添加到Scheduler中失败...', {'request': request}))
+                                           '添加到Scheduler中失败...',request))
     def _spider_idle(self,spider):
         if self.spider_is_idle():
             self.close_spider(spider,reason="finished")

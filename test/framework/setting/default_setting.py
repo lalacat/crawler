@@ -84,21 +84,23 @@ LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
 LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
 LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
-LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s \n %(exception)s %(time)s'
+LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
 
 
 #LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
 LOG_CRAWLED_MSG = 'Crawled:[%(module)s:%(name)s] %(msg)s'
 LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s'
-
-LOG_CRAWLED_TIME = 'Crawled:[%(module)s:%(name)s] %(msg)s:%(time)6.3fs'
-LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s:%(time)6.3fs'
-
-LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s %(request)s]%(msg)s'
 LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
 
+
+LOG_CRAWLED_TIME = 'Crawled:[%(module)s:%(name)s] %(msg)s %(time)6.3fs'
+LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s %(time)6.3fs'
+LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s %(time)6.3fs'
+
+# LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s %(request)s]%(msg)s'
+
 LOG_ERROR_MSG = 'Error:[%(module)s:%(name)s %(function)s]%(msg)s'
-LOG_CRAWLED_REQUEST_EXTRA = 'Error:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
+LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
 
 
 LOGGING_DIC = {
