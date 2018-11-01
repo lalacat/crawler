@@ -265,25 +265,33 @@ class ExecutionEngine(object):
             slot.nextcall.schedule()
             return _
 
-        def log_error(_,error_msg):
-            logger.error(*self.error('Spider',self.spider.name
-                                     ))
+        def log_error(_,msg):
+            error_msg = _.value if isinstance(_,Failure) else _
+            logger.error(*self.error('Spider',spider.name,
+                                     {
+                                         'function':'Engine',
+                                         'request':request
+                                     },
+                                     msg),
+                         extra={
+                             'exception':error_msg
+                         })
 
         d = self._download(request,spider)
 
         d.addBoth(self._handle_downloader_output,request,spider)
-        d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
+        # d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
+        d.addErrback(log_error,'在处理downloader output时出现错误:')
 
         #  移除掉处理过的request
         d.addBoth(remove_request,slot,request,spider)
-        # d.addBoth(lambda _: slot.remove_request(request,spider.name))
-        d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
+        # d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
+        d.addErrback(log_error,"在移除已处理的request时出现错误:")
 
         #  进行下一次的处理request
         d.addBoth(next_slot,slot)
-        #d.addBoth(lambda _: slot.nextcall.schedule())
-        d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
-
+        # d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
+        d.addErrback(log_error,"在添加新request进入scheduler时出现错误")
         return d
 
     def _handle_downloader_output(self,response,request,spider):
@@ -347,7 +355,7 @@ class ExecutionEngine(object):
                           'request':request.url
                       },
                           '下载失败，失败的原因'),
-             extra={'exception':_})
+                         extra={'exception':_})
             slot.nextcall.schedule()
             return _
 
@@ -399,26 +407,28 @@ class ExecutionEngine(object):
 
         dfd = slot.close(spider.name)
 
-        def log_failure(msg):
-            def errback():
-                logger.error(
-                    msg,
-                    extra={'spider': spider}
-                )
-            return errback
+        def log_failure(_,msg):
+            error_msg = _.value if isinstance(_,Failure) else _
+            logger.error(*self.error('Spider', spider.name,
+                                     'Engine',msg),
+                         extra={
+                             'exception': error_msg
+                         })
+            return _
+
 
 
         #  关闭下载器
         dfd.addBoth(lambda _: self.downloader.close())
-        dfd.addErrback(log_failure('Downloader close failure'))
+        dfd.addErrback(log_failure,'Downloader 关闭失败')
 
         # 关闭scraper
         dfd.addBoth(lambda _: self.scraper.close_spider(spider))
-        dfd.addErrback(log_failure('scraper close failure'))
+        dfd.addErrback(log_failure,'Scraper 关闭失败')
 
         #  关闭scheduler
         dfd.addBoth(lambda _: slot.scheduler.close(reason))
-        dfd.addErrback(log_failure('Scheduler close failure'))
+        dfd.addErrback(log_failure,'Scheduler 关闭失败')
 
         # dfd.addBoth(lambda _: logger.info("爬虫%(name)s已关闭：(%(reason)s)",
         #             {
@@ -427,15 +437,20 @@ class ExecutionEngine(object):
         #             },
         #             extra={'spider': spider}))
         dfd.addBoth(lambda _:logger.warning(*self.lfm.crawled_time("Spider", spider.name,
-                                       '关闭时间',time.clock(),'{'+reason+'}')))
+                                       '关闭时间:',
+                                        time.clock(),
+                                        {
+                                         'function': 'Spider',
+                                         'request' : '{'+reason+'}'
+                                        })))
 
         #  引擎中的slot清空
         dfd.addBoth(lambda _: setattr(self, 'slot', None))
-        dfd.addErrback(log_failure('Error while unassigning slot'))
+        dfd.addErrback(log_failure,'释放Slot的时候出现错误:')
 
         # 引擎中的spider清空
         dfd.addBoth(lambda _: setattr(self, 'spider', None))
-        dfd.addErrback(log_failure('Error while unassigning spider'))
+        dfd.addErrback(log_failure,'释放Spider的时候出现错误:')
 
         dfd.addBoth(lambda _: self._spider_closed_callback(spider))
 

@@ -41,4 +41,6 @@ logger.error(*a.error("Spider","lala",
                  'exception':'info',
                 'time':"\n时间是{:d}".format(34)
              })
-
+error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
+error_args = {'url': 'wwww', "size": 20, 'maxsize': 30}
+logger.error(error_msg, error_args)

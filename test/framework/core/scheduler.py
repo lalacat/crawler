@@ -49,7 +49,9 @@ class Scheduler(object):
         return True
 
     def close(self,reason):
-        logger.debug(reason)
+        # logger.debug(reason)
+        logger.debug(*self.lfm.crawled("Spider", self.spider.name,
+                                       'Scheduler已关闭...'))
         return
 
     def _mqpush(self,requset):

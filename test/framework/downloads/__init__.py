@@ -87,7 +87,7 @@ class Downloader(object):
         # logger.debug("Downloader 已初始化...")
         logger.debug(*self.lfm.crawled("Spider", crawler.spider.name,
                                        '已初始化...', 'Downloader'))
-        self.handler = load_object(self.settings["DOWNLOAD_HANDLER"])(self.settings)
+        self.handler = load_object(self.settings["DOWNLOAD_HANDLER"])(self.lfm,self.settings)
         self.spider = None
         self.slots = {}
         # active是一个活动集合，用于记录当前正在下载的request集合。

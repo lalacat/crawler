@@ -82,9 +82,12 @@ LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
 LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
 LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
+LOG_DEBUG_FORMAT_01 = '[%(levelname)s] %(message)s%(extra_info)s'
+
 LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
 LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
+# LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
 
 
 #LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
@@ -165,6 +168,7 @@ LOGGING_DIC = {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
             'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            # 'level': 'WARNING',
             'level': 'DEBUG',
             'propagate': True,  # 向上（更高level的logger）传递
         },

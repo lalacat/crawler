@@ -24,8 +24,15 @@ class DownloaderClientContextFactory(ClientContextFactory):
 
 class HTTPDownloadHandler(object):
 
-    def __init__(self,settings):
+    def __init__(self,logformatter,settings):
         # 管理连接的，作用request完成后，connections不会自动关闭，而是保持在缓存中，再次被利用
+        self.lfm = logformatter
+        #logger.debug(*self.lfm.crawled)
+        logger.debug(*self.lfm.crawled(
+            'Downloader',
+            'HTTPDownloadHandler',
+            '已初始化...'
+        ))
         self._pool = HTTPConnectionPool(reactor,persistent=True)
         self._pool.maxPersistentPerHost = settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
         self._pool._factory.noisy = False # 用于设置proxy代理
@@ -39,16 +46,24 @@ class HTTPDownloadHandler(object):
 
     @classmethod
     def from_crawler(cls,crawler):
-        return cls(crawler.settings)
+
+        return cls(crawler.logformatter,crawler.settings)
 
 
     def download_request(self,request,spider):
-        logger.debug("Spider:%s <%s> 执行download_request..."%(spider.name,request))
+        # logger.debug("Spider:%s <%s> 执行download_request..."%(spider.name,request))
+        logger.debug(*self.lfm.crawled(
+            'Spider',
+            spider.name,
+            '执行download_request...',
+            request
+        ))
         """返回一个http download 的 defer"""
+        self.spider = spider
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
                               warnsize=getattr(spider,'download_warnsize',self._default_warnsize),
-                              fail_on_dataloss=self._fail_on_dataloss
+                              fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm
                               )
         return agent.download_request(request)
 
@@ -58,6 +73,12 @@ class HTTPDownloadHandler(object):
         #  直接关闭closeCachedConnections会引起网络或者服务器端的问题，所以，通过人工设置延迟
         #  来激发defer,closeCachedConnections不能直接处理额外的errbacks，所以需要个人设定一个
         #  callback在_disconnect_timeout之后
+        logger.warning(
+            *self.lfm.crawled(
+                'Downloader',
+                'HTTPDownloadHandler',
+                '已关闭...'
+        ))
         delayed_call = reactor.callLater(self._disconnect_timeout,d.callback,[])
 
         #  判断cancel_delayed_call是否在等待，True就是出于激活状态,还没被执行
@@ -76,8 +97,13 @@ class DownloadAgent(object):
     _RedirectAgent = RedirectAgent
 
     def __init__(self,contextFactory=None, connectTimeout=10, bindAddress=None,
-                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False):
-        logger.debug("DownloadAgent 已初始化...")
+                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False,logformatter=None):
+        self.lfm = logformatter
+        logger.debug(*self.lfm.crawled(
+            'HTTPDownloadHandler',
+            'DownloadAgent',
+            '已初始化...'
+        ))
         self._contextFactory = contextFactory
         self._connectTimeout = connectTimeout
         self._bindAddress = bindAddress
@@ -101,7 +127,14 @@ class DownloadAgent(object):
     def download_request(self,request):
         timeout = request.meta.get('download_timeout') or self._connectTimeout
         redirect = request.meta.get('download_redirect') or self._redirect
-        logger.info("<%s> 执行download_request,延迟时间:%d...",request,timeout)
+        self.request = request
+        # logger.info("<%s> 执行download_request,延迟时间:%d...",request,timeout)
+        logger.debug(*self.lfm.crawled_time(
+                    'Request',
+                    request,
+                    '执行download_request,延迟时间:',
+                     timeout)
+                    )
         if redirect:
             agent = self._getRedirectAgent(timeout)
         else:
@@ -178,15 +211,32 @@ class DownloadAgent(object):
         return result
 
     def _cb_timeout(self,result,url,timeout):
-        logger.debug("进入下载超时处理方法")
+        # logger.debug("进入下载超时处理方法")
+        logger.debug(*self.lfm.crawled(
+                    'Request',
+                    self.request,
+                    '判断是否下载超时...')
+                     )
         # 如果_timeout_cl还没触发，就取消掉，不用再延迟了
         if self._timeout_cl.active():
-            logger.debug("下载没有超时")
+            # logger.debug("下载没有超时")
+            logger.debug(*self.lfm.crawled(
+                    'Request',
+                    self.request,
+                    '下载没有超时...'))
             self._timeout_cl.cancel()
             return result
         #  当规定的时间内_RequestBodyProducer没有收到connectionLost()的时候，强制退出
         if self._transferdata:
-            logger.error("接收body的程序要停止了")
+            # logger.error("接收body的程序要停止了"
+            logger.error(*self.lfm.error("Request",self.request,
+                     'DownloadAgent',
+                          '在规定的时间内，body没有接收完毕,',),
+             extra=
+             {
+                 'exception':'',
+                'time':"\n时间是{:6.3f}".format(time.clock())
+             })
             self._transferdata._transport.stopProducing()
 
         raise TimeoutError("下载 %s 花费的时间超过 %s 秒." % (url, timeout))
@@ -225,12 +275,19 @@ class DownloadAgent(object):
         return finished
 
     def _cb_body_done(self,result,request,url):
-        logger.debug("Request:<%s> Response 已创建..."%request)
+        # logger.debug("Request:<%s> Response 已创建..."%request)
+        logger.debug(*self.lfm.crawled("Request",
+                                       request,
+                          ' Response 已创建...'))
+
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         status = int(txresponse.code)
         header = dict()
         if status == 301 or status == 302:
-            logger.critical("%s 网页重定向，重新下载"%url)
+            # logger.critical("%s 网页重定向，重新下载"%url)
+            logger.warning(*self.lfm.crawled("Request",
+                                       request,
+                          '网页重定向，重新下载...'))
             request.meta["download_redirect"] = True
             response = request
         else:
@@ -238,7 +295,9 @@ class DownloadAgent(object):
                 for k,v in txresponse.headers.getAllRawHeaders():
                     header[k] = v
             except KeyError :
-                logger.error("header is None")
+                # logger.error("header is None")
+                logger.error(*self.lfm.error("request", request,
+                                             'header为None'))
             response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
 
         return response

@@ -118,7 +118,7 @@ class LogFormat(object):
     def _error(self,module, name, function,msg):
         error_msg = msg if msg else ''
         error_fun = function if function else ''
-        if isinstance(error_fun,str):
+        if isinstance(error_fun,str) :
             return {
                 'msg': self.settings['LOG_ERROR_MSG'],
                 'args': {
