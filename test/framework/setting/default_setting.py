@@ -94,8 +94,8 @@ LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request
 
 
 LOG_CRAWLED_TIME = 'Crawled:[%(module)s:%(name)s] %(msg)s %(time)6.3fs'
-LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s %(time)6.3fs'
-LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s %(time)6.3fs'
+LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s%(time)6.3fs'
+LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s%(time)6.3fs'
 
 # LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s %(request)s]%(msg)s'
 

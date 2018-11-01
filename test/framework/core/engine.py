@@ -253,10 +253,11 @@ class ExecutionEngine(object):
 
         def remove_request(_,slot,request,spider):
             slot.remove_request(request, spider.name)
-            logger.info("remove_request:%s,inprogress中还剩下%d个任务"%(request,len(slot.inprogress)))
+            # logger.info("remove_request:%s,inprogress中还剩下%d个任务"%(request,len(slot.inprogress)))
             logger.info(*self.lfm.crawled("Spider", spider.name,'inprogress中还剩下:','Engine'),
                         extra={'extra_info':"{:d}个任务".format(len(slot.inprogress))})
             return _
+
         def next_slot(_,slot):
             # logger.debug("next_slot")
             logger.debug(*self.lfm.crawled("Spider", spider.name,
@@ -264,14 +265,18 @@ class ExecutionEngine(object):
             slot.nextcall.schedule()
             return _
 
+        def log_error(_,error_msg):
+            logger.error(*self.error('Spider',self.spider.name
+                                     ))
+
         d = self._download(request,spider)
+
         d.addBoth(self._handle_downloader_output,request,spider)
-        #d.addErrback(test_err)
         d.addErrback(lambda f: logger.info('Error while handling downloader output',extra={'spider': spider}))
 
         #  移除掉处理过的request
         d.addBoth(remove_request,slot,request,spider)
-        #d.addBoth(lambda _: slot.remove_request(request,spider.name))
+        # d.addBoth(lambda _: slot.remove_request(request,spider.name))
         d.addErrback(lambda f: logger.info('Error while scheduling new request',extra={'spider': spider}))
 
         #  进行下一次的处理request

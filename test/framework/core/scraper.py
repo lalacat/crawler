@@ -240,19 +240,20 @@ class Scraper(object):
         from the given spider
         """
         # logger.debug("在并行处理中。。。。。。。。")
-        logger.debug(*self.lfm.crawled("Spider", "lala",
-                               '出现出现错误',
+        logger.debug(*self.lfm.crawled("Spider", spider.name,
+                               '并行处理中',
                                {
                                    'function': 'Scraper',
-                                   'request': "baba"
-                               }),
-                    extra={'extra_info': 'error'})
+                                   'request': request
+                               }))
         if isinstance(output, Request):
             # logger.info("处理的output%(request)s的类型是<Request>，将添加到下载序列中！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
             logger.info(*self.lfm.crawled_time('Spider',spider.name,'Output的类型是<Request>,将添加到下载队列中,加入时间:',time.clock(),output))
             self.crawler.engine.crawl(request=output, spider=spider)
         elif isinstance(output, (BaseItem, dict,int)):
-            # logger.info("处理的output%(request)s的类型是<BaseItem, dict,int>，将由自定义的process_item方法进行处理！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
+            # logger.info("处理的output%(request)s的类型是<BaseItem, dict,int>，
+            # 将由自定义的process_item方法进行处理！！添加时间是：%(time)f",
+            # {"request":output,"time":time.clock()})
             logger.info(*self.lfm.crawled_time('Spider',spider.name,'Output的类型是<BaseItem, dict,int>,将通过自定义的process_item方法进行处理,处理时间:',time.clock(),output))
 
             self.slot.itemproc_size += 1
@@ -322,5 +323,10 @@ class Scraper(object):
     def _process_item_time(self,_):
         end_time = time.clock()
         # logger.info("经过process_item处理后，此时时间为%f,完成Scraper模块使用了%7.6f"%(end_time,end_time-self.start_time))
-
+        logger.debug(*self.lfm.crawled_time("Spider",self.spider.name,
+                            'process_item处理完毕后的时间:',
+                            end_time,
+                            "Scraper"),
+                    extra={'extra_info':",完成Scraper模块使用了{:6.3f}".format(end_time-self.start_time)}
+                            )
         return None
