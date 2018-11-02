@@ -20,7 +20,7 @@ logger.info(*a.crawled_time("Spider",'works',
                             6.7777777,
                             "engine"),
             extra={
-                "extra_info":"inprogress中还剩下{:d}个任务".format(3)})
+                "extra_info":" inprogress中还剩下{:d}个任务".format(3)})
 
 
 logger.info(*a.crawled("Spider","lala",
@@ -35,7 +35,7 @@ logger.error(*a.error("Spider","lala",
                           'function':'Scraper',
                           'request':'www'
                       },
-                          '出现错误',),
+                          '出现错误{name}'.format(name='lili')),
              extra=
              {
                  'exception':'info',
@@ -44,3 +44,24 @@ logger.error(*a.error("Spider","lala",
 error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
 error_args = {'url': 'wwww', "size": 20, 'maxsize': 30}
 logger.error(error_msg, error_args)
+logger.error(*a.error("Spider","lala",
+                      {
+                          'function':'Scraper',
+                          'request':'www'
+                      },
+                          "{url} 网页的大小{size}已经超过可容许下载的最大值({maxsize}).".format(**error_args)),
+             extra=
+             {
+                 'exception':'info',
+                'time':"\n时间是{:d}".format(34)
+             })
+
+args = {'clsname': "lili", 'eargs': "bibi"}
+logger.warning(*a.crawled(
+    "Middleware", 'pupu',
+    '未生效:'),
+               extra={
+                   'extra_info': '{clsname}s: %{eargs}s'.format(**args)
+               }
+
+               )

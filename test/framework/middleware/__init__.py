@@ -13,10 +13,14 @@ class MiddlewareManager(object):
     """
     中间件的父类
     """
-    component_name = 'Father Middleware'
+    component_name = 'Parent Middleware'
 
     def __init__(self,*middlewares):
-        logger.debug("MiddlewareManager:%s 已初始化..."%self.component_name)
+        # logger.debug("MiddlewareManager:%s 已初始化..."%self.component_name)
+        logger.debug(*self.lfm.crawled(
+            "Middleware", self.component_name,
+            '已初始化...'
+        ))
         self.clsnames = middlewares[0]
         self.middlewares = middlewares[1]
 
@@ -40,6 +44,7 @@ class MiddlewareManager(object):
         :return:
         """
         mwlist = cls._get_mwlist_from_settings(settings)
+        cls.lfm = crawler.logformatter
         middlewares = []
         clsnames = []
         enabled = []
@@ -60,10 +65,18 @@ class MiddlewareManager(object):
                 clsnames.append(clsname)
             except Exception as e :
                 if e.args:
-                    logger.warning("未生效的Middleware: %(clsname)s: %(eargs)s",
-                                   {'clsname': clsname, 'eargs': e.args[0]},
-                                   extra={'crawler': crawler})
+                    # logger.warning("未生效的Middleware: %(clsname)s: %(eargs)s",
+                    #                {'clsname': clsname, 'eargs': e.args[0]},
+                    #                extra={'crawler': crawler})
+                    args = {'clsname': clsname, 'eargs': e.args[0]}
+                    logger.warning(*cls.lfm.crawled(
+                        "Middleware",cls.component_name,
+                        '未生效:'),
+                        extra = {
+                            'extra_info' : '{clsname}: {eargs}'.format(**args)
+                        }
 
+                    )
         if len(middlewares)  != len(clsnames):
             raise ImportError("%s的中间件载入不完整"%cls.component_name)
         if middlewares and clsnames:
