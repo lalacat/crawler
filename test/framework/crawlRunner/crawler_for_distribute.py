@@ -1,14 +1,17 @@
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, maybeDeferred, DeferredList
 import logging
+from test.framework.log.log import LogFormat
 
 from zope.interface.exceptions import DoesNotImplement
 from zope.interface.verify import verifyClass
 
 from test.framework.core.interface import ISpiderLoader
 from test.framework.objectimport.loadobject import load_object
-from test.framework.crawlRunner.engine_for_distribute import ExecutionEngine
+
+from test.framework.core.engine import ExecutionEngine
 from test.framework.setting import overridden_or_new_settings, Setting
+from test.framework.utils.defer import defer_succeed
 
 logger = logging.getLogger(__name__)
 
@@ -21,17 +24,26 @@ class Crawler(object):
         self.crawling = False
         self.spider = None
         self.engine = None
-        #导入的是爬虫对应的模块，不是名称
+
+        # 导入的是爬虫对应的模块，不是名称
         self.spidercls = spidercls
         self.settings = settings.copy()
+
+        # 获取log的格式
+        # lf_cls = load_object(self.settings['LOG_FORMATTER'])
+        self.logformatter = LogFormat.from_crawler(self)
+        logger.debug(*self.logformatter.crawled(
+            "Spider",'None',
+            "Crawler",'已初始化...'))
+
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
         if d:
-            logger.info("添加或重写的设置如下：\n %(settings)r",{'settings':d})
-
-        # 获取log的格式
-        lf_cls = load_object(self.settings['LOG_FORMATTER'])
-        self.logformatter = lf_cls.from_crawler(self)
+            logger.info(*self.logformatter.crawled(
+                "Spider",'None',
+                "添加或重写的设置如下：\n {settings}".format(settings=d),
+                "Crawler")
+            )
 
     @inlineCallbacks
     def crawl(self,*args,**kwargs):
@@ -67,36 +79,46 @@ class Crawler(object):
             '''
             yield maybeDeferred(self.engine.start)
         except Exception as e:
-            logger.error(e)
+            # logger.error(e,exc_info = True)
+            logger.error(*self.logformatter.error("Spider",self.spider.name,
+                      "Crawler",
+                          '出现错误:'),
+             extra=
+             {
+                 'exception':e,
+             },exc_info = True)
             self.crawling = False
             if self.engine is not None:
-                yield self.engine.close()
+                yield self.engine.stop()
+                # yield self.stop()
+            yield defer_succeed('crawl stop')
 
 
     """
     用户封装调度器以及引擎
     """
     def _create_engine(self):
-        logger.info("爬虫引擎已创建")
+        logger.debug(*self.logformatter.crawled('Spider',self.spider.name,"已创建..."))
         return ExecutionEngine(self,lambda _: self.stop())
 
     def _create_spider_schedule(self,schedule):
-        logger.info("爬虫：%s 已创建" % self.spidercls.__name__)
-        self._spider = self.spidercls.from_schedule(schedule)
+        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
+        return self.spidercls.from_schedule(schedule)
 
     def _create_spider(self,*args, **kwargs):
-        logger.info("爬虫：%s 已创建" %self.spidercls.name)
-        self._spider = self.spidercls.from_crawler(self,*args,**kwargs)
-
-    def _create_spider_from_task(self,spider_name,spider_start_urls):
-        self._spider = self.spidercls.from_task(spider_name,spider_start_urls)
-        logger.warning("爬虫：%s 已创建" %spider_name)
+        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
+        return self.spidercls.from_crawler(self,*args,**kwargs)
 
     @inlineCallbacks
     def stop(self):
         if self.crawling:
             self.crawling = False
             yield maybeDeferred(self.engine.stop)
+
+    def __str__(self):
+        return "%s" %(self.spider.name)
+
+    __repr__ = __str__
 
 
 
@@ -166,20 +188,19 @@ class CrawlerRunner(object):
 
     @inlineCallbacks
     def join(self):
-        '''
-        当所有的crawler完成激活之后，返回已经激活的defer的列表
-        '''
+
+        # 当所有的crawler完成激活之后，返回已经激活的defer的列表
+
         while self._active:
             yield DeferredList(self._active)
 
 
 class CrawlerProcess(CrawlerRunner):
-    '''
-    这个类主要是用来完成多个爬虫能够同时进行的功能，核心就是取得DeferredList，然后执行reactor.run()。
-    包含了reator的配置，启动，停止，
-    各种操作信号在这个类中完成注册。
 
-    '''
+    # 这个类主要是用来完成多个爬虫能够同时进行的功能，核心就是取得DeferredList，然后执行reactor.run()。
+    # 包含了reator的配置，启动，停止，
+    # 各种操作信号在这个类中完成注册。
+
     def __init__(self):
         super(CrawlerProcess,self).__init__()
 
@@ -192,17 +213,15 @@ class CrawlerProcess(CrawlerRunner):
             d.addBoth(self._stop_reactor)
 
         # 对reactor进行定制化处理，只能针对ipv4，设置一个内部解释器用于域名的查找
-        #reactor.installResolver(self._get_dns_resolver())
+        # reactor.installResolver(self._get_dns_resolver())
         # 返回一个线程池twisted.python.threadpool.ThreadPool,和python的原生类Thread有关
         tp = reactor.getThreadPool()
         # 调节线程池的大小adjustPoolsize(self, minthreads=None, maxthreads=None)
         tp.adjustPoolsize(maxthreads=self.settings.getint('REACTOR_THREADPOOL_MAXSIZE'))
 
-
         # 添加系统事件触发事件当系统关闭的时候，系统事件激活之前，reactor将会被激活进行停止的操作
         reactor.addSystemEventTrigger('before', 'shutdown', self.stop)
         reactor.run(installSignalHandlers=False)  # blocking call
-
 
     def _stop_reactor(self,_=None):
         try:

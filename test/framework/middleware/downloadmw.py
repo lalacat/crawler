@@ -13,9 +13,11 @@ logger = logging.getLogger(__name__)
 class DownloaderMiddlewareManager(MiddlewareManager):
 
     component_name = 'Downloader Middleware'
+    middlewares_name = 'DOWNLOADER_MIDDLEWARE'
+
     @classmethod
     def _get_mwlist_from_settings(cls,settings):
-        return bulid_component_list(settings["DOWNLOADER_MIDDLEWARE_TEST"],cls.component_name)
+        return bulid_component_list(settings[cls.middlewares_name],cls)
 
     def _add_middleware(self,mw):
         if hasattr(mw, 'process_request'):
@@ -32,7 +34,17 @@ class DownloaderMiddlewareManager(MiddlewareManager):
             #  处理process_request的方法自定义的时候，要么返回一个处理好的response要么返回一个None,
             #  返回一个request很容易陷入死循环。
             #  最大的作用就是处理request，往里添加或者修改内容的
-            logger.debug("Downloader Middleware: 加载process_request方法处理Request<%s>...",request)
+            # logger.debug("Downloader Middleware: 加载process_request方法处理Request<%s>...",request)
+            logger.debug(*self.lfm.crawled(
+                "Middleware", self.component_name,
+                '加载process_request方法处理Request',
+                request
+            ))
+            logger.debug(*self.lfm.crawled(
+                "Middleware", self.component_name,
+                '加载process_request方法处理Request',
+                request
+            ))
             for method in self.methods['process_request']:
                 response = yield method(request=request,spider =spider)
                 assert response is None or isinstance(response,(Response,Request)),\
@@ -47,7 +59,12 @@ class DownloaderMiddlewareManager(MiddlewareManager):
 
         @defer.inlineCallbacks
         def process_response(response):
-            logger.debug("Downloader Middleware: 加载process_response方法处理Request<%s>...",request)
+            # logger.debug("Downloader Middleware: 加载process_response方法处理Request<%s>...",request)
+            logger.debug(*self.lfm.crawled(
+                    "Middleware", self.component_name,
+                    '加载process_response方法处理Request',
+                    request
+            ))
             assert response is not None,"process_response接收到的数据是None"
             if isinstance(response,Request):
                 defer.returnValue(response)
@@ -55,6 +72,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
             for method in self.methods['process_response']:
                 response = yield method(request=request, response=response,
                                         spider=spider)
+
                 assert response is None or isinstance(response, (Response, Request)), \
                     'Downloader Middleware:%s.process_response 执行后返回的数据类型必须是<None>,<Response>,<Request>...' \
                     % method._class__._name__
@@ -65,6 +83,11 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         @defer.inlineCallbacks
         def process_exception(_failure):
             exception = _failure.value
+            logger.debug(*self.lfm.crawled(
+                    "Middleware", self.component_name,
+                    '加载process_exception方法处理Request',
+                    request
+            ))
             for method in self.methods['process_exception']:
                 response = yield method(request=request, exception=exception,
                                         spider=spider)

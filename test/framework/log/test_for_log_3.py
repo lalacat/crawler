@@ -1,4 +1,5 @@
 import logging
+import pprint
 
 from test.framework.log.log import LogFormat
 from test.framework.setting import Setting
@@ -57,6 +58,7 @@ logger.error(*a.error("Spider","lala",
              })
 
 args = {'clsname': "lili", 'eargs': "bibi"}
+pplist = ['q','w','e','r']
 logger.warning(*a.crawled(
     "Middleware", 'pupu',
     '未生效:'),
@@ -65,3 +67,25 @@ logger.warning(*a.crawled(
                }
 
                )
+logger.warning(*a.crawled(
+    "Middleware", 'pupu',
+    '生效:'),
+               extra={
+                   'extra_info': pprint.pformat(pplist)
+               }
+
+               )
+logger.info("添加或重写的设置如下：\n %s", pprint.pformat(args))
+
+
+logger.warning(*a.crawled(
+    "Middleware", 'pupu',
+    '生效:',
+    '处理后的结果类型是{0},下一步进行process_item并行处理'.format("gyhj"))
+               )
+
+logger.error(*a.error('Spider',"asdsa",'',
+                             '收取到的信息容量({bytes}) bytes 超过了下载信息的最大值({maxsize}) bytes '.format(
+                                 bytes= 20,
+                                 maxsize=10)
+                             ))

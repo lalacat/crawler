@@ -43,48 +43,63 @@ class MiddlewareManager(object):
         :param crawler:
         :return:
         """
-        mwlist = cls._get_mwlist_from_settings(settings)
         cls.lfm = crawler.logformatter
-        middlewares = []
-        clsnames = []
-        enabled = []
-        for clspath in mwlist:
-            try:
-                clsname = clspath.split('.')[-1]
-                mwcls = load_object(clspath)
-                #  两个if用来判断mwcls是类的情况下，是跟crawler关联还是和settings相关联
-                if crawler and hasattr(mwcls,'from_crawler'):
-                    mw = mwcls.from_crawler(crawler)
-                elif hasattr(mwcls,'from_settings'):
-                    mw = mwcls.from_settings(settings)
-                else:
-                #  当mwcls不是类的时候，那就是方法
-                    mw = mwcls
-                middlewares.append(mw)
-                enabled.append(clspath)
-                clsnames.append(clsname)
-            except Exception as e :
-                if e.args:
-                    # logger.warning("未生效的Middleware: %(clsname)s: %(eargs)s",
-                    #                {'clsname': clsname, 'eargs': e.args[0]},
-                    #                extra={'crawler': crawler})
-                    args = {'clsname': clsname, 'eargs': e.args[0]}
-                    logger.warning(*cls.lfm.crawled(
-                        "Middleware",cls.component_name,
-                        '未生效:'),
-                        extra = {
-                            'extra_info' : '{clsname}: {eargs}'.format(**args)
-                        }
+        try :
+            mwlist = cls._get_mwlist_from_settings(settings)
+            middlewares = []
+            clsnames = []
+            enabled = []
+            for clspath in mwlist:
+                try:
+                    clsname = clspath.split('.')[-1]
+                    mwcls = load_object(clspath)
+                    #  两个if用来判断mwcls是类的情况下，是跟crawler关联还是和settings相关联
+                    if crawler and hasattr(mwcls,'from_crawler'):
+                        mw = mwcls.from_crawler(crawler)
+                    elif hasattr(mwcls,'from_settings'):
+                        mw = mwcls.from_settings(settings)
+                    else:
+                    #  当mwcls不是类的时候，那就是方法
+                        mw = mwcls
+                    middlewares.append(mw)
+                    enabled.append(clspath)
+                    clsnames.append(clsname)
+                except Exception as e :
+                    if e.args:
+                        # logger.warning("未生效的Middleware: %(clsname)s: %(eargs)s",
+                        #                {'clsname': clsname, 'eargs': e.args[0]},
+                        #                extra={'crawler': crawler})
+                        args = {'clsname': clsname, 'eargs': e.args[0]}
+                        logger.warning(*cls.lfm.crawled(
+                            "Middleware",cls.component_name,
+                            '未生效:'),
+                            extra = {
+                                'extra_info' : '{clsname}: {eargs}'.format(**args)
+                            }
+                        )
+            if len(middlewares) != len(clsnames):
+                raise ImportError("中间件载入不完整")
+            if middlewares and clsnames:
+                # logger.info("生效%(componentname)ss的Middleware :\n%(enabledlist)s",
+                #             {'componentname': cls.component_name,
+                #              'enabledlist': pprint.pformat(enabled)},
+                #             extra={'crawler': crawler})
+                logger.info(*cls.lfm.crawled(
+                    "Middleware", cls.component_name,
+                    '生效:\n'),
+                            extra={
+                                'extra_info': pprint.pformat(enabled)
+                            }
+                            )
+            return cls(clsnames, middlewares)
+        except Exception as e :
+                logger.error(*cls.lfm.error(
+                    "Middleware", cls.component_name,
+                    function=None,
+                    msg = e),
+                exc_info = True)
 
-                    )
-        if len(middlewares)  != len(clsnames):
-            raise ImportError("%s的中间件载入不完整"%cls.component_name)
-        if middlewares and clsnames:
-            logger.info("生效%(componentname)ss的Middleware :\n%(enabledlist)s",
-                        {'componentname': cls.component_name,
-                         'enabledlist': pprint.pformat(enabled)},
-                        extra={'crawler': crawler})
-        return cls(clsnames,middlewares)
+
 
     @classmethod
     def from_crawler(cls,crawler):

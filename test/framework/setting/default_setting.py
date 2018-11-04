@@ -18,7 +18,7 @@ DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
 DOWNLOAD_FAIL_ON_DATALOSS = True
 
 DOWNLOAD_DELAY = 0
-DOWNLOADER_MIDDLEWARE_TEST = {
+DOWNLOADER_MIDDLEWARE = {
    # "test.framework.test.test_middleware.test_process_request_01.Change_Request_Header":10
 }
 
@@ -47,11 +47,11 @@ HEADER_COLLECTION =[
 ]
 #T
 ITEM_PIPELINES = {
-    #"test.framework.pipelines.mongoDB.MongoDB":20,
-    #"test.framework.pipelines.print_result.Print_Result":10
-    #"test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10
-    #"test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
-    #"test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
+    "test.framework.pipelines.mongoDB.MongoDB":20,
+    "test.framework.pipelines.print_result.Print_Result":10,
+    "test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10,
+    "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
+    "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
     #"test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20,
     #"test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
 
@@ -82,7 +82,7 @@ LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
 LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
 LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
-LOG_DEBUG_FORMAT_01 = '[%(levelname)s] %(message)s%(extra_info)s'
+LOG_DEBUG_FORMAT_01 = '%(message)s%(extra_info)s-[%(filename)s:%(lineno)d]'
 
 LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
@@ -96,7 +96,7 @@ LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s'
 LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
 
 
-LOG_CRAWLED_TIME = 'Crawled:[%(module)s:%(name)s] %(msg)s %(time)6.3fs'
+LOG_CRAWLED_TIME = 'Crawled:[%(module)s:%(name)s] %(msg)s%(time)6.3fs'
 LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s%(time)6.3fs'
 LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s%(time)6.3fs'
 
@@ -120,7 +120,7 @@ LOGGING_DIC = {
             'datefmt': LOG_DATE_FORMAT
         },
         'debug_format': {
-            'format': LOG_DEBUG_FORMAT,
+            'format': LOG_DEBUG_FORMAT_01,
             'datefmt': LOG_DATE_FORMAT
         },
         'error_format': {
@@ -178,7 +178,6 @@ LOGGING_DIC = {
 #M
 MONGODB_URL = "149.28.192.96:27017"
 MONGODB_NAME = "LianJia"
-
 #N
 #O
 #P
@@ -190,7 +189,8 @@ RANDOMIZE_DOWNLOAD_DELAY = True  # 随机延迟
 #S
 SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.core.scheduler.Scheduler"
-SPIDER_MIDDLEWARES_TEST = {}
+SPIDER_MIDDLEWARES = {}
+
 #T
 '''
 TEST_MIDDLEWARE = {

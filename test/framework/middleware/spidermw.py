@@ -13,10 +13,10 @@ def _isiterable(possible_iterator):
 
 class SpiderMiddlewareManager(MiddlewareManager):
     component_name = "Spider Middlerware"
-
+    middlewares_name = 'SPIDER_MIDDLEWARES'
     @classmethod
     def _get_mwlist_from_settings(cls,settings):
-        return bulid_component_list(settings["SPIDER_MIDDLEWARES_TEST"],cls.component_name)
+        return bulid_component_list(settings[cls.middlewares_name],cls)
 
     def _add_middleware(self,mw):
         #  父类中含有加载open_spider,close_spider方法

@@ -15,38 +15,46 @@ from test.framework.utils.defer import defer_succeed
 
 logger = logging.getLogger(__name__)
 
+
 class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
     # 装载爬虫，导入爬虫的网页
     # 将爬虫导入到引擎中
-    def __init__(self,spidercls=None,settings=None):
+    def __init__(self, spidercls=None, settings=None):
         self.crawling = False
         self.spider = None
         self.engine = None
 
-        #导入的是爬虫对应的模块，不是名称
+        # 导入的是爬虫对应的模块，不是名称
         self.spidercls = spidercls
         self.settings = settings.copy()
 
-        #获取log的格式
-        #lf_cls = load_object(self.settings['LOG_FORMATTER'])
+        # 获取log的格式
+        # lf_cls = load_object(self.settings['LOG_FORMATTER'])
         self.logformatter = LogFormat.from_crawler(self)
+        logger.debug(*self.logformatter.crawled(
+            "Spider", 'None',
+            "Crawler", '已初始化...'))
 
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
-        logger.info("添加或重写的设置如下：\n %(settings)r",{'settings':d})
-
-
+        if d:
+            logger.info(*self.logformatter.crawled(
+                "Spider", 'None',
+                "添加或重写的设置如下：\n {settings}".format(settings=d),
+                "Crawler")
+                        )
 
     @inlineCallbacks
-    def crawl(self,*args,**kwargs):
+    def crawl(self, *args, **kwargs):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
         try:
+            # self.spider = self._spider
             self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
-            yield self.engine.open_spider(self.spider,start_requests)
+            yield self.engine.open_spider(self.spider, start_requests)
             '''
             此函数的功能就是如果作为其参数返回值为defer，那么其不作任何处理，原样将defer返回。
             但如何返回值不是defer而是一个值（正如我们的缓存代理将本地缓冲的诗歌返回一样），那么这个maybeDeferred会将该值重新打包成一个已经激活的deferred返回，注意是已经激活的deferred。
@@ -55,34 +63,34 @@ class Crawler(object):
             yield maybeDeferred(self.engine.start)
         except Exception as e:
             # logger.error(e,exc_info = True)
-            logger.error(*self.logformatter.error("Spider",self.spider.name,
-                      "Crawler",
-                          '出现错误:'),
-             extra=
-             {
-                 'exception':e,
-             })
+            logger.error(*self.logformatter.error("Spider", self.spider.name,
+                                                  "Crawler",
+                                                  '出现错误:'),
+                         extra=
+                         {
+                             'exception': e,
+                         }, exc_info=True)
             self.crawling = False
             if self.engine is not None:
                 yield self.engine.stop()
                 # yield self.stop()
             yield defer_succeed('crawl stop')
 
-
     """
     用户封装调度器以及引擎
     """
-    def _create_engine(self):
-        logger.debug(*self.logformatter.crawled('Spider',self.spider.name,"已创建..."))
-        return ExecutionEngine(self,lambda _: self.stop())
 
-    def _create_spider_schedule(self,schedule):
-        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
+    def _create_engine(self):
+        logger.debug(*self.logformatter.crawled('Spider', self.spider.name, "已创建...","Engine"))
+        return ExecutionEngine(self, lambda _: self.stop())
+
+    def _create_spider_schedule(self, schedule):
+        logger.warning(*self.logformatter.crawled('Spider', self.spidercls.name, "已创建..."))
         return self.spidercls.from_schedule(schedule)
 
-    def _create_spider(self,*args, **kwargs):
-        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
-        return self.spidercls.from_crawler(self,*args,**kwargs)
+    def _create_spider(self, *args, **kwargs):
+        logger.warning(*self.logformatter.crawled('Spider', self.spidercls.name, "已创建..."))
+        return self.spidercls.from_crawler(self, *args, **kwargs)
 
     @inlineCallbacks
     def stop(self):
@@ -91,10 +99,9 @@ class Crawler(object):
             yield maybeDeferred(self.engine.stop)
 
     def __str__(self):
-        return "%s" %(self.spider.name)
+        return "%s" % (self.spider.name)
 
     __repr__ = __str__
-
 
 
 '''
@@ -104,26 +111,27 @@ defer外层闭环是由CrawlerRunner的_crawl中得到d-->_done
 
 '''
 
+
 class CrawlerRunner(object):
 
-    def __init__(self,settings=None):
-        if isinstance(settings,dict) or settings is None:
+    def __init__(self, settings=None):
+        if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
         logger.debug(type(self.settings))
         self.spider_loder = _get_spider_loader(settings)
-        #装载的是Crawler的集合
+        # 装载的是Crawler的集合
         self._crawlers = set()
-        #装载的是defer的集合
+        # 装载的是defer的集合
         self._active = set()
 
-    def crawl(self,crawler_or_spidercls, *args, **kwargs):
+    def crawl(self, crawler_or_spidercls, *args, **kwargs):
         crawler = self.create_crawler(crawler_or_spidercls)
-        return self._crawl(crawler,*args, **kwargs)
+        return self._crawl(crawler, *args, **kwargs)
 
-    def _crawl(self,crawler,*args,**kwargs):
+    def _crawl(self, crawler, *args, **kwargs):
         self._crawlers.add(crawler)
-        d = crawler.crawl(*args,**kwargs)
+        d = crawler.crawl(*args, **kwargs)
         self._active.add(d)
 
         def _done(result):
@@ -131,9 +139,10 @@ class CrawlerRunner(object):
             self._crawlers.discard(crawler)
             self._active.discard(d)
             return result
+
         return d.addBoth(_done)
 
-    def create_crawler(self,crawler_or_spidercls):
+    def create_crawler(self, crawler_or_spidercls):
 
         '''
         先判断传入的参数是不是已经包装成Crawler，如果是，直接返回
@@ -142,21 +151,21 @@ class CrawlerRunner(object):
         :return: Cralwer的实例
         '''
 
-        if isinstance(crawler_or_spidercls,Crawler):
+        if isinstance(crawler_or_spidercls, Crawler):
             return crawler_or_spidercls
         return self._create_crawler(crawler_or_spidercls)
 
-    def _create_crawler(self,spidercls):
+    def _create_crawler(self, spidercls):
         #  判断传入的参数是自定义爬虫的name还是对应的class模块
-        if isinstance(spidercls,str):
+        if isinstance(spidercls, str):
             spidercls = self.spider_loder.load(spidercls)
-        return Crawler(spidercls,self.settings)
+        return Crawler(spidercls, self.settings)
 
     def stop(self):
         #  停止
         # Stops simultaneously all the crawling jobs taking place.
         # Returns a deferred that is fired when they all have ended.
-        
+
         return DeferredList([c.stop() for c in list(self._crawlers)])
 
     @inlineCallbacks
@@ -175,10 +184,11 @@ class CrawlerProcess(CrawlerRunner):
     各种操作信号在这个类中完成注册。
 
     '''
-    def __init__(self):
-        super(CrawlerProcess,self).__init__()
 
-    def start(self,stop_after_crawl = True):
+    def __init__(self):
+        super(CrawlerProcess, self).__init__()
+
+    def start(self, stop_after_crawl=True):
 
         if stop_after_crawl:
             d = self.join()
@@ -187,7 +197,7 @@ class CrawlerProcess(CrawlerRunner):
             d.addBoth(self._stop_reactor)
 
         # 对reactor进行定制化处理，只能针对ipv4，设置一个内部解释器用于域名的查找
-        #reactor.installResolver(self._get_dns_resolver())
+        # reactor.installResolver(self._get_dns_resolver())
         # 返回一个线程池twisted.python.threadpool.ThreadPool,和python的原生类Thread有关
         tp = reactor.getThreadPool()
         # 调节线程池的大小adjustPoolsize(self, minthreads=None, maxthreads=None)
@@ -197,8 +207,7 @@ class CrawlerProcess(CrawlerRunner):
         reactor.addSystemEventTrigger('before', 'shutdown', self.stop)
         reactor.run(installSignalHandlers=False)  # blocking call
 
-
-    def _stop_reactor(self,_=None):
+    def _stop_reactor(self, _=None):
         try:
             reactor.stop()
         except RuntimeError:
@@ -209,14 +218,13 @@ def _get_spider_loader(settings):
     cls_path = settings["SPIDER_MANAGER_CLASS"]
     loader_cls = load_object(cls_path)
     try:
-        verifyClass(ISpiderLoader,loader_cls)
+        verifyClass(ISpiderLoader, loader_cls)
 
-    except AttributeError as e :
-        logger.warning("接口方法实现不完全：",e)
+    except AttributeError as e:
+        logger.warning("接口方法实现不完全：", e)
 
     except DoesNotImplement:
         logger.warning("爬虫导入失败，查看设定是否爬虫爬虫导入类的地址设置"
                        "")
 
     return loader_cls.from_settings()
-

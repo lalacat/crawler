@@ -228,7 +228,10 @@ class Scraper(object):
         #  这里的结果默认是能够迭代的List或者是dict类型的结果，每个结果都是并列的，能够同时符合process_item处理规则
         #  其中list里的结果是两种类型，一种是BaseItem及其子类一种是dict类型，这些都是在requst或者spider中自己
         #  处理后的得到的
-        logger.debug("%s的parse处理后的结果类型是%s,下一步进行process_item并行处理"%(spider.name,type(result)))
+        # logger.debug("%s的parse处理后的结果类型是%s,下一步进行process_item并行处理"%(spider.name,type(result)))
+        logger.debug(*self.lfm.crawled('Spider', spider.name,
+                                         '_parse(callback)',
+                                         '处理后的结果类型是{0},下一步进行process_item并行处理'.format(type(result))))
         it = iter_errback(result, self.handle_spider_error, request, response, spider)
 
         dfd = parallel(it,self.concurrent_items,self._process_spidermw_output, request, response, spider)

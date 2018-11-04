@@ -91,7 +91,7 @@ class LogFormat(object):
             }
         elif isinstance(extra,dict):
             return {
-                'msg': self.settings['LOG_ERROR_REQUEST_EXTRA'],
+                'msg': self.settings['LOG_CRAWLED_TIME_REQUEST_EXTRA'],
                 'args': {
                     'module': module,
                     'name': name,
