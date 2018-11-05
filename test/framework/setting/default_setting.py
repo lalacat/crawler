@@ -47,13 +47,14 @@ HEADER_COLLECTION =[
 ]
 #T
 ITEM_PIPELINES = {
-    "test.framework.pipelines.mongoDB.MongoDB":20,
-    "test.framework.pipelines.print_result.Print_Result":10,
-    "test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10,
-    "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
-    "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
+    # "test.framework.pipelines.mongoDB.MongoDB":20,
+    # "test.framework.pipelines.print_result.Print_Result":10,
+    # "test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10,
+    # "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
+    # "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
     #"test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20,
     #"test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
+    "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
 
 }
 #J
@@ -78,6 +79,7 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 %(process)d 进程ID。可能没有
 %(message)s 用户输出的消息
 '''
+LOG_FORMATTER_CLASS = 'test.framework.log.log.LogFormat'
 LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
 LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
@@ -169,7 +171,7 @@ LOGGING_DIC = {
         '': {
             'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             # 'level': 'WARNING',
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'propagate': True,  # 向上（更高level的logger）传递
         },
     },

@@ -30,8 +30,8 @@ class Crawler(object):
         self.settings = settings.copy()
 
         # 获取log的格式
-        # lf_cls = load_object(self.settings['LOG_FORMATTER'])
-        self.logformatter = LogFormat.from_crawler(self)
+        lf_cls = load_object(self.settings['LOG_FORMATTER_CLASS'])
+        self.logformatter = lf_cls.from_crawler(self)
         logger.debug(*self.logformatter.crawled(
             "Spider", 'None',
             "Crawler", '已初始化...'))

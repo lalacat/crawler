@@ -20,7 +20,7 @@ class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
     # 装载爬虫，导入爬虫的网页
     # 将爬虫导入到引擎中
-    def __init__(self,spidercls=None,settings=None):
+    def __init__(self,spidercls=None,settings=None,logformat=None):
         self.crawling = False
         self.spider = None
         self.engine = None
@@ -30,8 +30,10 @@ class Crawler(object):
         self.settings = settings.copy()
 
         # 获取log的格式
-        # lf_cls = load_object(self.settings['LOG_FORMATTER'])
-        self.logformatter = LogFormat.from_crawler(self)
+        if not logformat:
+            lf_cls = load_object(self.settings['LOG_FORMATTER_CLASS'])
+            self.logformatter = lf_cls.from_crawler(self)
+
         logger.debug(*self.logformatter.crawled(
             "Spider",'None',
             "Crawler",'已初始化...'))
@@ -80,13 +82,13 @@ class Crawler(object):
             yield maybeDeferred(self.engine.start)
         except Exception as e:
             # logger.error(e,exc_info = True)
-            logger.error(*self.logformatter.error("Spider",self.spider.name,
-                      "Crawler",
-                          '出现错误:'),
-             extra=
-             {
-                 'exception':e,
-             },exc_info = True)
+            logger.error(*self.logformatter.error("Spider", self.spider.name,
+                                                  "Crawler",
+                                                  '出现错误:'),
+                         extra=
+                         {
+                             'exception': e,
+                         }, exc_info=True)
             self.crawling = False
             if self.engine is not None:
                 yield self.engine.stop()
@@ -98,8 +100,8 @@ class Crawler(object):
     用户封装调度器以及引擎
     """
     def _create_engine(self):
-        logger.debug(*self.logformatter.crawled('Spider',self.spider.name,"已创建..."))
-        return ExecutionEngine(self,lambda _: self.stop())
+        logger.debug(*self.logformatter.crawled('Spider', self.spider.name, "已创建...","Engine"))
+        return ExecutionEngine(self, lambda _: self.stop())
 
     def _create_spider_schedule(self,schedule):
         logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
