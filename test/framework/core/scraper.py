@@ -192,7 +192,7 @@ class Scraper(object):
                      ,extra={
                         'exception':exc,
                         'time':'处理结果时间为：{:6.3f}s'.format(end_time-self.start_time)
-                    })
+                    },exc_info = True)
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")
 

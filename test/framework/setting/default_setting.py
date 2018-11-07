@@ -52,9 +52,10 @@ ITEM_PIPELINES = {
     # "test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
-    #"test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20,
-    #"test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
+    # "test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20,
+    # "test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
+    "test.framework.test.test_middleware.test_print.test_close_spider_print_06_shfe.Spider_Out_print": 10,
 
 }
 #J

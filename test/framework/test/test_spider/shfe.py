@@ -20,20 +20,15 @@ class SHFE_Rank(Spider):
     """
     将所有小区的地址都写入数据库中
     """
-    name = "cffex"
+    name = "shfe"
 
-    deal_sorts = {
-        '0':'total',
-        '1':'buy',
-        '2':'sale'
-    }
     def __init__(self):
 
-        self.total_sale_1810 = 0
-        self.total_sale_1811 = 0
-        self.total_sale_1812 = 0
-        self.total_sale_1903 = 0
-        self.total_sale_1906 = 0
+        self.total_cu = 0
+        self.total_al = 0
+        self.total_zn = 0
+        self.total_pb = 0
+        self.total_ni = 0
 
         self.instrument_cu = 'cu\d+'
         self.instrument_al = 'al\d+'
@@ -48,6 +43,8 @@ class SHFE_Rank(Spider):
         self.instrument_fu = 'fu\d+'
         self.instrument_bu = 'bu\d+'
         self.instrument_ru = 'ru\d+'
+
+        self.total_result = dict()
 
     def start_requests(self):
         self.start_urls = [
@@ -81,26 +78,75 @@ class SHFE_Rank(Spider):
     def _parse(self,response):
         data = json.loads(response.body)
         time = re.findall('\d{4}\d{1,2}\d{1,2}',response.url)
-        print(time)
+        b = lambda x: x.split('\\')[0]
 
-        # express = '$.o_cursor[*]'
-        # allitems = jsonpath.jsonpath(data, express)
-        #
-        # for oneitem in allitems:
-        #     if oneitem['PARTICIPANTABBR1'].strip() == '华泰期货':
-        #         # 持仓量
-        #         volume = oneitem['CJ1']
-        #         # print(volume)
-        #         # 排名
-        #         rank = oneitem['RANK']
-        #         # print(rank)
-        #         # 合约
-        #         instrumen = oneitem['INSTRUMENTID'].strip()
-        #         if re.match(self.instrument_cu, instrumen):
-        #             print('true')
-        #         # print(instrumen)
-        #
-        #         print(instrumen + ':\t' + str(rank) + ':\t' + str(volume)+'\n')
+        # print(time)
+
+        express = '$.o_cursor[*]'
+        allitems = jsonpath.jsonpath(data, express)
+
+        result = defaultdict(list)
+
+        for oneitem in allitems:
+            if oneitem['PARTICIPANTABBR1'].strip() == '华泰期货':
+                # 持仓量
+                volume = oneitem['CJ1']
+                # print(volume)
+                # 排名
+                rank = oneitem['RANK']
+                # print(rank)
+                # 合约
+                instrument = oneitem['INSTRUMENTID'].strip()
+                if re.match(self.instrument_cu, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_cu)].append(result_temp)
+
+                if re.match(self.instrument_al, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_al)].append(result_temp)
+
+                if re.match(self.instrument_zn, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_zn)].append(result_temp)
+
+                if re.match(self.instrument_pb, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_pb)].append(result_temp)
+
+                if re.match(self.instrument_ni, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_ni)].append(result_temp)
+
+                if re.match(self.instrument_sn, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_sn)].append(result_temp)
+
+                if re.match(self.instrument_au, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_au)].append(result_temp)
+
+                if re.match(self.instrument_ag, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_ag)].append(result_temp
+                                                   )
+                if re.match(self.instrument_hc, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_hc)].append(result_temp)
+
+                if re.match(self.instrument_fu, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_fu)].append(result_temp)
+
+                if re.match(self.instrument_bu, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_bu)].append(result_temp)
+
+                if re.match(self.instrument_ru, instrument):
+                    result_temp = instrument + ':' + str(rank) + ':' + str(volume)
+                    result[b(self.instrument_ru)].append(result_temp)
+
+        self.total_result[time[0]] = result
+        # print(self.total_result)
         return None
 
 
