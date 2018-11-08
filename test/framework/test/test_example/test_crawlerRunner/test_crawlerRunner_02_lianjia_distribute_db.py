@@ -1,10 +1,9 @@
 import pymongo
-import queue
 
 from twisted.internet import reactor
 
 from test.framework.setting import Setting
-from test.framework.test.test_crawler.test_crawlerRunner import CrawlerRunner
+from framework.test.test_crawler.test_crawlerRunner import CrawlerRunner
 
 # mongodb服务的地址和端口号
 mongo_url = "127.0.0.1:27017"

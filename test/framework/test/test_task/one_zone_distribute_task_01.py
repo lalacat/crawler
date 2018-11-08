@@ -2,7 +2,7 @@ import queue
 
 from twisted.internet import task, reactor
 
-from test.framework.test.test_spider.simple_spider.simple_spider_getPage_01 import SimpleSpider
+from framework.test import SimpleSpider
 
 zone_name = "yangpu"
 town_urls = [

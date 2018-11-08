@@ -1,9 +1,8 @@
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
 from twisted.internet import reactor
-from test.framework.test.test_spider.simple_spider.simple_spider_06_mutilyield import SimpleSpider_06
+from framework.test import SimpleSpider_06
 
-import logging
 '''
 LOG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s'
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"

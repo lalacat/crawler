@@ -1,4 +1,4 @@
-from test.framework.test.test_spider.lianjia_spider.lianjia_spider_total_community_db import Part_Zone
+from framework.test import Part_Zone
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
 from twisted.internet import reactor

@@ -1,4 +1,4 @@
-from test.framework.test.test_download.test_download_cancel import HTTPDownloadHandler
+from framework.test import HTTPDownloadHandler
 from test.framework.setting import Setting
 from test.framework.https.request import Request
 from spider.spider1 import Spider1

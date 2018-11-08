@@ -1,18 +1,17 @@
-import json
 from collections import defaultdict
 
 from lxml import etree
 
 from spider import Spider
 import logging
-from twisted.internet import defer, reactor
+from twisted.internet import reactor
 
 from test.framework.core.crawler import Crawler
 from test.framework.https.request import Request
-from test.framework.crawlRunner.crawlerRunner__for_distribute_from import CrawlerRunner
 from test.framework.setting import Setting
-from test.framework.test.test_spider.simple_spider.simple_spider_07_mutil_crawlrunner import SimpleSpider_07
+
 logger = logging.getLogger(__name__)
+
 
 class Cffex_Rank(Spider):
     """
@@ -87,7 +86,7 @@ class Cffex_Rank(Spider):
                 if data_value == 'total':
                     # print(tradingday)
                     if data_Text == 'IF1810':
-                        # print(data_Text+":"+volume)
+                        print(data_Text+":"+volume)
                         self.total_sale_1810 += int(volume)
 
                     if data_Text == 'IF1811':

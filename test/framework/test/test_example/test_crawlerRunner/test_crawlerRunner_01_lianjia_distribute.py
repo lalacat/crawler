@@ -3,7 +3,7 @@ import queue
 from twisted.internet import reactor
 
 from test.framework.setting import Setting
-from test.framework.test.test_crawler.test_crawlerRunner import CrawlerRunner
+from framework.test.test_crawler.test_crawlerRunner import CrawlerRunner
 
 zone_name = "yangpu"
 town_urls = [

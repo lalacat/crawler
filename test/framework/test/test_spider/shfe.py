@@ -11,9 +11,7 @@ from twisted.internet import defer, reactor
 
 from test.framework.core.crawler import Crawler
 from test.framework.https.request import Request
-from test.framework.crawlRunner.crawlerRunner__for_distribute_from import CrawlerRunner
 from test.framework.setting import Setting
-from test.framework.test.test_spider.simple_spider.simple_spider_07_mutil_crawlrunner import SimpleSpider_07
 logger = logging.getLogger(__name__)
 
 class SHFE_Rank(Spider):
