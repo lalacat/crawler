@@ -172,7 +172,7 @@ LOGGING_DIC = {
         '': {
             'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             # 'level': 'WARNING',
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': True,  # 向上（更高level的logger）传递
         },
     },
