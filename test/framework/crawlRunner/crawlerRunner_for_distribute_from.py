@@ -1,16 +1,18 @@
 import pymongo
 import queue
 import time
+import logging
+
 from queue import Empty
 from typing import Iterable
 
 from twisted.internet import task, defer
 from twisted.internet.defer import DeferredList, inlineCallbacks
 
+from test.framework.log.log import LogFormat
+from test.framework.objectimport.loadobject import load_object
 from test.framework.crawlRunner.crawler_for_distribute import Crawler
 from test.framework.setting import Setting
-import logging
-
 from test.framework.utils.reactor import CallLaterOnce
 
 logger = logging.getLogger(__name__)
@@ -55,10 +57,20 @@ class Slot(object):
 
 class CrawlerRunner(object):
 
-    def __init__(self,spidercls=None,settings=None):
+    def __init__(self,settings=None,spidercls=None):
         if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
+
+        self.lfs = load_object(self.settings['LOG_FORMATTER_CLASS'])
+        self.lfm = self.lfs.from_settings(self.settings)
+
+        # self.lfm = LogFormat.from_settings(self.settings)
+        logger.debug(*self.lfm.crawled(
+            "CrawlerRunner", '',
+            '已初始化...')
+                     )
+
         self.spider_loder = []
         # 装载的是Crawler的集合
         self._crawlers = set()
@@ -66,21 +78,16 @@ class CrawlerRunner(object):
         self._active = set()
         # 子爬虫的数量
         self.MAX_CHILD_NUM = 9
-
-        # 子爬虫的类
-        self.spidercls = spidercls
-        '''
-        #  从数据库中加载task
-        self._task_from_db = None
-        #  从iter迭代器加载task
-        self._task_from_iter = None
-
-        '''
+        if not spidercls:
+            # 子爬虫的类
+            self.spidercls = spidercls
+        else :
+            # 从设置中导入子爬虫的类
+            self.spidercls = load_object(self.settings['SPIDER_CHILD_CLASS'])
 
         #  task完成标志位
         self.task_finish = False
         self.slot = None
-
 
         self.running = False
         self._task_schedule = queue.Queue()
@@ -134,10 +141,20 @@ class CrawlerRunner(object):
     def _load_starturl_from_schedule(self,spidercls):
         try:
             start_urls = self._task_schedule.get(block=False)
-            logger.debug("当前爬取的网页是:%s"%start_urls)
-            name = start_urls.split('/')[-2]
-            crawler = self.create_crawler(spidercls)
-            crawler._create_spider_from_task(name,start_urls)
+            if isinstance(start_urls,dict):
+                name = [key for key in start_urls.keys()][0]
+                start_url = [value for value in start_urls.values()][0]
+            else:
+                start_url = start_urls
+                name = start_url.split('/')[-2]
+            # logger.debug("当前爬取的网页是:%s"%start_urls)
+            logger.debug(*self.lfm.crawled(
+                "CrawlerRunner", name,
+                '当前爬取的网页',start_url)
+                         )
+            # crawler = self.create_crawler()
+            crawler = Crawler(self.spidercls, self.settings,self.lfm)
+            crawler._create_spider_from_task(name,start_url)
         except Empty:
             logger.debug("task 分配完毕！！！！")
             self._create_task()
@@ -147,7 +164,7 @@ class CrawlerRunner(object):
         return crawler
 
     @classmethod
-    def task_from(cls,db_or_iter,spidercls=None,setting=None):
+    def task_from(cls,db_or_iter,setting=None,spidercls=None,):
         if isinstance(db_or_iter,Iterable):
             cls._task_from_iter = db_or_iter
             cls._task_from_db = None
@@ -158,37 +175,58 @@ class CrawlerRunner(object):
 
     def _create_task(self):
         if self._task_from_db:
-            logger.debug("载入来自db的task!!!!")
+            # logger.debug("载入来自db的task!!!!")
+            logger.debug(*self.lfm.crawled(
+                "CrawlerRunner", '',
+                '载入来自db的task')
+                         )
             try:
                 next_task = self._task_from_db.next()
                 #  task_name = next_task["total_zone_name"][0]
                 for name, url in next_task.items():
                     if name != 'total_zone_name':
-                        logger.debug("%s加载入任务队列中"%url)
+                        # logger.debug("%s加载入任务队列中"%url)
+                        logger.debug(*self.lfm.crawled(
+                            "CrawlerRunner", '',
+                            '加载入任务队列中',
+                            url)
+                                     )
                         self._task_schedule.put(url)
                 return
             except StopIteration:
-                logger.debug("来自db的task载入完毕")
+                # logger.debug("来自db的task载入完毕")
+                logger.debug(*self.lfm.crawled(
+                    "CrawlerRunner", '',
+                    '来自db的task载入完毕')
+                             )
                 self.task_finish = True
                 return
             except AttributeError:
                 logger.error("task载入类型错误")
 
         if self._task_from_iter:
-            logger.debug("载入来自iter的task!!!")
+            # logger.debug("载入来自iter的task!!!")
+            logger.debug(*self.lfm.crawled(
+                "CrawlerRunner", '',
+                '载入来自iter的task')
+                         )
             if not hasattr(self._task_from_iter,"_next__"):
                 self._task_from_iter = iter(self._task_from_iter)
             while True:
                 try:
                     self._task_schedule.put(self._task_from_iter.__next__())
                 except StopIteration:
-                    logger.debug("来自iter的task载入完毕")
+                    # logger.debug("来自iter的task载入完毕")
+                    logger.debug(*self.lfm.crawled(
+                        "CrawlerRunner", '',
+                        '来自iter的task载入完毕')
+                                 )
                     self._task_from_iter = None
                     break
                 except AttributeError:
                     break
         else:
-            logger.debug("来自iter的task任务结束")
+            # logger.debug("来自iter的task任务结束")
             self.task_finish = True
 
     def needs_backout(self):
@@ -201,7 +239,9 @@ class CrawlerRunner(object):
         try:
             self.running = True
             self.start_time = time.clock()
-            logger.debug("开始时间是%f"%self.start_time)
+            # logger.debug("开始时间是%f"%self.start_time)
+            logger.debug(*self.lfm.crawled_time('CrawlerRunner','','开始时间:',
+                                                self.start_time))
             nextcall = CallLaterOnce(self.next_task_from_schedule)
 
             #  将task导入到队列中
@@ -218,7 +258,9 @@ class CrawlerRunner(object):
             logger.error(e)
 
     def next_task_from_schedule(self):
-        logger.debug("调用next_task_from_schedule")
+        # logger.debug("调用next_task_from_schedule")
+        logger.debug(*self.lfm.crawled('CrawlerRunner', '',
+                                       '调用next_task_from_schedule'))
         while self.needs_backout():
             self.crawl(self.spidercls)
 

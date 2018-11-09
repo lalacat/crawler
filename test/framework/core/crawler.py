@@ -34,7 +34,7 @@ class Crawler(object):
         self.logformatter = lf_cls.from_crawler(self)
         logger.debug(*self.logformatter.crawled(
             "Spider", 'None',
-            "Crawler", '已初始化...'))
+             '已初始化...',"Crawler"))
 
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))

@@ -35,6 +35,10 @@ class LogFormat(object):
     def from_crawler(cls,crawler):
         return cls(crawler.settings)
 
+    @classmethod
+    def from_settings(cls,settings):
+        return cls(settings)
+
     def crawled(self, module, name, msg, extra=None):
         return self.logformatter_adapter(self._crawled(module, name, msg, extra))
 
@@ -46,12 +50,13 @@ class LogFormat(object):
         return self.logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
 
     def _crawled(self,module,name,msg,extra=None):
+        module_name = name if name is '' else ':'+name
         if not extra:
             return {
                 'msg': self.settings['LOG_CRAWLED_MSG'],
                 'args': {
                     'module':module,
-                    'name':name,
+                    'name':module_name,
                     'msg':msg
                 }
             }
@@ -61,7 +66,7 @@ class LogFormat(object):
                     'msg': self.settings['LOG_CRAWLED_REQUEST_EXTRA'],
                     'args': {
                         'module': module,
-                        'name': name,
+                        'name': module_name,
                         'function': extra['function'],
                         'request': extra['request'],
                         'msg': msg,
@@ -72,19 +77,20 @@ class LogFormat(object):
                 'msg': self.settings['LOG_CRAWLED_EXTRA'],
                 'args': {
                     'module': module,
-                    'name':name,
+                    'name':module_name,
                     'extra_model':extra,
                     'msg':msg
                 }
             }
 
     def _crawled_time(self,module,name,msg,time,extra=None):
+        module_name = name if name is '' else ':'+name
         if not extra:
             return {
                 'msg': self.settings['LOG_CRAWLED_TIME'],
                 'args': {
                     'module':module,
-                    'name':name,
+                    'name':module_name,
                     'msg':msg,
                     'time':time
                 }
@@ -94,7 +100,7 @@ class LogFormat(object):
                 'msg': self.settings['LOG_CRAWLED_TIME_REQUEST_EXTRA'],
                 'args': {
                     'module': module,
-                    'name': name,
+                    'name': module_name,
                     'msg': msg,
                     'function': extra['function'],
                     'request': extra['request'],
@@ -107,7 +113,7 @@ class LogFormat(object):
                 'msg': self.settings['LOG_CRAWLED_TIME_EXTRA'],
                 'args': {
                     'module': module,
-                    'name':name,
+                    'name':module_name,
                     'extra_model':extra,
                     'msg':msg,
                     'time':time
@@ -116,6 +122,7 @@ class LogFormat(object):
             }
 
     def _error(self,module, name, function,msg):
+        module_name = name if name is '' else ':'+name
         error_msg = msg if msg else ''
         error_fun = function if function else ''
         if isinstance(error_fun,str) :
@@ -123,7 +130,7 @@ class LogFormat(object):
                 'msg': self.settings['LOG_ERROR_MSG'],
                 'args': {
                     'module': module,
-                    'name': name,
+                    'name': module_name,
                     'msg': error_msg,
                     'function': error_fun
                 }
@@ -133,7 +140,7 @@ class LogFormat(object):
                 'msg': self.settings['LOG_ERROR_REQUEST_EXTRA'],
                 'args': {
                     'module': module,
-                    'name': name,
+                    'name': module_name,
                     'msg': error_msg,
                     'function': error_fun['function'],
                     'request' : error_fun['request']
@@ -161,7 +168,8 @@ class LogFormat(object):
         return (message, args)
 
     def _load_format(self):
-        logging.config.dictConfig(self.settings['LOGGING_DIC'])  # 导入上面定义的logging配置
+        # 导入上面定义的logging配置
+        logging.config.dictConfig(self.settings['LOGGING_DIC'])
 
 
 

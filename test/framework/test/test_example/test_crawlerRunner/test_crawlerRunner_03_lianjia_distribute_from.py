@@ -5,14 +5,7 @@ import pymongo
 from twisted.internet import reactor
 
 from test.framework.setting import Setting
-from test.framework.crawlRunner.crawlerRunner__for_distribute_from import CrawlerRunner
-
-LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'
-DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
-logging.basicConfig(level=logging.DEBUG,format=LOG_FORMAT,datefmt=DATE_FORMAT)
-
-
-
+from test.framework.crawlRunner.crawlerRunner_for_distribute_from import CrawlerRunner
 
 # mongodb服务的地址和端口号
 mongo_url = "127.0.0.1:27017"
@@ -48,10 +41,21 @@ town_urls = [
     #'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
 
 ]
+town_urls_dict= [
+    {'lala':'https://sh.lianjia.com/xiaoqu/anshan/'},# 157 156
 
+    #'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+    #'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
+    #'https://sh.lianjia.com/xiaoqu/kongjianglu/',
+    #'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+    #'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+    #'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+    #'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
+
+]
 
 s = Setting()
-cr = CrawlerRunner.task_from(town_urls)
+cr = CrawlerRunner.task_from(town_urls_dict,s)
 d = cr.start()
 d.addBoth(lambda _:print(_))
 d.addBoth(lambda _:reactor.stop())

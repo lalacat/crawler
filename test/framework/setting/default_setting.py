@@ -94,19 +94,19 @@ LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d
 
 
 #LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
-LOG_CRAWLED_MSG = 'Crawled:[%(module)s:%(name)s] %(msg)s'
-LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s'
-LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
+LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s] %(msg)s'
+LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s'
+LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
 
 
-LOG_CRAWLED_TIME = 'Crawled:[%(module)s:%(name)s] %(msg)s%(time)6.3fs'
-LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s:%(name)s %(extra_model)s] %(msg)s%(time)6.3fs'
-LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s%(time)6.3fs'
+LOG_CRAWLED_TIME = 'Crawled:[%(module)s%(name)s] %(msg)s%(time)6.3fs'
+LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s%(time)6.3fs'
+LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(time)6.3fs'
 
 # LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s %(request)s]%(msg)s'
 
-LOG_ERROR_MSG = 'Error:[%(module)s:%(name)s %(function)s]%(msg)s'
-LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s:%(name)s %(function)s %(request)s] %(msg)s'
+LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
+LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
 
 
 LOGGING_DIC = {
@@ -193,7 +193,7 @@ RANDOMIZE_DOWNLOAD_DELAY = True  # 随机延迟
 SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.core.scheduler.Scheduler"
 SPIDER_MIDDLEWARES = {}
-
+SPIDER_CHILD_CLASS = 'test.framework.test.test_spider.simple_spider.simple_spider_05_xiaoqu_house.SimpleSpider'
 #T
 '''
 TEST_MIDDLEWARE = {

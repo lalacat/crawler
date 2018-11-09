@@ -33,7 +33,8 @@ class Crawler(object):
         if not logformat:
             lf_cls = load_object(self.settings['LOG_FORMATTER_CLASS'])
             self.logformatter = lf_cls.from_crawler(self)
-
+        else:
+            self.logformatter = logformat
         logger.debug(*self.logformatter.crawled(
             "Spider",'None',
             "Crawler",'已初始化...'))
@@ -69,8 +70,8 @@ class Crawler(object):
         yield d
         """ 
         try:
-            self.spider = self._spider
-            #self.spider = self._create_spider(*args, **kwargs)
+            if not self.spider:
+                self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
             yield self.engine.open_spider(self.spider,start_requests)
@@ -110,6 +111,10 @@ class Crawler(object):
     def _create_spider(self,*args, **kwargs):
         logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
         return self.spidercls.from_crawler(self,*args,**kwargs)
+
+    def _create_spider_from_task(self,spider_name,spider_start_urls):
+        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
+        self.spider = self.spidercls.from_task(spider_name,spider_start_urls)
 
     @inlineCallbacks
     def stop(self):

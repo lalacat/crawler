@@ -23,4 +23,3 @@ def load_object(path):
 
     return obj
 
-
