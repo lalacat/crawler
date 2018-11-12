@@ -160,7 +160,14 @@ class CrawlerRunner(object):
             self._create_task()
             crawler = None
         except Exception as e :
-            logger.error(e)
+            # logger.error(e)
+            logger.error(*self.logformatter.error("Spider",name,
+                                                  "Crawler",
+                                                  '出现错误:'),
+                         extra=
+                         {
+                             'exception': e,
+                         }, exc_info=True)
         return crawler
 
     @classmethod
