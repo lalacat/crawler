@@ -9,7 +9,6 @@ from typing import Iterable
 from twisted.internet import task, defer
 from twisted.internet.defer import DeferredList, inlineCallbacks
 
-from test.framework.log.log import LogFormat
 from test.framework.objectimport.loadobject import load_object
 from test.framework.crawlRunner.crawler_for_distribute import Crawler
 from test.framework.setting import Setting
@@ -105,7 +104,11 @@ class CrawlerRunner(object):
 
         def _done(result):
             # 当已装载的爬虫运行完后，从列表中清除掉
-            logger.debug("从列表中清除掉%s"%crawler.spider.name)
+            # logger.debug("从列表中清除掉%s"%crawler.spider.name)
+            logger.debug(*self.lfm.crawled(
+                "CrawlerRunner", '',
+                '从队列中清除掉{0}'.format(crawler.spider.name))
+                         )
             self._crawlers.discard(crawler.spider.name)
             self._active.discard(d)
             return result
@@ -134,7 +137,7 @@ class CrawlerRunner(object):
     def _create_crawler(self, spidercls):
         #  判断传入的参数是自定义爬虫的name还是对应的class模块
         if isinstance(spidercls, str):
-            logger.debug("传入的是str类型的class")
+            # logger.debug("传入的是str类型的class")
             spidercls = self.spider_loder.load(spidercls)
         return Crawler(spidercls, self.settings)
 
@@ -156,7 +159,11 @@ class CrawlerRunner(object):
             crawler = Crawler(self.spidercls, self.settings,self.lfm)
             crawler._create_spider_from_task(name,start_url)
         except Empty:
-            logger.debug("task 分配完毕！！！！")
+            # logger.debug("task 分配完毕！！！！")
+            logger.debug(*self.lfm.crawled(
+                "CrawlerRunner", '',
+                '"task 分配完毕')
+                         )
             self._create_task()
             crawler = None
         except Exception as e :
@@ -209,7 +216,9 @@ class CrawlerRunner(object):
                 self.task_finish = True
                 return
             except AttributeError:
-                logger.error("task载入类型错误")
+                # logger.error("task载入类型错误")
+                logger.error(*self.lfm.error("CrawlerRunner", '',
+                                             'task载入类型错误'))
 
         if self._task_from_iter:
             # logger.debug("载入来自iter的task!!!")
@@ -278,11 +287,14 @@ class CrawlerRunner(object):
             self._closewait.callback("Finish")
 
     def stop_task(self,_):
-        logger.debug("任务分配完毕，任务停止")
+        # logger.debug("任务分配完毕，任务停止")
         slot = self.slot
         slot.heartbeat.stop()
         end_time = time.clock()
-        logger.debug("运行时间:%ds" % end_time)
+        logger.debug(*self.lfm.crawled_time('CrawlerRunner', '',
+                                '任务分配完毕，任务停止,时间为:',
+                                            end_time,))
+        # logger.debug("运行时间:%ds" % end_time)
         self.task_finish = False
         return None
 
@@ -292,7 +304,7 @@ class CrawlerRunner(object):
         当所有的crawler完成激活之后，返回已经激活的defer的列表
         '''
         while self._active:
-            logger.debug("deferlist")
+            # logger.debug("deferlist")
             yield DeferredList(self._active)
 
 

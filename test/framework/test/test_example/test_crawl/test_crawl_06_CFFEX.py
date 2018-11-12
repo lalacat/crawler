@@ -1,7 +1,7 @@
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
 from twisted.internet import reactor
-from framework.test import Cffex_Rank
+from test.framework.test.test_spider.cffex_01_IF import Cffex_Rank
 
 '''
 LOG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s'

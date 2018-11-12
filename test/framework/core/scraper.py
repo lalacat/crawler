@@ -120,7 +120,6 @@ class Scraper(object):
             return _
 
         def log_error(_):
-            # print(_.getErrorMessage())
             logger.error(*self.lfm.error("Spider", self.spider.name,
                                             {
                                                 'function': 'Scraper',
@@ -211,8 +210,9 @@ class Scraper(object):
         if not result:
             # logger.warning("%s._parse或者request.callback返回的结果为None,不经过自定义process_item 处理！！"%spider.name)
             logger.warning(*self.lfm.crawled('Spider',spider.name,
-                                             '_parse(callback)',
-                                             '返回的结果为<None>,不经过自定义{process_item}处理'))
+                                             '返回的结果为<None>,不经过自定义{process_item}处理',
+                                             '_parse(callback)'
+                                             ))
             return defer_succeed(None)
         if isinstance(result,Request):
             #  针对是return 当spider处理后的结果是yield，那么result的类型是generator

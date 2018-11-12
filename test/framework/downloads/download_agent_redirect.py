@@ -128,36 +128,36 @@ class DownloadAgent(object):
         timeout = request.meta.get('download_timeout') or self._connectTimeout
         redirect = request.meta.get('download_redirect') or self._redirect
         self.request = request
-        # logger.info("<%s> 执行download_request,延迟时间:%d...",request,timeout)
-        logger.debug(*self.lfm.crawled_time(
-                    'Request',
-                    request,
-                    '执行download_request,延迟时间:',
-                     timeout)
-                    )
-        if redirect:
-            agent = self._getRedirectAgent(timeout)
-        else:
-            agent = self._getAgent(timeout)
-        #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
-        #  urldefrag去掉fragment
-        url = urldefrag(request.url)[0]
-        method = to_bytes(request.method)
-        headers = request.headers
-        if request.body:
-            bodyproducer = _RequestBodyProducer(request.body)
-        elif method == b'POST':
-            bodyproducer = _RequestBodyProducer(b'')
-        else :
-            bodyproducer = None
-        start_time = time.clock()
-
-        d = agent.request(method,
-              to_bytes(url),
-              headers,
-              bodyproducer)
-        d.addCallback(self._cb_latency,request,start_time)
         try:
+            # logger.info("<%s> 执行download_request,延迟时间:%d...",request,timeout)
+            logger.debug(*self.lfm.crawled_time(
+                        'Request',request,
+                        '执行download_request,延迟时间:',
+                         timeout)
+                        )
+            if redirect:
+                agent = self._getRedirectAgent(timeout)
+            else:
+                agent = self._getAgent(timeout)
+            #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
+            #  urldefrag去掉fragment
+            url = urldefrag(request.url)[0]
+            method = to_bytes(request.method)
+            headers = request.headers
+            if request.body:
+                bodyproducer = _RequestBodyProducer(request.body)
+            elif method == b'POST':
+                bodyproducer = _RequestBodyProducer(b'')
+            else :
+                bodyproducer = None
+            start_time = time.clock()
+
+            d = agent.request(method,
+                  to_bytes(url),
+                  headers,
+                  bodyproducer)
+            d.addCallback(self._cb_latency,request,start_time)
+
             #  下载request.body
             d.addCallback(self._cb_body_get,request)
             d.addCallback(self._cb_body_done,request,url)
@@ -166,44 +166,20 @@ class DownloadAgent(object):
             #  只有执行的方法是能够回到reactor主循环的时候，callLater才能执行
             #  _RequestBodyProducer中dataReceived方法不会一直占用，数据还没接收到是，是会回到reactor循环的，
             #  当总的接收数据的时间超过了timeout的时候，才会执行d.cancel
-            #  d.addCallback(self.fun_print,request)
             self._timeout_cl = reactor.callLater(timeout,d.cancel)
             d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
-            logger.error(e)
+            # logger.error(e)
+            logger.error(*self.lfm.error("Request", request,
+                                        DownloadAgent,
+                                        '下载过程中出现错误:'),
+                         extra=
+                         {
+                             'exception': e,
+                         }, exc_info=True)
+
         return d
-    """
-    测试区
-    
-    def fun_err(self,content):
-        print("接受信息错误")
-        return content
 
-    def fun_print(self,content,request):
-        logger.info("fun_print 成功")
-        logger.info(content)
-        if content.status == 301:
-            logger.critical("再次下载")
-            self._redirect = True
-            content = self.download_request(request)
-
-        return content
-
-    def fun_cancel(self,obj):
-        logger.debug("test cancel")
-        obj.cancel()
-
-    def fun_delay(self,content,num):
-        logger.debug("休眠 :%d s"%num)
-        for i in range(num,0,-1):
-            print("倒计时：%d" %i)
-            time.sleep(1)
-        return content
-
-
-    
-    测试区
-    """
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
         request.meta['download_latency'] = time.clock() - start_time
@@ -390,6 +366,7 @@ class _ResponseReader(Protocol):
                                             'dataReceived'
                                              ))
             self._warnsize_flag = True
+
 
     def connectionLost(self, reason):
         if self._finished.called:

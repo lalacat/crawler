@@ -57,7 +57,6 @@ town_urls_dict= [
 s = Setting()
 cr = CrawlerRunner.task_from(town_urls_dict,s)
 d = cr.start()
-d.addBoth(lambda _:print(_))
 d.addBoth(lambda _:reactor.stop())
 reactor.run()
 

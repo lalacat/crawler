@@ -50,7 +50,7 @@ class LogFormat(object):
         return self.logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
 
     def _crawled(self,module,name,msg,extra=None):
-        module_name = name if name is '' else ':'+name
+        module_name = name if name is '' else ':'+str(name)
         if not extra:
             return {
                 'msg': self.settings['LOG_CRAWLED_MSG'],
@@ -84,7 +84,7 @@ class LogFormat(object):
             }
 
     def _crawled_time(self,module,name,msg,time,extra=None):
-        module_name = name if name is '' else ':'+name
+        module_name = name if name is '' else ':'+str(name)
         if not extra:
             return {
                 'msg': self.settings['LOG_CRAWLED_TIME'],
@@ -122,7 +122,7 @@ class LogFormat(object):
             }
 
     def _error(self,module, name, function,msg):
-        module_name = name if name is '' else ':'+name
+        module_name = name if name is '' else ':'+str(name)
         error_msg = msg if msg else ''
         error_fun = function if function else ''
         if isinstance(error_fun,str) :

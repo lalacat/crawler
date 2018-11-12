@@ -29,7 +29,7 @@ class SimpleSpider(Spider):
 
     @name.setter
     def name(self, info):
-        base_name = "SpiderTask: "
+        base_name = "Task_"
         self._name = base_name+info
 
     @property
