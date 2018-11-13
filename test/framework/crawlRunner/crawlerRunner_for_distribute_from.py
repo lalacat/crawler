@@ -90,9 +90,9 @@ class CrawlerRunner(object):
         self.running = False
         self._task_schedule = queue.Queue()
 
-    def crawl(self, crawler_or_spidercls, *args, **kwargs):
+    def crawl(self, *args, **kwargs):
 
-        crawler = self._load_starturl_from_schedule(crawler_or_spidercls)
+        crawler = self._load_starturl_from_schedule()
         if crawler is None:
             return None
         return self._crawl(crawler, *args, **kwargs)
@@ -120,27 +120,27 @@ class CrawlerRunner(object):
         d.addBoth(_next_slot)
         self._active.add(d)
 
-    def create_crawler(self, crawler_or_spidercls):
+    # def create_crawler(self, crawler_or_spidercls):
+    #
+    #     '''
+    #     先判断传入的参数是不是已经包装成Crawler，如果是，直接返回
+    #     不是的，将传入的参数进行包装，返回成Crawler
+    #     :param crawler_or_spidercls: Crawler的实例，或者是自定义爬虫模块
+    #     :return: Cralwer的实例
+    #     '''
+    #
+    #     if isinstance(crawler_or_spidercls, Crawler):
+    #         return crawler_or_spidercls
+    #     return self._create_crawler(crawler_or_spidercls)
+    #
+    # def _create_crawler(self, spidercls):
+    #     #  判断传入的参数是自定义爬虫的name还是对应的class模块
+    #     if isinstance(spidercls, str):
+    #         # logger.debug("传入的是str类型的class")
+    #         spidercls = self.spider_loder.load(spidercls)
+    #     return Crawler(spidercls, self.settings)
 
-        '''
-        先判断传入的参数是不是已经包装成Crawler，如果是，直接返回
-        不是的，将传入的参数进行包装，返回成Crawler
-        :param crawler_or_spidercls: Crawler的实例，或者是自定义爬虫模块
-        :return: Cralwer的实例
-        '''
-
-        if isinstance(crawler_or_spidercls, Crawler):
-            return crawler_or_spidercls
-        return self._create_crawler(crawler_or_spidercls)
-
-    def _create_crawler(self, spidercls):
-        #  判断传入的参数是自定义爬虫的name还是对应的class模块
-        if isinstance(spidercls, str):
-            # logger.debug("传入的是str类型的class")
-            spidercls = self.spider_loder.load(spidercls)
-        return Crawler(spidercls, self.settings)
-
-    def _load_starturl_from_schedule(self,spidercls):
+    def _load_starturl_from_schedule(self):
         try:
             start_urls = self._task_schedule.get(block=False)
             if isinstance(start_urls,dict):
@@ -154,7 +154,6 @@ class CrawlerRunner(object):
                 "CrawlerRunner", name,
                 '当前爬取的网页',start_url)
                          )
-            # crawler = self.create_crawler()
             crawler = Crawler(self.spidercls, self.settings,self.lfm)
             crawler._create_spider_from_task(name,start_url)
         except Empty:
@@ -255,7 +254,7 @@ class CrawlerRunner(object):
             self.running = True
             self.start_time = time.clock()
             # logger.debug("开始时间是%f"%self.start_time)
-            logger.warning(*self.lfm.crawled_time('CrawlerRunner','','开始时间:',
+            logger.critical(*self.lfm.crawled_time('CrawlerRunner','','开始时间:',
                                                 self.start_time))
             nextcall = CallLaterOnce(self.next_task_from_schedule)
 
@@ -290,7 +289,7 @@ class CrawlerRunner(object):
         slot = self.slot
         slot.heartbeat.stop()
         end_time = time.clock()
-        logger.warning(*self.lfm.crawled_time('CrawlerRunner', '',
+        logger.critical(*self.lfm.crawled_time('CrawlerRunner', '',
                                 '任务分配完毕，任务停止,时间为:',
                                             end_time,))
         # logger.debug("运行时间:%ds" % end_time)

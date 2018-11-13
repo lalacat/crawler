@@ -108,8 +108,8 @@ LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(req
 LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
 LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
 
-# LOG_LEVEL = "WARNING"
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "ERROR"
+# LOG_LEVEL = "DEBUG"
 
 LOGGING_DIC = {
     'version': 1,
