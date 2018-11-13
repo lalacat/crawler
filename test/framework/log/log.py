@@ -8,7 +8,7 @@ import warnings
 from test.framework.log.test_logger_A import Log_A
 # 定义三种日志输出格式 开始
 from test.framework.setting import Setting
-
+logger = logging.getLogger(__name__)
 
 class LogFormat(object):
     # log配置字典
@@ -29,6 +29,7 @@ class LogFormat(object):
         logfile_path = os.path.join(logfile_dir, logfile_name)
         '''
         self.settings =settings
+        self.level = settings['LOG_LEVEL']
         self._load_format()
 
     @classmethod
@@ -170,7 +171,5 @@ class LogFormat(object):
     def _load_format(self):
         # 导入上面定义的logging配置
         logging.config.dictConfig(self.settings['LOGGING_DIC'])
-
-
 
 

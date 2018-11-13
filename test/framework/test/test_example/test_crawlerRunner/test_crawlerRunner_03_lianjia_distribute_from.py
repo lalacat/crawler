@@ -44,13 +44,13 @@ town_urls = [
 town_urls_dict= [
     {'lala':'https://sh.lianjia.com/xiaoqu/anshan/'},# 157 156
 
-    #'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-    #'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
-    #'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-    #'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-    #'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-    #'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-    #'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
+    # 'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+    # 'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
+    # 'https://sh.lianjia.com/xiaoqu/kongjianglu/',
+    # 'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+    # 'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+    # 'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+    # 'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
 
 ]
 

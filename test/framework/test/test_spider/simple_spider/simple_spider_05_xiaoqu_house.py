@@ -55,7 +55,6 @@ class SimpleSpider(Spider):
         total_xiaoqu_number = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
         logger.debug("%s的总页数是%d" % (self.name, self.total_page_number))
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
-
         return None
         '''   
         for i in range(1, self.total_page_number + 1):

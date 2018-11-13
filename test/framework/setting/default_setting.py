@@ -108,6 +108,8 @@ LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(req
 LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
 LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
 
+# LOG_LEVEL = "WARNING"
+LOG_LEVEL = "DEBUG"
 
 LOGGING_DIC = {
     'version': 1,
@@ -171,10 +173,10 @@ LOGGING_DIC = {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
             'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
-            # 'level': 'WARNING',
-            'level': 'DEBUG',
+            'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
+
     },
 }
 

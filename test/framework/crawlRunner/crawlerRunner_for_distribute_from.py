@@ -64,8 +64,7 @@ class CrawlerRunner(object):
         self.lfs = load_object(self.settings['LOG_FORMATTER_CLASS'])
         self.lfm = self.lfs.from_settings(self.settings)
 
-        # self.lfm = LogFormat.from_settings(self.settings)
-        logger.debug(*self.lfm.crawled(
+        logger.info(*self.lfm.crawled(
             "CrawlerRunner", '',
             '已初始化...')
                      )
@@ -151,7 +150,7 @@ class CrawlerRunner(object):
                 start_url = start_urls
                 name = start_url.split('/')[-2]
             # logger.debug("当前爬取的网页是:%s"%start_urls)
-            logger.debug(*self.lfm.crawled(
+            logger.info(*self.lfm.crawled(
                 "CrawlerRunner", name,
                 '当前爬取的网页',start_url)
                          )
@@ -190,7 +189,7 @@ class CrawlerRunner(object):
     def _create_task(self):
         if self._task_from_db:
             # logger.debug("载入来自db的task!!!!")
-            logger.debug(*self.lfm.crawled(
+            logger.info(*self.lfm.crawled(
                 "CrawlerRunner", '',
                 '载入来自db的task')
                          )
@@ -222,7 +221,7 @@ class CrawlerRunner(object):
 
         if self._task_from_iter:
             # logger.debug("载入来自iter的task!!!")
-            logger.debug(*self.lfm.crawled(
+            logger.info(*self.lfm.crawled(
                 "CrawlerRunner", '',
                 '载入来自iter的task')
                          )
@@ -256,7 +255,7 @@ class CrawlerRunner(object):
             self.running = True
             self.start_time = time.clock()
             # logger.debug("开始时间是%f"%self.start_time)
-            logger.debug(*self.lfm.crawled_time('CrawlerRunner','','开始时间:',
+            logger.warning(*self.lfm.crawled_time('CrawlerRunner','','开始时间:',
                                                 self.start_time))
             nextcall = CallLaterOnce(self.next_task_from_schedule)
 
@@ -291,7 +290,7 @@ class CrawlerRunner(object):
         slot = self.slot
         slot.heartbeat.stop()
         end_time = time.clock()
-        logger.debug(*self.lfm.crawled_time('CrawlerRunner', '',
+        logger.warning(*self.lfm.crawled_time('CrawlerRunner', '',
                                 '任务分配完毕，任务停止,时间为:',
                                             end_time,))
         # logger.debug("运行时间:%ds" % end_time)

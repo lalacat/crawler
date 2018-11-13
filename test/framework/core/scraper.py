@@ -1,4 +1,5 @@
 import logging
+import pprint
 import time
 from collections import deque, Iterable
 
@@ -177,21 +178,33 @@ class Scraper(object):
         return dfd
 
     def handle_spider_error(self, _failure, request, response, spider):
+        # 接受来自Spider中的异常
         exc = _failure.value
         end_time = time.clock()
         # logger.error("%(request)s处理结果的时候出现错误：\n%(failure)s\nprocess item 持续时间"
         #              "为：%(time)f",
         #              {"request":request,"failure":exc,"time":(end_time-self.start_time)})
 
-        logger.error(*self.lfm.error('Spider',self.spider.name,
-                                     {
-                                         'function':'Scraper',
-                                         'request':request
-                                     },'处理结果的时候出现错误')
-                     ,extra={
-                        'exception':exc,
-                        'time':'处理结果时间为：{:6.3f}s'.format(end_time-self.start_time)
-                    },exc_info = True)
+        if self.lfm.level is not 'DEBUG':
+            logger.error(*self.lfm.error('Spider',self.spider.name,
+                                         {
+                                             'function':'Scraper',
+                                             'request':request
+                                         },'调用_parse方法过程中出现错误:')
+                         ,extra={
+                            'exception':exc,
+                            'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)
+                        })
+        else:
+            logger.error(*self.lfm.error('Spider',self.spider.name,
+                                         {
+                                             'function':'Scraper',
+                                             'request':request
+                                         },'调用_parse方法过程中出现错误，详细内容为:')
+                         ,extra={
+                            'exception':_failure,
+                            'time':'错误时间为：{:6.3f}s'.format(end_time-self.start_time)
+                        },exc_info = True)
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")
 
