@@ -30,6 +30,7 @@ class LogFormat(object):
         '''
         self.settings =settings
         self.level = settings['LOG_LEVEL']
+        self.settings.update({'LOG_FILE_NAME': 'test'})
         self._load_format()
 
     @classmethod
@@ -45,7 +46,6 @@ class LogFormat(object):
 
     def error(self, module, name,function, msg):
         return self.logformatter_adapter(self._error(module, name,function, msg))
-
 
     def crawled_time(self,module,name,msg,time,extra=None):
         return self.logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
@@ -171,5 +171,6 @@ class LogFormat(object):
     def _load_format(self):
         # 导入上面定义的logging配置
         logging.config.dictConfig(self.settings['LOGGING_DIC'])
+
 
 

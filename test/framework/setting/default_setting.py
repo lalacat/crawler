@@ -83,7 +83,9 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 LOG_FORMATTER_CLASS = 'test.framework.log.log.LogFormat'
 LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
+
 LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
+
 LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
 LOG_DEBUG_FORMAT_01 = '%(message)s%(extra_info)s-[%(filename)s:%(lineno)d]'
 
@@ -108,15 +110,16 @@ LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(req
 LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
 LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
 
-LOG_LEVEL = "ERROR"
-# LOG_LEVEL = "DEBUG"
+# LOG_LEVEL = "ERROR"
+LOG_FILE_NAME  = 'default_log_name'
+LOG_LEVEL = "DEBUG"
 
 LOGGING_DIC = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'file_format': {
-            'format': LOG_FILE_FORMAT,
+            'format': LOG_DEBUG_FORMAT_01,
             'datefmt': LOG_DATE_FORMAT
 
         },
@@ -151,28 +154,29 @@ LOGGING_DIC = {
 
         },
         'console_error': {
-            'level': 'ERROR',
+            'level': 'DEBUG',
             # 'class': 'logging.StreamHandler',  # 打印到屏幕
             'class': 'test.framework.log.loghandler.ConsoleErrorHandler',  # 自定义打印到屏幕
             'formatter': 'error_format',
         },
         # 打印到文件的日志,收集info及以上的日志
 
-        # 'file': {
-        #     'level': 'DEBUG',
-        #     'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件
-        #     'formatter': 'file_format',
-        #     'filename': "test",  # 日志文件
-        #     'maxBytes': 1024 * 1024 * 5,  # 日志大小 5M
-        #     'backupCount': 5,
-        #     'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
-        # },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'test.framework.log.loghandler.FileHandler',  # 保存到文件
+            'formatter': 'file_format',
+            'filters': ['error_filter'],
+            'filename': LOG_FILE_NAME,  # 日志文件
+            'maxBytes': 1024 * 1024 * 5,  # 日志大小 5M
+            'backupCount': 5,  # 当一个文件超过大小的时候，最多再添加5个文件
+            'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
+        },
 
     },
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['file','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },

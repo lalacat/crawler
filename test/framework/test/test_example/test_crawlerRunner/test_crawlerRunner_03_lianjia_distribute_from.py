@@ -78,17 +78,17 @@ town_urls = [
 ]
 town_urls_dict= [
     'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
-    'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-    'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
-    'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-    'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-    'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-    'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-    'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
+    # 'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+    # 'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
+    # 'https://sh.lianjia.com/xiaoqu/kongjianglu/',
+    # 'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+    # 'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+    # 'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+    # 'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
 ]
 
 s = Setting()
-cr = CrawlerRunner.task_from(all_zone,s)
+cr = CrawlerRunner.task_from(town_urls_dict,s)
 d = cr.start()
 d.addBoth(lambda _:reactor.stop())
 reactor.run()
