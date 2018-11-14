@@ -1,5 +1,8 @@
 import logging
 from logging.handlers import RotatingFileHandler
+logging.FileHandler
+
+
 class ConsoleHandler(logging.StreamHandler):
 
     def __init__(self, *args, **kwargs):
@@ -39,39 +42,48 @@ class ConsoleErrorHandler(logging.StreamHandler):
         except Exception:
             self.handleError(record)
 
-class FileHandler(RotatingFileHandler):
 
-    def __init__(self, *args, **kwargs):
-        super(RotatingFileHandler, self).__init__(filename=self.filename, mode='a', maxBytes=self.maxBytes,
-                                                  backupCount=self.backupCount, encoding=self.encoding, delay=False)
+class RotateFileHandler(RotatingFileHandler):
+    #  不覆盖原有的文件，一直生成
+    def __init__(self,filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=False):
+        super(RotateFileHandler, self).__init__(filename=filename,mode=mode,
+                                                  maxBytes=maxBytes,
+                                                  backupCount=backupCount,
+                                                  encoding=encoding,
+                                                  delay=delay)
 
     # 每进行一次log就会调用这个方法
     def emit(self, record):
+        """
+        Emit a record.
+
+        Output the record to the file, catering for rollover as described
+        in doRollover().
+        """
         if not hasattr(record, 'extra_info'):
             record.__dict__['extra_info'] = ' '
         try:
-            msg = self.format(record)
-            stream = self.stream
-            stream.write(msg)
-            stream.write(self.terminator)
-            self.flush()
+            if self.shouldRollover(record):
+                self.doRollover()
+            logging.FileHandler.emit(self, record)
         except Exception:
             self.handleError(record)
 
-    def shouldRollover(self, record):
-        """
-        Determine if rollover should occur.
 
-        Basically, see if the supplied record would cause the file to exceed
-        the size limit we have.
+class OnlyOneFileHandler(logging.FileHandler):
+    def __init__(self,filename, mode='a', encoding=None, delay=False):
+        super(OnlyOneFileHandler, self).__init__(filename=filename,mode=mode,
+                                                  encoding=encoding,
+                                                  delay=delay)
+    def emit(self, record):
+        """
+        Emit a record.
+
+        If the stream was not opened because 'delay' was specified in the
+        constructor, open it before calling the superclass's emit.
         """
         if not hasattr(record, 'extra_info'):
             record.__dict__['extra_info'] = ' '
-        if self.stream is None:  # delay was set...
+        if self.stream is None:
             self.stream = self._open()
-        if self.maxBytes > 0:  # are we rolling over?
-            msg = "%s\n" % self.format(record)
-            self.stream.seek(0, 2)  # due to non-posix-compliant Windows feature
-            if self.stream.tell() + len(msg) >= self.maxBytes:
-                return 1
-        return 0
+        logging.StreamHandler.emit(self, record)

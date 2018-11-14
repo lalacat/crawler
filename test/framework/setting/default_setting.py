@@ -54,7 +54,7 @@ ITEM_PIPELINES = {
     # "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
-    # "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
+    "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_06_shfe.Spider_Out_print": 10,
 
 }
@@ -83,6 +83,8 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 LOG_FORMATTER_CLASS = 'test.framework.log.log.LogFormat'
 LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
+LOG_FILE_FORMAT_01 = '[%(levelname)s][%(asctime)s]:%(message)s%(extra_info)s - [%(filename)s][line:%(lineno)d]: '
+
 
 LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
 
@@ -110,16 +112,16 @@ LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(req
 LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
 LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
 
-# LOG_LEVEL = "ERROR"
-LOG_FILE_NAME  = 'default_log_name'
-LOG_LEVEL = "DEBUG"
+LOG_FILE_PATH = 'C:\\Users\\scott\\PycharmProjects\\crawler\\log_record\\'
+LOG_FILE_NAME  = LOG_FILE_PATH+'default_log_name.log'
+LOG_LEVEL = "ERROR"
 
 LOGGING_DIC = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'file_format': {
-            'format': LOG_DEBUG_FORMAT_01,
+            'format': LOG_FILE_FORMAT_01,
             'datefmt': LOG_DATE_FORMAT
 
         },
@@ -147,28 +149,36 @@ LOGGING_DIC = {
         #  打印到终端的日志
         'console_info': {
             'level': 'DEBUG',
-            # 'class': 'logging.StreamHandler',  # 打印到屏幕
             'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
             'formatter': 'debug_format',
             'filters': ['error_filter'],
 
         },
         'console_error': {
-            'level': 'DEBUG',
-            # 'class': 'logging.StreamHandler',  # 打印到屏幕
+            'level': 'ERROR',
             'class': 'test.framework.log.loghandler.ConsoleErrorHandler',  # 自定义打印到屏幕
             'formatter': 'error_format',
         },
         # 打印到文件的日志,收集info及以上的日志
-
-        'file': {
+        'rollfile': {
             'level': 'DEBUG',
-            'class': 'test.framework.log.loghandler.FileHandler',  # 保存到文件
+            'class': 'test.framework.log.loghandler.RotateFileHandler',  # 保存到文件
+            # 'class':'logging.handlers.RotatingFileHandler',
             'formatter': 'file_format',
             'filters': ['error_filter'],
             'filename': LOG_FILE_NAME,  # 日志文件
+            # 'mode': 'w',  # 文件的读写模式
             'maxBytes': 1024 * 1024 * 5,  # 日志大小 5M
             'backupCount': 5,  # 当一个文件超过大小的时候，最多再添加5个文件
+            'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
+        },
+        'onefile': {
+            'level': 'DEBUG',
+            'class': 'test.framework.log.loghandler.OnlyOneFileHandler',  # 保存到文件
+            'formatter': 'file_format',
+            'filters': ['error_filter'],
+            'filename': LOG_FILE_NAME,  # 日志文件
+            'mode': 'w',  # 文件的读写模式
             'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
         },
 
@@ -176,10 +186,17 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['file','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
-            'level': LOG_LEVEL,
+            'handlers': ['onefile','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            # 'handlers':['file'],
+            'level': "DEBUG",
             'propagate': True,  # 向上（更高level的logger）传递
         },
+        # 'lala': {
+        #     'handlers': ['onefile','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+        #     # 'handlers':['file'],
+        #     'level': "DEBUG",
+        #     'propagate': True,  # 向上（更高level的logger）传递
+        # },
 
     },
 }

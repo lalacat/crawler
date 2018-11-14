@@ -338,11 +338,11 @@ class _ResponseReader(Protocol):
                             bytes= self._bytes_received,
                             maxsize = self._maxsize)
             ))
-                # "从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
-                #          "最大值(%(maxsize)s) bytes " % {
-                # 'request_and_response' : self._request,
-                # 'bytes' : self._bytes_received,
-                # 'maxsize' : self._maxsize})
+            # "从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+            #          "最大值(%(maxsize)s) bytes " % {
+            # 'request_and_response' : self._request,
+            # 'bytes' : self._bytes_received,
+            # 'maxsize' : self._maxsize})
             # 当下载量超过最大值的时候，把数据缓存变量情况，取消下载
             self._bodybuf.truncate(0)
             """

@@ -3,6 +3,8 @@ logging配置
 """
 import os
 import logging.config
+import pprint
+import time
 import warnings
 
 from test.framework.log.test_logger_A import Log_A
@@ -10,9 +12,12 @@ from test.framework.log.test_logger_A import Log_A
 from test.framework.setting import Setting
 logger = logging.getLogger(__name__)
 
+
+
+
+
 class LogFormat(object):
     # log配置字典
-
 
     def __init__(self,settings=None):
         # 定义日志输出格式 结束
@@ -29,8 +34,8 @@ class LogFormat(object):
         logfile_path = os.path.join(logfile_dir, logfile_name)
         '''
         self.settings =settings
-        self.level = settings['LOG_LEVEL']
-        self.settings.update({'LOG_FILE_NAME': 'test'})
+        self.file_name = self._get_filename()
+        self._update_loggingdict()
         self._load_format()
 
     @classmethod
@@ -42,13 +47,13 @@ class LogFormat(object):
         return cls(settings)
 
     def crawled(self, module, name, msg, extra=None):
-        return self.logformatter_adapter(self._crawled(module, name, msg, extra))
+        return self._logformatter_adapter(self._crawled(module, name, msg, extra))
 
     def error(self, module, name,function, msg):
-        return self.logformatter_adapter(self._error(module, name,function, msg))
+        return self._logformatter_adapter(self._error(module, name,function, msg))
 
     def crawled_time(self,module,name,msg,time,extra=None):
-        return self.logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
+        return self._logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
 
     def _crawled(self,module,name,msg,extra=None):
         module_name = name if name is '' else ':'+str(name)
@@ -150,9 +155,20 @@ class LogFormat(object):
         else:
             raise AttributeError("log输出参数错误")
 
+    def _update_loggingdict(self):
+        for name, logset in self.settings['LOGGING_DIC'].items():
+            if name is 'handlers':
+                if isinstance(logset, dict):
+                    for key,value in logset.items():
+                        if value.get('filename'):
+                            value['filename'] = self.file_name
 
+    def _get_filename(self):
+        time_now = time.localtime(time.time())
+        time_str = time.strftime('%Y%m%d', time_now)
+        return self.settings['LOG_FILE_PATH']+time_str+'.log'
 
-    def logformatter_adapter(self,logkws):
+    def _logformatter_adapter(self,logkws):
         """
         Helper that takes the dictionary output from the methods in LogFormatter
         and adapts it into a tuple of positional arguments for logger.log calls,
@@ -171,6 +187,10 @@ class LogFormat(object):
     def _load_format(self):
         # 导入上面定义的logging配置
         logging.config.dictConfig(self.settings['LOGGING_DIC'])
+
+
+
+
 
 
 

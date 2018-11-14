@@ -213,8 +213,6 @@ class BaseSettings(object):
         '''
         self.update(values,priority)
 
-
-
     def setmodule(self,module,priority='project'):
         '''用于导入默认的设置包或者自定义的设置文件'''
         if isinstance(module,str):
@@ -232,6 +230,7 @@ class BaseSettings(object):
     def copy(self):
         """对当前设置进行深度复制，为的是根据不同的对象，可能在个别的配置上存在着不同"""
         return copy.deepcopy(self)
+
 
 
 class Setting(BaseSettings):
