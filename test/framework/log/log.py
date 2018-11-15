@@ -35,6 +35,7 @@ class LogFormat(object):
         '''
         self.settings =settings
         self.file_name = self._get_filename()
+        print(self.file_name)
         self._update_loggingdict()
         self._load_format()
 
@@ -165,8 +166,13 @@ class LogFormat(object):
 
     def _get_filename(self):
         time_now = time.localtime(time.time())
-        time_str = time.strftime('%Y%m%d', time_now)
-        return self.settings['LOG_FILE_PATH']+time_str+'.log'
+        time_str = time.strftime('%Y%m%d', time_now)+'.log'
+        os.chdir('../../')
+        logfile_dir = os.path.join(os.path.dirname(os.getcwd()),'log_record')
+        if not os.path.isdir(logfile_dir):
+            os.makedirs(logfile_dir)
+        file_name = os.path.join(logfile_dir,time_str)
+        return file_name
 
     def _logformatter_adapter(self,logkws):
         """
@@ -189,8 +195,13 @@ class LogFormat(object):
         logging.config.dictConfig(self.settings['LOGGING_DIC'])
 
 
+root_path = os.getcwd()
+root = root_path.rindex('crawler')
 
+print(root)
+print(root_path[:root+len('crawler')])
 
-
-
-
+os.chdir('../../')
+logfile_dir = os.path.join(os.path.dirname(os.getcwd()),'log_record')
+if not os.path.isdir(logfile_dir):
+    os.makedirs(logfile_dir)
