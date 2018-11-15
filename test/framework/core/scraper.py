@@ -270,7 +270,9 @@ class Scraper(object):
             # logger.info("处理的output%(request)s的类型是<BaseItem, dict,int>，
             # 将由自定义的process_item方法进行处理！！添加时间是：%(time)f",
             # {"request":output,"time":time.clock()})
-            logger.info(*self.lfm.crawled_time('Spider',spider.name,'Output的类型是<BaseItem, dict,int>,将通过自定义的process_item方法进行处理,处理时间:',time.clock(),output))
+            logger.info(*self.lfm.crawled_time(
+                'Spider',spider.name,
+                'Output的类型是<BaseItem, dict,int>,将通过自定义的process_item方法进行处理,处理时间:',time.clock()))
 
             self.slot.itemproc_size += 1
             dfd = self.itemproc.process_item(item=output,spider=spider)
@@ -316,7 +318,7 @@ class Scraper(object):
             logger.debug(*self.lfm.crawled('Spider',spider.name,'处理完毕',
                                            {
                                                'function': 'Scraper',
-                                               'request': item
+                                               'request': 'item'
                                            }
                                            ))
         return None

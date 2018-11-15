@@ -125,7 +125,7 @@ def iter_errback(iterable, errback, *a, **kw):
     try:
         it = iter(iterable)
     except Exception as e :
-        print(e)
+        raise Exception(e)
     while True:
         try:
             yield next(it)
@@ -133,5 +133,8 @@ def iter_errback(iterable, errback, *a, **kw):
             break
         except:
             errback(failure.Failure(), *a, **kw)
-
-
+#
+# a = ['a','b','c','d']
+#
+# for i in iter_errback(a,lambda _:print(_)):
+#     print(i)

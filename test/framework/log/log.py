@@ -34,8 +34,8 @@ class LogFormat(object):
         logfile_path = os.path.join(logfile_dir, logfile_name)
         '''
         self.settings =settings
+        self.level = settings['LOG_LEVEL']
         self.file_name = self._get_filename()
-        print(self.file_name)
         self._update_loggingdict()
         self._load_format()
 
@@ -167,8 +167,9 @@ class LogFormat(object):
     def _get_filename(self):
         time_now = time.localtime(time.time())
         time_str = time.strftime('%Y%m%d', time_now)+'.log'
-        os.chdir('../../')
-        logfile_dir = os.path.join(os.path.dirname(os.getcwd()),'log_record')
+        root_path = os.getcwd()
+        root_num = root_path.index('crawler')
+        logfile_dir = os.path.join(root_path[:root_num+len('crawler')],'log_record')
         if not os.path.isdir(logfile_dir):
             os.makedirs(logfile_dir)
         file_name = os.path.join(logfile_dir,time_str)
@@ -195,13 +196,10 @@ class LogFormat(object):
         logging.config.dictConfig(self.settings['LOGGING_DIC'])
 
 
-root_path = os.getcwd()
-root = root_path.rindex('crawler')
+# root_path = os.getcwd()
+# root = root_path.index('crawler')
+#
+# print(root)
+# print(root_path[:root+len('crawler')])
+# print(os.path.dirname(root_path[:root+len('crawler')]))
 
-print(root)
-print(root_path[:root+len('crawler')])
-
-os.chdir('../../')
-logfile_dir = os.path.join(os.path.dirname(os.getcwd()),'log_record')
-if not os.path.isdir(logfile_dir):
-    os.makedirs(logfile_dir)

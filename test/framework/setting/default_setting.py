@@ -48,13 +48,14 @@ HEADER_COLLECTION =[
 #T
 ITEM_PIPELINES = {
     # "test.framework.pipelines.mongoDB.MongoDB":20,
+    "test.framework.test.test_middleware.test_db.lianjia_xiaoqu_mongoDB_01.LJ_XQ_DB":10,
     # "test.framework.pipelines.print_result.Print_Result":10,
     # "test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
-    "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
+    # "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_06_shfe.Spider_Out_print": 10,
 
 }
@@ -83,7 +84,7 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 LOG_FORMATTER_CLASS = 'test.framework.log.log.LogFormat'
 LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
-LOG_FILE_FORMAT_01 = '[%(levelname)s][%(asctime)s]:%(message)s%(extra_info)s - [%(filename)s][line:%(lineno)d]: '
+LOG_FILE_FORMAT_01 = '[%(levelname)s][%(asctime)s]:%(message)s%(extra_info)s - [%(filename)s][line:%(lineno)d]\n '
 
 
 LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
@@ -114,7 +115,7 @@ LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %
 
 LOG_FILE_PATH = 'C:\\Users\\scott\\PycharmProjects\\crawler\\log_record\\'
 LOG_FILE_NAME  = LOG_FILE_PATH+'default_log_name.log'
-LOG_LEVEL = "ERROR"
+LOG_LEVEL = "DEBUG"
 
 LOGGING_DIC = {
     'version': 1,
@@ -176,7 +177,7 @@ LOGGING_DIC = {
             'level': 'DEBUG',
             'class': 'test.framework.log.loghandler.OnlyOneFileHandler',  # 保存到文件
             'formatter': 'file_format',
-            'filters': ['error_filter'],
+            # 'filters': ['error_filter'],
             'filename': LOG_FILE_NAME,  # 日志文件
             'mode': 'w',  # 文件的读写模式
             'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
@@ -187,8 +188,7 @@ LOGGING_DIC = {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
             'handlers': ['onefile','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
-            # 'handlers':['file'],
-            'level': "DEBUG",
+            'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
         # 'lala': {
@@ -202,7 +202,9 @@ LOGGING_DIC = {
 }
 
 #M
-MONGODB_URL = "149.28.192.96:27017"
+# MONGODB_URL = "149.28.192.96:27017"
+MONGODB_URL = "127.0.0.1:27017"
+
 MONGODB_NAME = "LianJia"
 #N
 #O

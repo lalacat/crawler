@@ -67,7 +67,9 @@ class SimpleSpider(Spider):
         self.result[str(page_num)]=self._get_onePage(all_communities)
         self.result_len += len(self.result[str(page_num)])
         print(self.name+':'+str(page_num))
-        return None
+        # print(type(self.result[str(page_num)]))
+        # print(self.result[str(page_num)])
+        return self.result[str(page_num)]
 
     def _parse_get_HouseInfo(self,response):
         pass
@@ -114,4 +116,6 @@ class SimpleSpider(Spider):
             one_page.append(result)
 
         return one_page
+
+
 

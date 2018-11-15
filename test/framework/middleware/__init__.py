@@ -54,6 +54,7 @@ class MiddlewareManager(object):
                     clsname = clspath.split('.')[-1]
                     mwcls = load_object(clspath)
                     #  两个if用来判断mwcls是类的情况下，是跟crawler关联还是和settings相关联
+                    # 用来实例化所有的中间件
                     if crawler and hasattr(mwcls,'from_crawler'):
                         mw = mwcls.from_crawler(crawler)
                     elif hasattr(mwcls,'from_settings'):
@@ -98,8 +99,6 @@ class MiddlewareManager(object):
                     function=None,
                     msg = e),
                 exc_info = True)
-
-
 
     @classmethod
     def from_crawler(cls,crawler):
