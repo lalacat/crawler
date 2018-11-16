@@ -1,6 +1,7 @@
 import pymongo
 import logging
 
+from test.framework.core.crawler import Crawler
 
 logger = logging.getLogger(__name__)
 
@@ -51,20 +52,20 @@ class LJ_XQ_DB(object):
                 logger.debug(*self.lfm.crawled(
                     "Spider",spider.name,
                 '正在添加进入数据库'))
-                _db_collection = self.db[self.collection_name]
+                self._db_collection = self.db[self.collection_name]
                 if self.db_filter(item) == 'insert':
-                    _db_collection.insert_one(item)
+                    self._db_collection.insert_one(item)
                 elif self.db_filter(item) == 'update':
-                    _db_collection.update(self.update_query,self.update_doctument)
+                    self._db_collection.update(self.update_query,self.update_doctument)
                 return None
             return item
 
     def db_filter(self,item):
         #  1.防止重复写入
         #  2.对某条字段更新
-        if self._db_collection.find(item).count() == 1:
+        if self._db_collection.find(item).count() >= 1:
             return 'exist'
-        elif self._db_collection.find(item['']).count() == 1:
+        elif self._db_collection.find({'community_name':item['community_name']}).count() >= 1:
             self.update_query = {'community_name':item['community_name']}
             self.update_doctument ={'$set':{
                    'community_sale_num': item['community_sale_num'],
@@ -73,5 +74,11 @@ class LJ_XQ_DB(object):
                    'community_avr_price': item['community_avr_price']
                 }}
             return 'update'
-        else:
+        elif self._db_collection.find(item).count() == 0:
             return 'insert'
+        else:
+            print('Nothing')
+            'Nothing'
+
+
+

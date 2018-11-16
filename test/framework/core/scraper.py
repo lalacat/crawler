@@ -304,15 +304,16 @@ class Scraper(object):
 
         self.slot.itemproc_size -= 1
         if isinstance(output, Failure):
-            ex = output.value
+
             # logging.error(ex)
             # logger.error('process item(%(item)s)过程中出现错误', {'item': item})
             logger.error(*self.lfm.error('Spider',spider.name,
                                        {
                                            'function':'Scraper',
-                                           'request':item
+                                           'request':'item'
                                        },'处理过程中出现错误:')
-                         ,extra={'exception':ex})
+                         ,extra=
+                         {'exception':output})
         else:
             # logger.debug("process item(%s)处理完毕"%item,extra={'spider': spider})
             logger.debug(*self.lfm.crawled('Spider',spider.name,'处理完毕',

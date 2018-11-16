@@ -87,6 +87,7 @@ class SimpleSpider(Spider):
             community_name = community_info.xpath('./div[@class="title"]/a')[0].text
             result["community_name"] = community_name
 
+
             # 小区url
             community_url = community_info.xpath('./div[@class="title"]/a')[0].get('href')
             result["community_url"] = community_url
