@@ -17,6 +17,9 @@ class LJ_XQ_DB(object):
         self.db_name = self.settings["MONGODB_NAME"]
         self.collection_name = None
 
+        self.update_query = None
+        self.update_doctument= None
+
         try:
             self.client = pymongo.MongoClient(self.db_url)
             self.db = self.client[self.db_name]
@@ -34,7 +37,6 @@ class LJ_XQ_DB(object):
         return cls(crawler)
 
     def open_spider(self,spider):
-        print('mongodb open_spider')
         self.collection_name = spider.name
 
     def process_item(self,item,spider):
@@ -45,11 +47,31 @@ class LJ_XQ_DB(object):
                 'self.__class__.__name__'))
             return item
         else:
-            logger.debug(*self.lfm.crawled(
-                "Spider",spider.name,
-            '正在添加进入数据库'))
+            if spider.handler_db:
+                logger.debug(*self.lfm.crawled(
+                    "Spider",spider.name,
+                '正在添加进入数据库'))
+                _db_collection = self.db[self.collection_name]
+                if self.db_filter(item) == 'insert':
+                    _db_collection.insert_one(item)
+                elif self.db_filter(item) == 'update':
+                    _db_collection.update(self.update_query,self.update_doctument)
+                return None
+            return item
 
-            _db_collection = self.db[self.collection_name]
-            # if not _db_collection.find({"total_zone_name":item["total_zone_name"]}).count():
-            _db_collection.insert_one(item)
-            return None
+    def db_filter(self,item):
+        #  1.防止重复写入
+        #  2.对某条字段更新
+        if self._db_collection.find(item).count() == 1:
+            return 'exist'
+        elif self._db_collection.find(item['']).count() == 1:
+            self.update_query = {'community_name':item['community_name']}
+            self.update_doctument ={'$set':{
+                   'community_sale_num': item['community_sale_num'],
+                   'community_rent_num': item['community_rent_num'],
+                   'community_onsale_num': item['community_onsale_num'],
+                   'community_avr_price': item['community_avr_price']
+                }}
+            return 'update'
+        else:
+            return 'insert'

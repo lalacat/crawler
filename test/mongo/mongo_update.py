@@ -10,7 +10,7 @@ mongo_url = "127.0.0.1:27017"
 client = pymongo.MongoClient(mongo_url)
 
 #连接到数据库myDatabase
-DATABASE = "Twisted_Database"
+DATABASE = "test"
 db = client[DATABASE]
 
 #连接到集合(表):myDatabase.myCollection
@@ -24,7 +24,11 @@ _data = {
     'content': 'PyMongo is fun, you guys',
     'author': 'Scott'
 }
-
+house_info = {'community_name': '和平花苑', 'community_url': 'https://sh.lianjia.com/xiaoqu/5011000017889/',
+              'community_sale_num': '1', 'community_rent_num': '1',
+              'community_onsale_num': '10',
+              'community_bulid_year': '1997年建成',
+              'community_avr_price': '75616'}
 post_data = defaultdict(list)
 post_data["A"] = [x for x in range(3)]
 post_data["B"] = [x for x in range(3,6)]

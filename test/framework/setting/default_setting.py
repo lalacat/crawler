@@ -164,11 +164,9 @@ LOGGING_DIC = {
         'rollfile': {
             'level': 'DEBUG',
             'class': 'test.framework.log.loghandler.RotateFileHandler',  # 保存到文件
-            # 'class':'logging.handlers.RotatingFileHandler',
             'formatter': 'file_format',
-            'filters': ['error_filter'],
+            # 'filters': ['error_filter'],
             'filename': LOG_FILE_NAME,  # 日志文件
-            # 'mode': 'w',  # 文件的读写模式
             'maxBytes': 1024 * 1024 * 5,  # 日志大小 5M
             'backupCount': 5,  # 当一个文件超过大小的时候，最多再添加5个文件
             'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
@@ -191,12 +189,6 @@ LOGGING_DIC = {
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
-        # 'lala': {
-        #     'handlers': ['onefile','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
-        #     # 'handlers':['file'],
-        #     'level': "DEBUG",
-        #     'propagate': True,  # 向上（更高level的logger）传递
-        # },
 
     },
 }
