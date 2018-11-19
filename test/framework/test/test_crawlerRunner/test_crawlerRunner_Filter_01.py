@@ -1,5 +1,7 @@
-from collections import Iterable
+import queue
 
+from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import FilterTask
+from collections import Iterable
 
 import pymongo
 
@@ -26,8 +28,6 @@ one = xiaoqu.next()
 #
 db_coll = db[COLLECTION]
 
-print(db.collection_names())
-
 def make_generator(obj):
     if isinstance(obj,Iterable):
         try:
@@ -52,19 +52,46 @@ j = 0
 #         print(i)
 #     print(str(j)+':'+i)
 # a = make_generator(collecs)
+def filter(b):
+    for key,value in next(b).items():
+        yield (key,value)
 searchRes = db_coll.find({"total_zone_name":"huangpu"},{'_id':False})
 a = make_generator(searchRes)
+c = next(a)
+b = make_generator(c)
+print(c[next(b)])
+
+
+# f = FilterTask()
+
+# while True:
+#     try:
+#         for i in range(50):
+#             try:
+#                 temp = f.filter(next(b))
+#                 print(temp)
+#             except StopIteration:
+#                 print('没了')
+#                 raise StopIteration('Nothing')
+#         print('50次\n')
+#     except StopIteration:
+#         break
+#
+
+
+a = [('a',1),('b',2),('c',3)]
+a1 = ('a',1)
+a2 = ('b',2)
+a3 = ('c',3)
+q = queue.Queue()
+# q.put(a1)
+# q.put(a2)
+# q.put(a3)
+q.put(a)
+
 while True:
     try:
-        for i in range(50):
-            try:
-                temp = next(a)
-                print(i)
-                print(temp)
-            except StopIteration:
-                print('没了')
-                raise StopIteration('Nothing')
-        print('50次\n')
-    except StopIteration:
+        b = q.get(block=False)
+        print(b)
+    except queue.Empty:
         break
-

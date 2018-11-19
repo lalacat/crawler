@@ -56,7 +56,7 @@ class Slot(object):
 
 class CrawlerRunner(object):
 
-    def __init__(self,settings=None,spidercls=None):
+    def __init__(self,tasks,settings=None,spidercls=None):
         if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
@@ -68,7 +68,7 @@ class CrawlerRunner(object):
             "CrawlerRunner", '',
             '已初始化...')
                      )
-
+        self._tasks = tasks
         self.spider_loder = []
         # 装载的是Crawler的集合
         self._crawlers = set()
@@ -76,6 +76,11 @@ class CrawlerRunner(object):
         self._active = set()
         # 子爬虫的数量
         self.MAX_CHILD_NUM = 9
+        # 子爬虫的名称
+        # self.SPIDER_NAME_CHOICE = self.settings['SPIDER_NAME_CHOICE']
+        self.SPIDER_NAME_CHOICE = False
+        # 缓冲的地址最大数量
+        self.MAX_SCHEDULE_NUM = 10
         if not spidercls:
             # 子爬虫的类
             self.spidercls = spidercls
@@ -84,7 +89,10 @@ class CrawlerRunner(object):
             self.spidercls = load_object(self.settings['SPIDER_CHILD_CLASS'])
 
         #  task完成标志位
+        self.filter_task = FilterTask(self.SPIDER_NAME_CHOICE)
         self.task_finish = False
+        self._next_task = None
+
         self.slot = None
 
         self.running = False
@@ -122,105 +130,63 @@ class CrawlerRunner(object):
     def _load_starturl_from_schedule(self):
         try:
             start_urls = self._task_schedule.get(block=False)
-            if isinstance(start_urls,dict):
-                name = [key for key in start_urls.keys()][0]
-                start_url = [value for value in start_urls.values()][0]
-            else:
-                start_url = start_urls
-                name = start_url.split('/')[-2]
+            name = start_urls[0]
+            start_url = start_urls[1]
             # logger.debug("当前爬取的网页是:%s"%start_urls)
             logger.info(*self.lfm.crawled(
                 "CrawlerRunner", name,
                 '当前爬取的网页',start_url)
                          )
             crawler = Crawler(self.spidercls, self.settings,self.lfm)
-            crawler._create_spider_from_task(name,start_url)
+            crawler.create_spider_from_task(name,start_url)
+            return crawler
         except Empty:
-            # logger.debug("task 分配完毕！！！！")
             logger.debug(*self.lfm.crawled(
                 "CrawlerRunner", '',
                 '"task 分配完毕')
                          )
             self._create_task()
-            crawler = None
         except Exception as e :
             # logger.error(e)
-            logger.error(*self.logformatter.error("Spider",name,
-                                                  "Crawler",
-                                                  '出现错误:'),
+            logger.error(*self.lfm.error("CrawlerRunner","",
+                                         "",
+                                         '出现错误:',),
                          extra=
                          {
                              'exception': e,
                          }, exc_info=True)
-        return crawler
-
-    @classmethod
-    def task_from(cls,db_or_iter,setting=None,spidercls=None,):
-        if isinstance(db_or_iter,Iterable):
-            cls._task_from_iter = db_or_iter
-            cls._task_from_db = None
-        if isinstance(db_or_iter,pymongo.cursor.Cursor):
-            cls._task_from_iter = None
-            cls._task_from_db = db_or_iter
-        return cls(spidercls,setting)
+        return None
 
     def _create_task(self):
-        if self._task_from_db:
-            # logger.debug("载入来自db的task!!!!")
-            logger.info(*self.lfm.crawled(
-                "CrawlerRunner", '',
-                '载入来自db的task')
-                         )
-            try:
-                next_task = self._task_from_db.next()
-                #  task_name = next_task["total_zone_name"][0]
-                for name, url in next_task.items():
-                    if name != 'total_zone_name':
-                        # logger.debug("%s加载入任务队列中"%url)
-                        logger.debug(*self.lfm.crawled(
-                            "CrawlerRunner", '',
-                            '加载入任务队列中',
-                            url)
-                                     )
-                        self._task_schedule.put(url)
+        logger.info(*self.lfm.crawled(
+            "CrawlerRunner", '',
+            'task装载入队列中')
+                     )
+        try:
+            while self._task_schedule.qsize() <= self.SPIDER_NAME_CHOICE:
+                # logger.debug(*self.lfm.crawled(
+                #     "CrawlerRunner", '',
+                #     '加载入任务队列中')
+                #              )
+                if self._next_task is None:
+                    self._next_task = self.filter_task(next(self._tasks))
+                if isinstance(self._next_task,tuple):
+                    self._task_schedule.put(self._next_task)
+                else:
+                    try:
+                        self._task_schedule.put(next(self._next_task))
+                    except StopIteration:
+                        self._next_task = None
                 return
-            except StopIteration:
-                # logger.debug("来自db的task载入完毕")
-                logger.debug(*self.lfm.crawled(
-                    "CrawlerRunner", '',
-                    '来自db的task载入完毕')
-                             )
-                self.task_finish = True
-                return
-            except AttributeError:
-                # logger.error("task载入类型错误")
-                logger.error(*self.lfm.error("CrawlerRunner", '',
-                                             'task载入类型错误'))
-
-        if self._task_from_iter:
-            # logger.debug("载入来自iter的task!!!")
-            logger.info(*self.lfm.crawled(
+        except StopIteration:
+            # logger.debug("来自db的task载入完毕")
+            logger.debug(*self.lfm.crawled(
                 "CrawlerRunner", '',
-                '载入来自iter的task')
+                '来自db的task载入完毕')
                          )
-            if not hasattr(self._task_from_iter,"_next__"):
-                self._task_from_iter = iter(self._task_from_iter)
-            while True:
-                try:
-                    self._task_schedule.put(self._task_from_iter.__next__())
-                except StopIteration:
-                    # logger.debug("来自iter的task载入完毕")
-                    logger.debug(*self.lfm.crawled(
-                        "CrawlerRunner", '',
-                        '来自iter的task载入完毕')
-                                 )
-                    self._task_from_iter = None
-                    break
-                except AttributeError:
-                    break
-        else:
-            # logger.debug("来自iter的task任务结束")
             self.task_finish = True
+            return
+
 
     def needs_backout(self):
         flag = not self.task_finish and len(self._active) < self.MAX_CHILD_NUM
@@ -231,15 +197,15 @@ class CrawlerRunner(object):
         assert not self.running,"task载入已启动"
         try:
             self.running = True
-            self.start_time = time.clock()
             # logger.debug("开始时间是%f"%self.start_time)
             logger.critical(*self.lfm.crawled_time('CrawlerRunner','','开始时间:',
-                                                self.start_time))
-            nextcall = CallLaterOnce(self.next_task_from_schedule)
+                                                   time.clock()))
 
-            #  将task导入到队列中
+            # 将task导入到队列中
+            self._tasks = make_generator(self.tasks)
             self._create_task()
 
+            nextcall = CallLaterOnce(self.next_task_from_schedule)
             self.slot = Slot(nextcall)
             self.slot.nextcall.schedule()
             self.slot.heartbeat.start(5)
@@ -248,7 +214,13 @@ class CrawlerRunner(object):
             self._closewait.addBoth(self.stop_task)
             yield self._closewait
         except Exception as e:
-            logger.error(e)
+            logger.error(*self.lfm.error("CrawlerRunner", "",
+                                         "",
+                                         '出现错误:', ),
+                         extra=
+                         {
+                             'exception': e,
+                         }, exc_info=True)
 
     def next_task_from_schedule(self):
         # logger.debug("调用next_task_from_schedule")
@@ -275,16 +247,57 @@ class CrawlerRunner(object):
         self.task_finish = False
         return None
 
-    @inlineCallbacks
-    def join(self):
-        '''
-        当所有的crawler完成激活之后，返回已经激活的defer的列表
-        '''
-        while self._active:
-            # logger.debug("deferlist")
-            yield DeferredList(self._active)
+
+class FilterTask(object):
+
+    def __init__(self,settings= None):
+        # 子爬虫的名称
+        # self.SPIDER_NAME_CHOICE = settings['SPIDER_NAME_CHOICE']
+        self.SPIDER_NAME_CHOICE = False
+        self.name_num = 0
+        # self.filter_words = settings['TASK_FILTER_NAME']
+        self.filter_words = 'community_url'
+
+    """
+    传入的task类型有三种
+    1.迭代前是list的列表，传入后，需要默认添加名称：SPIDER_NAME_CHOICE = Ture
+    2.迭代前是数据的游标，传入后分两种，
+        a)每个task中包含多个URL，此时数据库中每个对象的格式应该是dict类型{name:url}，此时name,url可以分别取task中的每个dict内容
+        b)每个task中只含有一个URL，此时使用关键字就行，name需要使用默认添加名称
+    """
+    def filter(self,task):
+        if self.SPIDER_NAME_CHOICE:
+            name = str(self.name_num)
+            self.name_num += 1
+            if isinstance(task,str):
+                url = task
+            else:
+                url = task[self.filter_words]
+        else:
+            if isinstance(task, dict):
+                if len(task) == 1:
+                    name = [key for key in task.keys()][0]
+                    url = [value for value in task.values()][0]
+                else:
+                    return make_generator(task)
+            else:
+                raise TypeError('task({0})的类型必须是<dict>，或者将{SPIDER_NAME_CHOICE}设置为True，自动为每个task设置名称'.format(type(task)))
+        return (name, url)
 
 
-
-
-
+def make_generator(tasks):
+    try:
+        it = iter(tasks)
+    except Exception as e:
+        # logger.error(*self.lfm.error("CrawlerRunner", '',
+        #                              'tasks不能被迭代',
+        #                              '_make_generator'),
+        #              extra={
+        #                  'exception': e
+        #              })
+        raise TypeError('tasks不能被迭代')
+    while True:
+        try:
+            yield it.__next__()
+        except StopIteration:
+            break

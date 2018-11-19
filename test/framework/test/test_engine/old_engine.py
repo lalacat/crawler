@@ -1,7 +1,7 @@
 from twisted.internet import defer,reactor
 from twisted.web.client import getPage
 from queue import Queue
-from test.framework.utils.url_convert import safe_url_string
+from test.framework.utils.urllibs import safe_url_string
 
 import logging
 #LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"

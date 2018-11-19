@@ -1,12 +1,15 @@
+import re
+from urllib.parse import urlparse
+
 from twisted.web.client import getPage
 from twisted.internet import reactor,defer
 from six.moves.urllib.parse import (urljoin, urlsplit, urlunsplit,
-                                    urldefrag, urlencode, urlparse,
+                                    urldefrag, urlencode,
                                     quote, parse_qs, parse_qsl,
                                     ParseResult, unquote, urlunparse)
+from w3lib.url import any_to_uri
 from w3lib.util import to_bytes, to_native_str, to_unicode
 import string
-
 
 # constants from RFC 3986, Section 2.2 and 2.3
 RFC3986_GEN_DELIMS = b':/?#[]@'
@@ -93,14 +96,14 @@ def escape_ajax(url):
 def add_or_replace_parameter(url, name, new_value):
     """Add or remove a parameter to a given url
 
-    >>> import w3lib.url
-    >>> w3lib.url.add_or_replace_parameter(https', 'arg', 'v')
-    'https://www.example.com/index.php?arg=v'
-    >>> w3lib.url.add_or_replace_parameter(hhttps, 'arg4', 'v4')
-    'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3httpsarg4=v4'
-    >>> w3lib.url.add_or_replace_parameter(https, 'arg3', 'v3new')
-    'http://www.example.com/inhttpsphp?arg1=v1&arg2=v2&arg3=v3new'
-    >>>
+    # >>> import w3lib.url
+    # >>> w3lib.url.add_or_replace_parameter(https', 'arg', 'v')
+    # 'https://www.example.com/index.php?arg=v'
+    # >>> w3lib.url.add_or_replace_parameter(hhttps, 'arg4', 'v4')
+    # 'http://www.example.com/index.php?arg1=v1&arg2=v2&arg3httpsarg4=v4'
+    # >>> w3lib.url.add_or_replace_parameter(https, 'arg3', 'v3new')
+    # 'http://www.example.com/inhttpsphp?arg1=v1&arg2=v2&arg3=v3new'
+    # >>>
 
     """
     parsed = urlsplit(url)
@@ -120,4 +123,63 @@ def add_or_replace_parameter(url, name, new_value):
 
     query = urlencode(new_args)
     return urlunsplit(parsed._replace(query=query))
+
+def add_http_if_no_scheme(url):
+    """Add http as the default scheme if it is missing from the url."""
+    match = re.match(r"^\w+://", url, flags=re.I)
+    if not match:
+        parts = urlparse(url)
+        scheme = "http:" if parts.netloc else "http://"
+        url = scheme + url
+
+    return url
+
+
+def guess_scheme(url):
+    """Add an URL scheme if missing: file:// for filepath-like input or http:// otherwise."""
+    parts = urlparse(url)
+    if parts.scheme:
+        return url
+    # Note: this does not match Windows filepath
+    if re.match(r'''^                   # start with...
+                    (
+                        \.              # ...a single dot,
+                        (
+                            \. | [^/\.]+  # optionally followed by
+                        )?                # either a second dot or some characters
+                    )?      # optional match of ".", ".." or ".blabla"
+                    /       # at least one "/" for a file path,
+                    .       # and something after the "/"
+                    ''', parts.path, flags=re.VERBOSE):
+        return any_to_uri(url)
+    else:
+        return add_http_if_no_scheme(url)
+
+def validate_url(url):
+    _url = urlparse(url)
+    print(_url)
+    if not _url.scheme :
+        if not _url.netloc:
+            return False
+        elif re.match(r'''^                   # start with...
+                            (
+                                \.              # ...a single dot,
+                                (
+                                    \. | [^/\.]+  # optionally followed by
+                                )?                # either a second dot or some characters
+                            )?      # optional match of ".", ".." or ".blabla"
+                            /       # at least one "/" for a file path,
+                            .       # and something after the "/"
+                            ''', _url.path, flags=re.VERBOSE):
+            return any_to_uri(url)
+        else:
+            return add_http_if_no_scheme(url)
+    return url
+
+
+
+#
+# dd = validate_url('www.baidu.com')
+# print(dd)
+
 
