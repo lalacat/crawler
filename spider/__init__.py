@@ -59,5 +59,8 @@ class Spider(object_ref):
     def _set_crawler(self,crawler):
         self.crawler = crawler
 
+    def __str__(self):
+        return '<%s %s>'%(self.name,self.start_urls)
+    __repr__ = __str__
 
 

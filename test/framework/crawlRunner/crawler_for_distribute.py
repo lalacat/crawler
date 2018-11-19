@@ -52,21 +52,22 @@ class Crawler(object):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
 
-        """
+
         self.spider = self._spider
         url = self.spider._start_urls[0].encode("utf-8")
-
-        def _parse(response):
-            seletor = etree.HTML(response)
-            #  获取下属城镇的小区总数
-            page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
-            num = json.loads(page_number[0])["totalPage"]
-            logger.debug("%s的总页数是%d"%(self.spider.name,num))
-            return None
-
-        d = getPage(url)
-        d.addBoth(_parse)
-        yield d
+        print(self.spider)
+        #
+        # def _parse(response):
+        #     seletor = etree.HTML(response)
+        #     #  获取下属城镇的小区总数
+        #     page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
+        #     num = json.loads(page_number[0])["totalPage"]
+        #     logger.debug("%s的总页数是%d"%(self.spider.name,num))
+        #     return None
+        #
+        # d = getPage(url)
+        # d.addBoth(_parse)
+        yield self.spider
         """ 
         try:
             if not self.spider:
@@ -94,7 +95,7 @@ class Crawler(object):
                 yield self.engine.stop()
                 # yield self.stop()
             yield defer_succeed('crawl stop')
-
+    """
 
     """
     用户封装调度器以及引擎

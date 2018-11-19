@@ -89,9 +89,11 @@ class CrawlerRunner(object):
             self.spidercls = load_object(self.settings['SPIDER_CHILD_CLASS'])
 
         #  task完成标志位
-        self.filter_task = FilterTask(self.SPIDER_NAME_CHOICE)
+        # self.filter_task = FilterTask(self.SPIDER_NAME_CHOICE)
+        self.filter_task = 10
         self.task_finish = False
         self._next_task = None
+        self.fifer = FilterTask(settings)
 
         self.slot = None
 
@@ -164,29 +166,33 @@ class CrawlerRunner(object):
                      )
         try:
             while self._task_schedule.qsize() <= self.SPIDER_NAME_CHOICE:
-                # logger.debug(*self.lfm.crawled(
-                #     "CrawlerRunner", '',
-                #     '加载入任务队列中')
-                #              )
+
                 if self._next_task is None:
-                    self._next_task = self.filter_task(next(self._tasks))
+                    temp_cache = next(self._tasks)
+                    self._next_task = self.fifer.filter_task(temp_cache)
                 if isinstance(self._next_task,tuple):
+                    filter_data = self._next_task
                     self._task_schedule.put(self._next_task)
+                    self._next_task = None
                 else:
                     try:
-                        self._task_schedule.put(next(self._next_task))
+                        name = next(self._next_task)
+                        filter_data = self.fifer.filter_task((name,temp_cache[name]))
+                        if filter_data:
+                            self._task_schedule.put(filter_data)
                     except StopIteration:
                         self._next_task = None
+                logger.debug(*self.lfm.crawled(
+                    "CrawlerRunner", 'schedule',
+                    '来自db的task载入完毕',filter_data))
                 return
         except StopIteration:
-            # logger.debug("来自db的task载入完毕")
             logger.debug(*self.lfm.crawled(
                 "CrawlerRunner", '',
                 '来自db的task载入完毕')
                          )
             self.task_finish = True
             return
-
 
     def needs_backout(self):
         flag = not self.task_finish and len(self._active) < self.MAX_CHILD_NUM
@@ -202,7 +208,7 @@ class CrawlerRunner(object):
                                                    time.clock()))
 
             # 将task导入到队列中
-            self._tasks = make_generator(self.tasks)
+            self._tasks = make_generator(self._tasks)
             self._create_task()
 
             nextcall = CallLaterOnce(self.next_task_from_schedule)
@@ -253,7 +259,7 @@ class FilterTask(object):
     def __init__(self,settings= None):
         # 子爬虫的名称
         # self.SPIDER_NAME_CHOICE = settings['SPIDER_NAME_CHOICE']
-        self.SPIDER_NAME_CHOICE = False
+        self.SPIDER_NAME_CHOICE = True
         self.name_num = 0
         # self.filter_words = settings['TASK_FILTER_NAME']
         self.filter_words = 'community_url'
@@ -265,24 +271,46 @@ class FilterTask(object):
         a)每个task中包含多个URL，此时数据库中每个对象的格式应该是dict类型{name:url}，此时name,url可以分别取task中的每个dict内容
         b)每个task中只含有一个URL，此时使用关键字就行，name需要使用默认添加名称
     """
-    def filter(self,task):
+    def filter_task(self,task):
+
+        if isinstance(task, str) and not self.SPIDER_NAME_CHOICE:
+            raise ValueError('爬虫的URL需要设置名称，或者将{SPIDER_NAME_CHOICE}设置为True,使用默认值！')
+
         if self.SPIDER_NAME_CHOICE:
+
             name = str(self.name_num)
             self.name_num += 1
-            if isinstance(task,str):
+            if isinstance(task, str):
                 url = task
             else:
-                url = task[self.filter_words]
+                if not isinstance(task, dict):
+                    raise TypeError('task(%s)的类型必须是<str>或者包含关键字{%s}的<dict>，'
+                                    '或者将{SPIDER_NAME_CHOICE}设置为False，自动为每个task设置名称'
+                                    % (type(task), 'community_url'))
+                else:
+                    if task.get('community_url'):
+                        url = task['community_url']
+                    else:
+                        raise KeyError('task(%s)包含关键字{%s}' % (type(task), 'community_url'))
         else:
             if isinstance(task, dict):
                 if len(task) == 1:
                     name = [key for key in task.keys()][0]
                     url = [value for value in task.values()][0]
-                else:
+                elif len(task) > 1:
                     return make_generator(task)
+                else:
+                    raise TypeError('task(%s)的类型必须是<dict>，或者将{SPIDER_NAME_CHOICE}设置为True，自动为每个task设置名称' % type(task))
             else:
-                raise TypeError('task({0})的类型必须是<dict>，或者将{SPIDER_NAME_CHOICE}设置为True，自动为每个task设置名称'.format(type(task)))
+                if isinstance(task, tuple):
+                    if task[0] == 'total_zone_name':
+                        return None
+                    name = task[0]
+                    url = task[1]
+
         return (name, url)
+
+
 
 
 def make_generator(tasks):

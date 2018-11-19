@@ -1,3 +1,4 @@
+import pprint
 import queue
 
 from collections import Iterable
@@ -19,18 +20,14 @@ db = client[DATABASE]
 COLLECTION = "XiaoQu"
 
 xiaoqu = db[COLLECTION].find({})
-# print(type(xiaoqu))
-# print(xiaoqu)
 one = xiaoqu.next()
-# print(one)
-# print(type(one))
-#
+
 db_coll = db[COLLECTION]
 searchRes = db_coll.find({},{'_id':False})
 
 
-
-town_urls_dict= [
+#  list
+town_urls_list = [
     'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
     'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
     'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
@@ -41,6 +38,7 @@ town_urls_dict= [
     'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
 ]
 
+# 所有URL,在community_url下的，dict没有命名的
 queryArgs = [
     {"total_zone_name":"putuo"},
     {"total_zone_name":"minhang"},
@@ -72,6 +70,10 @@ for query in queryArgs:
         except StopIteration:
             break
 
+#
+
+
+
 def make_generator(obj):
     if isinstance(obj,Iterable):
         try:
@@ -88,30 +90,40 @@ def make_generator(obj):
         print('False')
 
 
+
+
+
+
+print(len(all_zone))
 _task_schedule = queue.Queue()
 _next_task = None
-_tasks = make_generator(searchRes)
-SPIDER_NAME_CHOICE = False
+_tasks = make_generator(all_zone)
+SPIDER_NAME_CHOICE = True
 name_num = 0
 task_finish = False
+temp_dict = None
 
 
 def _create_task():
     global task_finish
+    global _next_task
+    global _tasks
+    global temp_dict
     try:
         while _task_schedule.qsize() <= 10:
-            global _next_task
-            global _tasks
+
             if _next_task is None:
-                _next_task = filter(next(_tasks))
+                temp_dict = next(_tasks)
+                _next_task = filter(temp_dict)
             if isinstance(_next_task, tuple):
                 _task_schedule.put(_next_task)
                 _next_task = None
             else:
                 try:
                     temp = next(_next_task)
-                    print(temp)
-                    _task_schedule.put((temp,_next_task[temp]))
+                    filter_data = filter((temp,temp_dict[temp]))
+                    if filter_data:
+                      _task_schedule.put(filter_data)
                 except StopIteration:
                     _next_task = None
         print('10次')
@@ -125,27 +137,42 @@ def _create_task():
 def filter(task):
     global name_num
     global SPIDER_NAME_CHOICE
+
+    if isinstance(task,str) and not SPIDER_NAME_CHOICE:
+        raise ValueError('爬虫的URL需要设置名称，或者将{SPIDER_NAME_CHOICE}设置为True,使用默认值！')
     if SPIDER_NAME_CHOICE:
-        if len(task) > 1 :
-            raise TypeError('task(%s)的类型必须是<str>或者包含关键字{%s}，或者将{SPIDER_NAME_CHOICE}设置为False，自动为每个task设置名称'%(type(task),'community_url'))
+
         name = str(name_num)
         name_num += 1
         if isinstance(task,str):
             url = task
         else:
-            url = task['community_url']
+            if not isinstance(task,dict):
+                raise TypeError('task(%s)的类型必须是<str>或者包含关键字{%s}的<dict>，'
+                                '或者将{SPIDER_NAME_CHOICE}设置为False，自动为每个task设置名称'
+                                % (type(task), 'community_url'))
+            else:
+                if task.get('community_url'):
+                    url = task['community_url']
+                else:
+                    raise KeyError('task(%s)包含关键字{%s}' % (type(task), 'community_url'))
     else:
         if isinstance(task, dict):
             if len(task) == 1:
                 name = [key for key in task.keys()][0]
                 url = [value for value in task.values()][0]
-            else:
+            elif len(task) > 1 :
                 return make_generator(task)
+            else:
+                raise TypeError('task(%s)的类型必须是<dict>，或者将{SPIDER_NAME_CHOICE}设置为True，自动为每个task设置名称'%type(task))
         else:
-            raise TypeError('task(%s)的类型必须是<dict>，或者将{SPIDER_NAME_CHOICE}设置为True，自动为每个task设置名称'%type(task))
+            if isinstance(task, tuple):
+                if task[0] == 'total_zone_name':
+                    return None
+                name = task[0]
+                url = task[1]
+
     return (name, url)
-
-
 
 
 
