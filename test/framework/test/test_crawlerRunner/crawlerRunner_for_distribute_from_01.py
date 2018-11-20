@@ -81,7 +81,7 @@ class CrawlerRunner(object):
         self.SPIDER_NAME_CHOICE = False
         # 缓冲的地址最大数量
         self.MAX_SCHEDULE_NUM = 10
-        if not spidercls:
+        if spidercls:
             # 子爬虫的类
             self.spidercls = spidercls
         else :
@@ -193,13 +193,30 @@ class CrawlerRunner(object):
                          )
             self.task_finish = True
             return
+        except ValueError as e:
+            logger.error(*self.lfm.error("CrawlerRunner", "_create_task",
+                                         "",
+                                         '出现错误:', ),
+                         extra=
+                         {
+                             'exception': e,
+                         })
+            raise ValueError(e)
 
     def needs_backout(self):
         flag = not self.task_finish and len(self._active) < self.MAX_CHILD_NUM
         return flag
 
-    @inlineCallbacks
     def start(self):
+        try:
+            self.init_task()
+            d = self.start_task()
+            return d
+        except Exception  as e :
+            raise Exception(e)
+
+
+    def init_task(self):
         assert not self.running,"task载入已启动"
         try:
             self.running = True
@@ -215,18 +232,21 @@ class CrawlerRunner(object):
             self.slot = Slot(nextcall)
             self.slot.nextcall.schedule()
             self.slot.heartbeat.start(5)
+        except ValueError as e:
+            # logger.error(*self.lfm.error("CrawlerRunner", "start",
+            #                              "",
+            #                              '出现错误:', ),
+            #              extra=
+            #              {
+            #                  'exception': e,
+            #              }, exc_info=True)
+            raise ValueError(e)
 
-            self._closewait = defer.Deferred()
-            self._closewait.addBoth(self.stop_task)
-            yield self._closewait
-        except Exception as e:
-            logger.error(*self.lfm.error("CrawlerRunner", "",
-                                         "",
-                                         '出现错误:', ),
-                         extra=
-                         {
-                             'exception': e,
-                         }, exc_info=True)
+    @inlineCallbacks
+    def start_task(self):
+        self._closewait = defer.Deferred()
+        self._closewait.addBoth(self.stop_task)
+        yield self._closewait
 
     def next_task_from_schedule(self):
         # logger.debug("调用next_task_from_schedule")
@@ -259,7 +279,7 @@ class FilterTask(object):
     def __init__(self,settings= None):
         # 子爬虫的名称
         # self.SPIDER_NAME_CHOICE = settings['SPIDER_NAME_CHOICE']
-        self.SPIDER_NAME_CHOICE = True
+        self.SPIDER_NAME_CHOICE = False
         self.name_num = 0
         # self.filter_words = settings['TASK_FILTER_NAME']
         self.filter_words = 'community_url'
@@ -274,8 +294,8 @@ class FilterTask(object):
     def filter_task(self,task):
 
         if isinstance(task, str) and not self.SPIDER_NAME_CHOICE:
-            raise ValueError('爬虫的URL需要设置名称，或者将{SPIDER_NAME_CHOICE}设置为True,使用默认值！')
-
+            # raise ValueError('爬虫的URL需要设置名称，或者将{SPIDER_NAME_CHOICE}设置为True,使用默认值！')
+            self.SPIDER_NAME_CHOICE = True
         if self.SPIDER_NAME_CHOICE:
 
             name = str(self.name_num)
@@ -307,10 +327,7 @@ class FilterTask(object):
                         return None
                     name = task[0]
                     url = task[1]
-
         return (name, url)
-
-
 
 
 def make_generator(tasks):
