@@ -1,6 +1,6 @@
 # mongodb服务的地址和端口号
 import pymongo
-from framework.test import SpiderGetFromSchedlue
+from test.framework.test import SpiderGetFromSchedlue
 
 mongo_url = "127.0.0.1:27017"
 

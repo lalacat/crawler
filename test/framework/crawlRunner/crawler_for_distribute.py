@@ -2,6 +2,7 @@ from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, maybeDeferred, DeferredList
 import logging
 
+from twisted.web.client import getPage
 from zope.interface.exceptions import DoesNotImplement
 from zope.interface.verify import verifyClass
 
@@ -52,11 +53,12 @@ class Crawler(object):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
 
-
-        self.spider = self._spider
-        url = self.spider._start_urls[0].encode("utf-8")
-        print(self.spider)
-        #
+        try:
+            # self.spider = self._spider
+            url = self.spider._start_urls[0].encode("utf-8")
+            logger.info(self.spider)
+        except Exception as e:
+            print(e)
         # def _parse(response):
         #     seletor = etree.HTML(response)
         #     #  获取下属城镇的小区总数
@@ -64,9 +66,9 @@ class Crawler(object):
         #     num = json.loads(page_number[0])["totalPage"]
         #     logger.debug("%s的总页数是%d"%(self.spider.name,num))
         #     return None
-        #
+
         # d = getPage(url)
-        # d.addBoth(_parse)
+        # d.addBoth(lambda _:print(self.spider._start_urls[0]))
         yield self.spider
         """ 
         try:

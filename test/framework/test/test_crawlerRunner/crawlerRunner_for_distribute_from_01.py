@@ -90,14 +90,17 @@ class CrawlerRunner(object):
 
         #  task完成标志位
         # self.filter_task = FilterTask(self.SPIDER_NAME_CHOICE)
-        self.filter_task = 10
-        self.task_finish = False
+        self.filter_task = 4
+        self._push_task_finish = False
+        self._pull_task_finish = False
         self._next_task = None
         self.fifer = FilterTask(settings)
 
         self.slot = None
+        self._closewait = None
 
         self.running = False
+        self._pause = False
         self._task_schedule = queue.Queue()
 
     def crawl(self, *args, **kwargs):
@@ -145,11 +148,13 @@ class CrawlerRunner(object):
         except Empty:
             logger.debug(*self.lfm.crawled(
                 "CrawlerRunner", '',
-                '"task 分配完毕')
+                '队列中的task分配完毕')
                          )
-            self._create_task()
+            if not self._push_task_finish:
+                self._create_task()
+            else:
+                self._pull_task_finish = True
         except Exception as e :
-            # logger.error(e)
             logger.error(*self.lfm.error("CrawlerRunner","",
                                          "",
                                          '出现错误:',),
@@ -165,7 +170,7 @@ class CrawlerRunner(object):
             'task装载入队列中')
                      )
         try:
-            while self._task_schedule.qsize() <= self.SPIDER_NAME_CHOICE:
+            while self._task_schedule.qsize() <= self.filter_task:
 
                 if self._next_task is None:
                     temp_cache = next(self._tasks)
@@ -184,37 +189,30 @@ class CrawlerRunner(object):
                         self._next_task = None
                 logger.debug(*self.lfm.crawled(
                     "CrawlerRunner", 'schedule',
-                    '来自db的task载入完毕',filter_data))
-                return
+                    '载入队列...',filter_data))
         except StopIteration:
             logger.debug(*self.lfm.crawled(
                 "CrawlerRunner", '',
-                '来自db的task载入完毕')
+                'task载入完毕')
                          )
-            self.task_finish = True
-            return
+            self._push_task_finish = True
         except ValueError as e:
-            logger.error(*self.lfm.error("CrawlerRunner", "_create_task",
-                                         "",
-                                         '出现错误:', ),
-                         extra=
-                         {
-                             'exception': e,
-                         })
+            # logger.error(*self.lfm.error("CrawlerRunner", "_create_task",
+            #                              "",
+            #                              '出现错误:', ),
+            #              extra=
+            #              {
+            #                  'exception': e,
+            #              })
             raise ValueError(e)
-
-    def needs_backout(self):
-        flag = not self.task_finish and len(self._active) < self.MAX_CHILD_NUM
-        return flag
 
     def start(self):
         try:
             self.init_task()
             d = self.start_task()
             return d
-        except Exception  as e :
+        except Exception as e:
             raise Exception(e)
-
 
     def init_task(self):
         assert not self.running,"task载入已启动"
@@ -232,14 +230,8 @@ class CrawlerRunner(object):
             self.slot = Slot(nextcall)
             self.slot.nextcall.schedule()
             self.slot.heartbeat.start(5)
+
         except ValueError as e:
-            # logger.error(*self.lfm.error("CrawlerRunner", "start",
-            #                              "",
-            #                              '出现错误:', ),
-            #              extra=
-            #              {
-            #                  'exception': e,
-            #              }, exc_info=True)
             raise ValueError(e)
 
     @inlineCallbacks
@@ -248,18 +240,49 @@ class CrawlerRunner(object):
         self._closewait.addBoth(self.stop_task)
         yield self._closewait
 
+    @property
+    def pause(self):
+        return self._pause
+
+    @pause.setter
+    def pause(self,pause):
+        if pause:
+            if self._pause :
+                logger.debug(*self.lfm.crawled('CrawlerRunner', '',
+                                   '已经暂停了...'))
+            else:
+                self._pause = True
+        else:
+            self._pause = False
+
+
+    def needs_backout(self):
+        flag = not self._pull_task_finish and len(self._active) < self.MAX_CHILD_NUM
+        return flag
+
     def next_task_from_schedule(self):
         # logger.debug("调用next_task_from_schedule")
         logger.debug(*self.lfm.crawled('CrawlerRunner', '',
                                        '调用next_task_from_schedule'))
+        if self.pause():
+            return
+
         while self.needs_backout():
             self.crawl(self.spidercls)
 
         if self._active:
             d = DeferredList(self._active)
             return d
-        elif self.running:
+
+        if self.running:
             self._closewait.callback("Finish")
+
+    def stop(self):
+        assert not self.running,'CrawlRunner 未启动'
+        self.running = False
+        if self._closewait:
+            self._closewait.callback
+
 
     def stop_task(self,_):
         # logger.debug("任务分配完毕，任务停止")
@@ -269,8 +292,8 @@ class CrawlerRunner(object):
         logger.critical(*self.lfm.crawled_time('CrawlerRunner', '',
                                 '任务分配完毕，任务停止,时间为:',
                                             end_time,))
-        # logger.debug("运行时间:%ds" % end_time)
-        self.task_finish = False
+        self._push_task_finish = False
+        self._pull_task_finish = False
         return None
 
 

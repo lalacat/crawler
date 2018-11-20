@@ -89,8 +89,17 @@ town_urls_dict= [
 
 s = Setting()
 cr = CrawlerRunner(town_urls_dict,s)
-d = cr.start()
-d.addBoth(lambda _:reactor.stop())
-reactor.run()
+# d = cr.start()
+# d.addBoth(lambda _:reactor.stop())
+# reactor.run()
+#
+print(cr.pause)
+cr.pause = True
+print(cr.pause)
 
+cr.pause = True
+print(cr.pause)
+
+cr.pause = False
+print(cr.pause)
 
