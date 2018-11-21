@@ -122,6 +122,7 @@ class CrawlerRunner(object):
                          )
             self._crawlers.discard(crawler.spider.name)
             self._active.discard(d)
+            print(len(self._active))
             return result
 
         def _next_slot(_):
@@ -195,6 +196,7 @@ class CrawlerRunner(object):
                 "CrawlerRunner", '',
                 'task载入完毕')
                          )
+            self._tasks = None
             self._push_task_finish = True
         except ValueError as e:
             # logger.error(*self.lfm.error("CrawlerRunner", "_create_task",
@@ -237,7 +239,7 @@ class CrawlerRunner(object):
     @inlineCallbacks
     def start_task(self):
         self._closewait = defer.Deferred()
-        self._closewait.addBoth(self.stop_task)
+        # self._closewait.addBoth(self.stop_task)
         yield self._closewait
 
     @property
@@ -255,7 +257,6 @@ class CrawlerRunner(object):
         else:
             self._pause = False
 
-
     def needs_backout(self):
         flag = not self._pull_task_finish and len(self._active) < self.MAX_CHILD_NUM
         return flag
@@ -264,37 +265,52 @@ class CrawlerRunner(object):
         # logger.debug("调用next_task_from_schedule")
         logger.debug(*self.lfm.crawled('CrawlerRunner', '',
                                        '调用next_task_from_schedule'))
-        if self.pause():
+        if self.pause:
             return
 
         while self.needs_backout():
+            logger.info("needs_backout")
             self.crawl(self.spidercls)
 
         if self._active:
             d = DeferredList(self._active)
             return d
 
-        if self.running:
-            self._closewait.callback("Finish")
+        if self.runner_is_idle():
+            # self._closewait.callback("Finish")
+            self.stop()
 
     def stop(self):
         assert not self.running,'CrawlRunner 未启动'
+        logger.critical(*self.lfm.crawled_time('CrawlerRunner', '',
+                                '任务分配完毕，任务停止,时间为:',
+                                            time.clock(),))
         self.running = False
-        if self._closewait:
-            self._closewait.callback
+        self.slot.close()
+        self._closewait.callback(None)
 
 
     def stop_task(self,_):
         # logger.debug("任务分配完毕，任务停止")
         slot = self.slot
         slot.heartbeat.stop()
-        end_time = time.clock()
-        logger.critical(*self.lfm.crawled_time('CrawlerRunner', '',
-                                '任务分配完毕，任务停止,时间为:',
-                                            end_time,))
+
         self._push_task_finish = False
         self._pull_task_finish = False
         return None
+
+    def runner_is_idle(self):
+        if not self._pull_task_finish:
+            # 任务分配完毕
+            return False
+        if self.slot:
+            #  判断slot是否为空
+            return False
+        if self._active:
+            return False
+
+        return True
+
 
 
 class FilterTask(object):
