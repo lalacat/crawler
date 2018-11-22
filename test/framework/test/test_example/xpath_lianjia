@@ -39,7 +39,7 @@ num = json.loads(page_number[0])["totalPage"]
 
 小区或者房屋总数
 total_number_community = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
-
+total_number_community = seletor.xpath('//div/h2[@class="total f1"]/span/text()')
 
 
 小区：
