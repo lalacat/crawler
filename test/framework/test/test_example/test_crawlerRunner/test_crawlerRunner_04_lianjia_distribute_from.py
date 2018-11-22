@@ -87,11 +87,12 @@ town_urls_dict= [
     'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
 ]
 
-# s = Setting()
-# cr = CrawlerRunner(town_urls_dict,s)
-# d = cr.start()
-# d.addBoth(lambda _:reactor.stop())
-# reactor.run()
-#
-#
+s = Setting()
+cr = CrawlerRunner(town_urls_dict,s)
+d = cr.start()
+d.addBoth(lambda _:reactor.stop())
+# reactor.callLater(2,cr.stop)
+reactor.run()
+
+
 

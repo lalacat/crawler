@@ -1,12 +1,10 @@
-import pymongo
 import queue
 import time
 import logging
 
 from queue import Empty
-from typing import Iterable
 
-from twisted.internet import task, defer
+from twisted.internet import task, defer, reactor
 from twisted.internet.defer import DeferredList, inlineCallbacks
 
 from test.framework.objectimport.loadobject import load_object
@@ -114,22 +112,22 @@ class CrawlerRunner(object):
         d = crawler.crawl(*args, **kwargs)
         self._crawlers.add(crawler.spider.name)
 
-        def _done(result):
+        def _done(result,d1):
             # 当已装载的爬虫运行完后，从列表中清除掉
-            logger.debug(*self.lfm.crawled(
+
+            self._crawlers.discard(crawler.spider.name)
+            self._active.discard(d1)
+            logger.warning(*self.lfm.crawled(
                 "CrawlerRunner", '',
                 '从队列中清除掉{0}'.format(crawler.spider.name))
                          )
-            self._crawlers.discard(crawler.spider.name)
-            self._active.discard(d)
-            print(len(self._active))
             return result
 
         def _next_slot(_):
             self.slot.nextcall.schedule()
             return _
 
-        d.addBoth(_done)
+        d.addBoth(_done,d)
         d.addBoth(_next_slot)
         self._active.add(d)
 
@@ -206,15 +204,27 @@ class CrawlerRunner(object):
             #              {
             #                  'exception': e,
             #              })
-            raise ValueError(e)
+            # print(e.args)
+            raise ValueError(e.args[0])
 
+
+    @inlineCallbacks
     def start(self):
         try:
             self.init_task()
-            d = self.start_task()
-            return d
         except Exception as e:
-            raise Exception(e)
+            logger.error(*self.lfm.error("CrawlerRunner", "_create_task",
+                                         "",
+                                         '出现错误:', ),
+                         extra=
+                         {
+                             'exception': e,
+                         })
+        finally:
+            self._closewait = defer.Deferred()
+            self.delay_stop = reactor.callLater(1,self.stop,'cancel')
+            yield self._closewait
+            # self.stop()
 
     def init_task(self):
         assert not self.running,"task载入已启动"
@@ -239,7 +249,6 @@ class CrawlerRunner(object):
     @inlineCallbacks
     def start_task(self):
         self._closewait = defer.Deferred()
-        # self._closewait.addBoth(self.stop_task)
         yield self._closewait
 
     @property
@@ -268,6 +277,9 @@ class CrawlerRunner(object):
         if self.pause:
             return
 
+        if self.delay_stop.active():
+            self.delay_stop.cancel()
+
         while self.needs_backout():
             logger.info("needs_backout")
             self.crawl(self.spidercls)
@@ -277,40 +289,37 @@ class CrawlerRunner(object):
             return d
 
         if self.runner_is_idle():
-            # self._closewait.callback("Finish")
             self.stop()
 
-    def stop(self):
-        assert not self.running,'CrawlRunner 未启动'
-        logger.critical(*self.lfm.crawled_time('CrawlerRunner', '',
-                                '任务分配完毕，任务停止,时间为:',
-                                            time.clock(),))
+    def stop(self,reason='Finish'):
+        assert self.running,'CrawlRunner 未启动'
         self.running = False
-        self.slot.close()
-        self._closewait.callback(None)
-
-
-    def stop_task(self,_):
-        # logger.debug("任务分配完毕，任务停止")
-        slot = self.slot
-        slot.heartbeat.stop()
-
+        if self.slot:
+            self.slot.close()
+            self.slot = None
+        if self._closewait:
+            self._closewait.callback("Finish")
+        logger.critical(*self.lfm.crawled_time('CrawlerRunner', '',
+                                'CrawlRunner停止,时间为:',
+                                            time.clock(),reason))
         self._push_task_finish = False
         self._pull_task_finish = False
-        return None
+        # return None
+
 
     def runner_is_idle(self):
+        if not self._push_task_finish:
+            # 任务载入数据库完毕
+            return False
+
         if not self._pull_task_finish:
             # 任务分配完毕
             return False
-        if self.slot:
-            #  判断slot是否为空
-            return False
+
         if self._active:
             return False
 
         return True
-
 
 
 class FilterTask(object):
@@ -333,8 +342,8 @@ class FilterTask(object):
     def filter_task(self,task):
 
         if isinstance(task, str) and not self.SPIDER_NAME_CHOICE:
-            # raise ValueError('爬虫的URL需要设置名称，或者将{SPIDER_NAME_CHOICE}设置为True,使用默认值！')
             self.SPIDER_NAME_CHOICE = True
+            # raise ValueError('爬虫的URL需要设置名称，或者将{SPIDER_NAME_CHOICE}设置为True,使用默认值！')
         if self.SPIDER_NAME_CHOICE:
 
             name = str(self.name_num)

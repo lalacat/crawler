@@ -18,7 +18,7 @@ class SimpleSpider(Spider):
     def __init__(self):
         self.name = ""
         self._start_urls = []
-        self.handler_db = True
+        self.handler_db = False
         self.total_number_community = 0
         self.result = defaultdict(list)
         self.result_len = 0
@@ -67,8 +67,7 @@ class SimpleSpider(Spider):
         self.result[str(page_num)]=self._get_onePage(all_communities)
         self.result_len += len(self.result[str(page_num)])
         print(self.name+':'+str(page_num))
-        # print(type(self.result[str(page_num)]))
-        # print(self.result[str(page_num)])
+
         return self.result[str(page_num)]
 
     def _parse_get_HouseInfo(self,response):

@@ -53,12 +53,12 @@ class Crawler(object):
         assert not self.crawling, "已经开始爬虫了........"
         self.crawling = True
 
-        try:
-            # self.spider = self._spider
-            url = self.spider._start_urls[0].encode("utf-8")
-            logger.info(self.spider)
-        except Exception as e:
-            print(e)
+        # try:
+        #     # self.spider = self._spider
+        #     url = self.spider._start_urls[0].encode("utf-8")
+        #     logger.info(self.spider)
+        # except Exception as e:
+        #     print(e)
         # def _parse(response):
         #     seletor = etree.HTML(response)
         #     #  获取下属城镇的小区总数
@@ -69,8 +69,7 @@ class Crawler(object):
 
         # d = getPage(url)
         # d.addBoth(lambda _:print(self.spider._start_urls[0]))
-        yield self.spider
-        """ 
+        # yield d
         try:
             if not self.spider:
                 self.spider = self._create_spider(*args, **kwargs)
@@ -97,7 +96,7 @@ class Crawler(object):
                 yield self.engine.stop()
                 # yield self.stop()
             yield defer_succeed('crawl stop')
-    """
+
 
     """
     用户封装调度器以及引擎
