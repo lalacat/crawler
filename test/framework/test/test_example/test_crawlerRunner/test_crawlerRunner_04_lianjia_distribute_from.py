@@ -68,7 +68,9 @@ for query in queryArgs:
 zone_name = "yangpu"
 town_urls = [
     # 'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
-    {'anshan':'https://sh.lianjia.com/xiaoqu/anshan/'}
+    {'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',
+    'dongwaitan':'https://sh.lianjia.com/xiaoqu/dongwaitan/'
+     }
     #'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
     #'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
     #'https://sh.lianjia.com/xiaoqu/kongjianglu/',
@@ -90,11 +92,13 @@ town_urls_dict= {
 }
 
 s = Setting()
-cr = CrawlerRunner(town_urls,s,SimpleSpider_08)
+cr = CrawlerRunner(town_urls_dict,s,SimpleSpider_08)
 d = cr.start()
 d.addBoth(lambda _:reactor.stop())
 # reactor.callLater(2,cr.stop)
 reactor.run()
 
-
-
+# b =lambda x: url if url else None
+#
+# c = b(town_urls_dict)
+# print(c)

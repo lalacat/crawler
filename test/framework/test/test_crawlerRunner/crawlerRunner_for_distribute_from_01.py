@@ -10,6 +10,7 @@ from twisted.internet.defer import DeferredList, inlineCallbacks
 from test.framework.objectimport.loadobject import load_object
 from test.framework.crawlRunner.crawler_for_distribute import Crawler
 from test.framework.setting import Setting
+from test.framework.utils.buildins import iter_dict
 from test.framework.utils.reactor import CallLaterOnce
 
 logger = logging.getLogger(__name__)
@@ -66,7 +67,10 @@ class CrawlerRunner(object):
             "CrawlerRunner", '',
             '已初始化...')
                      )
-        self.tasks = tasks
+        if isinstance(tasks,dict):
+            self.tasks = iter_dict(tasks)
+        else:
+            self.tasks = tasks
         self.spider_loder = []
         # 装载的是Crawler的集合
         self._crawlers = set()
@@ -180,8 +184,8 @@ class CrawlerRunner(object):
                     self._next_task = None
                 else:
                     try:
-                        name = next(self._next_task)
-                        filter_data = self.fifer.filter_task((name,temp_cache[name]))
+                        filter_data = next(self._next_task)
+                        # filter_data = self.fifer.filter_task((name,temp_cache[name]))
                         if filter_data:
                             self._task_schedule.put(filter_data)
                     except StopIteration:
@@ -281,7 +285,6 @@ class CrawlerRunner(object):
             self.delay_stop.cancel()
 
         while self.needs_backout():
-            logger.info("needs_backout")
             self.crawl(self.spidercls)
 
         if self._active:
@@ -366,7 +369,7 @@ class FilterTask(object):
                     name = [key for key in task.keys()][0]
                     url = [value for value in task.values()][0]
                 elif len(task) > 1:
-                    return make_generator(task)
+                    return make_generator(iter_dict(task))
                 else:
                     raise TypeError('task(%s)的类型必须是<dict>，或者将{SPIDER_NAME_CHOICE}设置为True，自动为每个task设置名称' % type(task))
             else:

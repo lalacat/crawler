@@ -37,6 +37,7 @@ class SimpleSpider_08(Spider):
 
     @property
     def start_urls(self):
+
         return self._start_urls
 
     @start_urls.setter
@@ -59,7 +60,7 @@ class SimpleSpider_08(Spider):
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
         # logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
-        for i in range(1, 1 + 1):
+        for i in range(1, self.total_page_number+1):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
@@ -70,11 +71,11 @@ class SimpleSpider_08(Spider):
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
         self.result[str(page_num)]=self._get_onePage(all_communities)
         self.result_len += len(self.result[str(page_num)])
-        print(self.name+':'+str(page_num))
-
-        community_name = response.url.split('/')[-2]
-        had_saled_url = re.sub(community_name, 'c' + community_name, re.sub(r'xiaoqu', 'chengjiao', response.url))
-        on_sale_url = re.sub(community_name, 'c' + community_name, re.sub(r'xiaoqu', 'ershoufang', response.url))
+        print(self.name+':'+str(page_num)+"============================")
+        community_url = self.result[str(page_num)][0]["community_url"]
+        community_name = community_url.split('/')[-2]
+        had_saled_url = re.sub(community_name, 'c' + community_name, re.sub(r'xiaoqu', 'chengjiao', community_url))
+        on_sale_url = re.sub(community_name, 'c' + community_name, re.sub(r'xiaoqu', 'ershoufang', community_url))
 
         urls = {
             'sale':on_sale_url,
