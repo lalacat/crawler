@@ -66,7 +66,7 @@ class CrawlerRunner(object):
             "CrawlerRunner", '',
             '已初始化...')
                      )
-        self._tasks = tasks
+        self.tasks = tasks
         self.spider_loder = []
         # 装载的是Crawler的集合
         self._crawlers = set()
@@ -235,7 +235,7 @@ class CrawlerRunner(object):
                                                    time.clock()))
 
             # 将task导入到队列中
-            self._tasks = make_generator(self._tasks)
+            self._tasks = make_generator(self.tasks)
             self._create_task()
 
             nextcall = CallLaterOnce(self.next_task_from_schedule)

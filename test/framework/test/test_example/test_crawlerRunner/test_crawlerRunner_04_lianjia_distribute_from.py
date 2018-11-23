@@ -9,6 +9,8 @@ from test.framework.setting import Setting
 from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import CrawlerRunner
 
 # mongodb服务的地址和端口号
+from test.framework.test.test_spider.simple_spider.simple_spider_08_xiaoqu_sale_sold import SimpleSpider_08
+
 mongo_url = "127.0.0.1:27017"
 
 # 连接到mongodb，如果参数不填，默认为“localhost:27017”
@@ -65,8 +67,8 @@ for query in queryArgs:
 
 zone_name = "yangpu"
 town_urls = [
-    'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
-
+    # 'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
+    {'anshan':'https://sh.lianjia.com/xiaoqu/anshan/'}
     #'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
     #'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
     #'https://sh.lianjia.com/xiaoqu/kongjianglu/',
@@ -76,19 +78,19 @@ town_urls = [
     #'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
 
 ]
-town_urls_dict= [
-    'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
-    'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-    'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
-    'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-    'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-    'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-    'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-    'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
-]
+town_urls_dict= {
+    'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
+#     'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+#     'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
+#     'https://sh.lianjia.com/xiaoqu/kongjianglu/',
+#     'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+#     'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+#     'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+#     'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
+}
 
 s = Setting()
-cr = CrawlerRunner(town_urls_dict,s)
+cr = CrawlerRunner(town_urls,s,SimpleSpider_08)
 d = cr.start()
 d.addBoth(lambda _:reactor.stop())
 # reactor.callLater(2,cr.stop)
