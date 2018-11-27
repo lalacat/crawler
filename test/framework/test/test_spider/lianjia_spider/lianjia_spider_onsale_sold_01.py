@@ -1,7 +1,4 @@
-import json
 from collections import defaultdict
-from urllib.parse import urljoin, urlparse, urlunparse
-
 from lxml import etree
 
 from spider import Spider
@@ -66,9 +63,8 @@ class SoldOrSale(Spider):
             print((len(houses)))
             # 总的套数
 
-            # total_num = seletor.xpath('//h2[@class="total f1"]/span/text()')
-            total_num = seletor.xpath('/html/body/div[4]/div[1]/div[2]/h2/span/text()')
-            print(response.url+': '+str(total_num))
+            total_num = seletor.xpath('//h2[@class="total fl"]/span/text()')
+            print('sale：'+response.url+': '+str(total_num))
 
             # for on_house in houses:
             #     # 总价及均价
@@ -108,49 +104,53 @@ class SoldOrSale(Spider):
 
     def _parse_sold(self,response):
         seletor = etree.HTML(response.body)
-        # print(url)
         try:
             base_xpath = './div[@class="info"]'
 
-            had_saled_houses = self._xpath_filter(seletor.xpath("//ul[@class='listContent']")).xpath('./li')
-            print(len(had_saled_houses))
-            for had_saled_house in had_saled_houses:
-                had_sold_title = \
-                self._xpath_filter(had_saled_house.xpath(base_xpath + '/div[@class="title"]/a/text()'))
-                print(had_sold_title)
+            sold_houses = self._xpath_filter(seletor.xpath("//ul[@class='listContent']")).xpath('./li')
+            print(len(sold_houses))
 
-                had_sold_address = \
-                self._xpath_filter(had_saled_house.xpath(base_xpath + '/div[@class="address"]/div[@class="houseInfo"]/text()'))
-                print(had_sold_address)
+            total_num = seletor.xpath('//div[@class="total fl"]/span/text()')
+            print("sold："+response.url+': '+str(total_num))
 
-                had_sold_dealDate = \
-                self._xpath_filter(had_saled_house.xpath(base_xpath + '/div[@class="address"]/div[@class="dealDate"]/text()'))
-                print(had_sold_dealDate)
+            # for sold_house in sold_houses:
+            #     sold_title = \
+            #     self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="title"]/a/text()'))
+            #     print("小区名称："+sold_title)
+            #
+            #     sold_address = \
+            #     self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="houseInfo"]/text()'))
+            #     print("小区地址："+sold_address)
+            #
+            #     sold_dealDate = \
+            #     self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="dealDate"]/text()'))
+            #     print("成交日期："+sold_dealDate)
+            #
+            #     sold_totalPrice = \
+            #     self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="totalPrice"]/span/text()'))
+            #     print("成交价格："+sold_totalPrice)
+            #
+            #     sold_unitPrice = \
+            #     self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))
+            #     print('成交均价：'+sold_unitPrice)
+            #
+            #     sold_positionInfo = \
+            #     self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="positionInfo"]/text()'))
+            #     print("楼层高度："+sold_positionInfo)
+            #
+            #     sold_saleonborad = \
+            #     self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[1]/text()'))
+            #
+            #     print("挂牌价："+sold_saleonborad)
+            #
+            #     sold_dealcycle = \
+            #     self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]/text()'))
+            #     print("成交周期："+sold_dealcycle)
 
-                had_sold_totalPrice = \
-                self._xpath_filter(had_saled_house.xpath(base_xpath + '/div[@class="address"]/div[@class="totalPrice"]/span/text()'))
-                print(had_sold_totalPrice)
-
-                had_sold_unitPrice = \
-                self._xpath_filter(had_saled_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))
-                print(had_sold_unitPrice)
-
-                had_sold_positionInfo = \
-                self._xpath_filter(had_saled_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="positionInfo"]/text()'))
-                print(had_sold_positionInfo)
-
-                had_sold_saleonborad = \
-                self._xpath_filter(had_saled_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[1]/text()'))
-
-                print(had_sold_saleonborad)
-
-                had_sold_dealcycle = \
-                self._xpath_filter(had_saled_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]/text()'))
-                print(had_sold_dealcycle)
-
-            return None
         except Exception as e:
             print(e)
+            # raise Exception(e)
+        return None
 
     def _xpath_filter(self,xpath):
         if xpath:

@@ -68,7 +68,7 @@ class SimpleSpider_08(Spider):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
-    @defer.inlineCallbacks
+    # @defer.inlineCallbacks
     def _parse_getCommunityInfo(self,response):
         seletor = etree.HTML(response.body)
         page_num = response.requset.meta["page_num"]
@@ -84,21 +84,24 @@ class SimpleSpider_08(Spider):
             sale_url = re.sub(community_name, 'c' + community_name, re.sub(r'xiaoqu', 'ershoufang', community_url))
             sold_url = re.sub(community_name, 'c' + community_name, re.sub(r'xiaoqu', 'chengjiao', community_url))
 
-            self.sale_url[name] = sale_url
-            self.sold_url[name] = sold_url
+            self.sale_url['sale_'+name] = sale_url
+            self.sold_url['sold_'+name] = sold_url
+        d = dict(self.sale_url,**self.sold_url)
+        # d.update(self.sale_url)
+        # d.update(self.sold_url)
+        print(pprint.pformat(d))
 
-        print(pprint.pformat(self.sale_url))
-        print(pprint.pformat(self.sold_url))
+        # print(pprint.pformat(self.sale_url))
         # self.sale_url['']
         # urls = {
         #     'sale':on_sale_url,
         #     'sold':had_saled_url,
         # }
-        try:
-            cr = CrawlerRunner(self.sale_url,self.settings,SoldOrSale)
-            yield cr.start()
-        except Exception as e :
-            print(e)
+        # try:
+        #     cr = CrawlerRunner(self.sold_url,self.settings,SoldOrSale)
+        #     yield cr.start()
+        # except Exception as e :
+        #     print(e)
         return None
 
 

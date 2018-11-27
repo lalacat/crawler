@@ -17,21 +17,26 @@ on_sale_url =re.sub(community_name,'c'+community_name, re.sub(r'xiaoqu','ershouf
 
 print(had_saled_url)
 print(on_sale_url)
+# "/html/body/div[5]/div[1]/div[2]/div[1]/span"
+# '/html/body/div[4]/div[1]/div[2]/h2/span/text()'
 
-""" 
+
 r = requests.get(on_sale_url,headers=header)
 r.encoding = "utf-8"
 
 seletor = etree.HTML(r.content)
 
 # 所有的在售房屋列表
-houses = seletor.xpath("//ul[@class='sellListContent']")[0].xpath('./li')
+# houses = seletor.xpath("//ul[@class='sellListContent']")[0].xpath('./li')
 
-print(len(houses))
+# print(len(houses))
 
 # 总的套数
-total_num = seletor.xpath('//div/h2[@class="total f1"]/span/text()')
+total_num_01 = seletor.xpath('//h2[@class="total fl"]/span/text()')[0]
+print(total_num_01)
 
+
+""" 
 # 总价及均价
 total_price = houses[0].xpath("./div[@class='info clear']/div[@class='priceInfo']/div[@class='totalPrice']/span")[0].text
 unit_prince = houses[0].xpath("./div[@class='info clear']/div[@class='priceInfo']/div[@class='unitPrice']/span")[0].text
@@ -61,7 +66,13 @@ page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-d
 num = json.loads(page_number[0])["totalPage"]
 print(num)
 
-"""
+
+
+
+
+
+
+
 
 r = requests.get(had_saled_url,headers=header)
 r.encoding = "utf-8"
@@ -71,6 +82,8 @@ seletor = etree.HTML(r.content)
 base_xpath='./div[@class="info"]'
 
 had_saled_houses = seletor.xpath("//ul[@class='listContent']/li")
+
+total_num_01 = seletor.xpath('//div[@class="total fl"]/span/text()')[0]
 
 had_sold_title = had_saled_houses[0].xpath(base_xpath+'/div[@class="title"]/a')[0].text
 print(had_sold_title)
@@ -95,3 +108,4 @@ print(had_sold_saleonborad)
 
 had_sold_dealcycle = had_saled_houses[0].xpath(base_xpath+'/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]')[0].text
 print(had_sold_dealcycle)
+"""
