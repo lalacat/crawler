@@ -19,7 +19,7 @@ DOWNLOAD_FAIL_ON_DATALOSS = True
 
 DOWNLOAD_DELAY = 0
 DOWNLOADER_MIDDLEWARE = {
-   # "test.framework.test.test_middleware.test_process_request_01.Change_Request_Header":10
+   "test.framework.test.test_middleware.test_process_request_01.Change_Request_Header":10
 }
 
 

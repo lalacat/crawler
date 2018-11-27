@@ -1,4 +1,6 @@
 from collections import defaultdict
+
+from bs4 import BeautifulSoup
 from lxml import etree
 
 from spider import Spider
@@ -49,22 +51,22 @@ class SoldOrSale(Spider):
 
 
     def _parse_sale(self,response):
+
         seletor = etree.HTML(response.body)
-        print(self.name)
+
         # 所有的在售房屋列表
         try:
             total_house = self._xpath_filter(seletor.xpath("//ul[@class='sellListContent']"))
             if total_house is None:
                 total_house = self._xpath_filter(seletor.xpath("//ul[@class='sellListContent LOGCLICKDATA']"))
             if total_house is None:
-                print(" ")
+                print(response.url+':0')
                 return None
             houses = total_house.xpath('./li')
-            print((len(houses)))
-            # 总的套数
 
+            # 总的套数
             total_num = seletor.xpath('//h2[@class="total fl"]/span/text()')
-            print('sale：'+response.url+': '+str(total_num))
+            print('sale：'+response.url+': '+str(total_num)+"==="+str(len(houses)))
 
             # for on_house in houses:
             #     # 总价及均价
@@ -104,14 +106,19 @@ class SoldOrSale(Spider):
 
     def _parse_sold(self,response):
         seletor = etree.HTML(response.body)
+        bs_obj = BeautifulSoup(response.body, "html.parser")
+        if response.url == 'https://sh.lianjia.com/chengjiao/c5012200974233196/':
+            print(bs_obj)
         try:
             base_xpath = './div[@class="info"]'
 
             sold_houses = self._xpath_filter(seletor.xpath("//ul[@class='listContent']")).xpath('./li')
-            print(len(sold_houses))
+            # total_num = seletor.xpath('//div[@class="total fl"]/span/text()')
+            total_num = seletor.xpath("/html/body/div[5]/div[1]/div[2]/div[1]/span/text()")[0]
 
-            total_num = seletor.xpath('//div[@class="total fl"]/span/text()')
-            print("sold："+response.url+': '+str(total_num))
+
+            print("sold："+response.url+': '+str(total_num)+"==="+str(len(sold_houses)))
+            return None
 
             # for sold_house in sold_houses:
             #     sold_title = \

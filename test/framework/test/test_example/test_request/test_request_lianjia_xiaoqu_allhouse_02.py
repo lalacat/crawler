@@ -15,24 +15,34 @@ community_name = url.split('/')[-2]
 had_saled_url =re.sub(community_name,'c'+community_name, re.sub(r'xiaoqu','chengjiao',url))
 on_sale_url =re.sub(community_name,'c'+community_name, re.sub(r'xiaoqu','ershoufang',url))
 
-print(had_saled_url)
-print(on_sale_url)
+# print(had_saled_url)
+# print(on_sale_url)
 
 
-r = requests.get(on_sale_url,headers=header)
+# sold_url = "https://sh.lianjia.com/chengjiao/c5011000014520/"
+sold_url = "https://sh.lianjia.com/chengjiao/c5011000012841/"
+sale_url = ""
+
+r = requests.get(sold_url,headers=header)
 r.encoding = "utf-8"
 
 seletor = etree.HTML(r.content)
 
-# 所有的在售房屋列表
+
+
+
+# # 在售的总的套数
 # houses = seletor.xpath("//ul[@class='sellListContent']")[0].xpath('./li')
-
 # print(len(houses))
+#
+# total_num_01 = seletor.xpath('//h2[@class="total fl"]/span/text()')[0]
+# print(total_num_01)
 
-# 总的套数
-total_num_01 = seletor.xpath('//h2[@class="total fl"]/span/text()')[0]
+# 已售的总的套数
+had_saled_houses = seletor.xpath("//ul[@class='listContent']/li")
+print(len(had_saled_houses))
+total_num_01 = seletor.xpath('//div[@class="total fl"]/span/text()')[0]
 print(total_num_01)
-
 
 """ 
 # 总价及均价
