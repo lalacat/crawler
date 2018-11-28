@@ -103,6 +103,7 @@ class SoldOrSale(Spider):
         return None
 
     def _parse_sold(self,response):
+        print(response.headers)
         self.seletor = BeautifulSoup(response.body, "html.parser")
         try:
             base_xpath = './div[@class="info"]'
@@ -115,7 +116,7 @@ class SoldOrSale(Spider):
             # total_num = seletor.xpath("/html/body/div[5]/div[1]/div[2]/div[1]/span/text()")[0]
             #
             #
-            print("sold："+response.url+': '+str(total_num)+"==="+str(len(sold_houses)))
+            # print("sold："+response.url+': '+str(total_num)+"==="+str(len(sold_houses)))
             return None
 
             # for sold_house in sold_houses:

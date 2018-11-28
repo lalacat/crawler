@@ -40,11 +40,6 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                 '加载process_request方法处理Request',
                 request
             ))
-            logger.debug(*self.lfm.crawled(
-                "Middleware", self.component_name,
-                '加载process_request方法处理Request',
-                request
-            ))
             for method in self.methods['process_request']:
                 response = yield method(request=request,spider =spider)
                 assert response is None or isinstance(response,(Response,Request)),\

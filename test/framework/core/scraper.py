@@ -156,25 +156,24 @@ class Scraper(object):
         dfd.addCallback(self.handle_spider_output, request, response, spider)
         return dfd
 
-    def _scrape2(self, request_result, request, spider):
+    def _scrape2(self, response_failure, request, spider):
         """Handle the different cases of request's result been a Response or a
         Failure"""
-        if not isinstance(request_result, Failure):
-            return self.spidermw.scrape_response(self.call_spider, request_result, request, spider)
+        if not isinstance(response_failure, Failure):
+            return self.spidermw.scrape_response(self.call_spider, response_failure, request, spider)
         else:
             #
-            dfd = self.call_spider(request_result, request, spider)
-            dfd.addErrback(self._log_download_errors, request_result, request, spider)
+            dfd = self.call_spider(response_failure, request, spider)
+            dfd.addErrback(self._log_download_errors, response_failure, request, spider)
             return dfd
 
-    def call_spider(self, result, request, spider):
-        middle_time = time.clock()
-        # logger.info("通过%s._parse处理结果,时间为：%f"%(spider.name,middle_time))
+    def call_spider(self, response, request, spider):
 
-        result.request = request
-        dfd = defer_result(result)
+        response.request = request
+        dfd = defer_result(response)
         #  这一步才是真正意义上的处理爬到的结果，之前的都是在过滤错误
-        dfd.addCallbacks(request.callback or spider.parse, request.errback)
+        # dfd.addCallbacks(request.callback or spider.parse, request.errback)
+        dfd.addCallbacks(request.callback, request.errback)
         return dfd
 
     def handle_spider_error(self, _failure, request, response, spider):

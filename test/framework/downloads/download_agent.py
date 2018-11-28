@@ -24,8 +24,15 @@ class DownloaderClientContextFactory(ClientContextFactory):
 
 class HTTPDownloadHandler(object):
 
-    def __init__(self,settings):
+    def __init__(self,logformatter,settings):
         # 管理连接的，作用request完成后，connections不会自动关闭，而是保持在缓存中，再次被利用
+        self.lfm = logformatter
+        #logger.debug(*self.lfm.crawled)
+        logger.debug(*self.lfm.crawled(
+            'Downloader',
+            'HTTPDownloadHandler',
+            '已初始化...'
+        ))
         self._pool = HTTPConnectionPool(reactor,persistent=True)
         self._pool.maxPersistentPerHost = settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
         self._pool._factory.noisy = False # 用于设置proxy代理
@@ -39,16 +46,23 @@ class HTTPDownloadHandler(object):
 
     @classmethod
     def from_crawler(cls,crawler):
-        return cls(crawler.settings)
+        return cls(crawler.logformatter,crawler.settings)
 
 
     def download_request(self,request,spider):
-        logger.debug("download_request get a request：%s，spider: %s"%(request,spider))
+        # logger.debug("Spider:%s <%s> 执行download_request..."%(spider.name,request))
+        logger.debug(*self.lfm.crawled(
+            'Spider',
+            spider.name,
+            '执行download_request...',
+            request
+        ))
         """返回一个http download 的 defer"""
+        self.spider = spider
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
                               warnsize=getattr(spider,'download_warnsize',self._default_warnsize),
-                              fail_on_dataloss=self._fail_on_dataloss
+                              fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm
                               )
         return agent.download_request(request)
 
@@ -58,6 +72,12 @@ class HTTPDownloadHandler(object):
         #  直接关闭closeCachedConnections会引起网络或者服务器端的问题，所以，通过人工设置延迟
         #  来激发defer,closeCachedConnections不能直接处理额外的errbacks，所以需要个人设定一个
         #  callback在_disconnect_timeout之后
+        logger.warning(
+            *self.lfm.crawled(
+                'Downloader',
+                'HTTPDownloadHandler',
+                '已关闭...'
+        ))
         delayed_call = reactor.callLater(self._disconnect_timeout,d.callback,[])
 
         #  判断cancel_delayed_call是否在等待，True就是出于激活状态,还没被执行
@@ -75,7 +95,13 @@ class DownloadAgent(object):
     _Agent = Agent
 
     def __init__(self,contextFactory=None, connectTimeout=10, bindAddress=None,
-                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False):
+                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False,logformatter=None):
+        self.lfm = logformatter
+        logger.debug(*self.lfm.crawled(
+            'HTTPDownloadHandler',
+            'DownloadAgent',
+            '已初始化...'
+        ))
         self._contextFactory = contextFactory
         self._connectTimeout = connectTimeout
         self._bindAddress = bindAddress
@@ -93,15 +119,19 @@ class DownloadAgent(object):
                            pool=self._pool)
 
     def download_request(self,request):
-        logger.info("进入下载download_request")
         timeout = request.meta.get('download_timeout') or self._connectTimeout
-        logger.debug("download_timeout is %d"%timeout)
+        logger.debug(*self.lfm.crawled_time(
+            'Request', request,
+            '执行download_request,延迟时间:',
+            timeout)
+                     )
         agent = self._getAgent(timeout)
         #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
         #  urldefrag去掉fragment
         url = urldefrag(request.url)[0]
         method = to_bytes(request.method)
         headers = request.headers
+        self.request = request
 
         if request.body:
             bodyproducer = _RequestBodyProducer(request.body)
@@ -125,58 +155,53 @@ class DownloadAgent(object):
             #  只有执行的方法是能够回到reactor主循环的时候，callLater才能执行
             #  _RequestBodyProducer中dataReceived方法不会一直占用，数据还没接收到是，是会回到reactor循环的，
             #  当总的接收数据的时间超过了timeout的时候，才会执行d.cancel
-            self._timeout_cl = reactor.callLater(timeout,self.fun_cancel,d)
+            self._timeout_cl = reactor.callLater(timeout,d.cancel)
             d.addBoth(self._cb_timeout,url,timeout)
         except Exception as e:
-            logger.error(e)
+            # logger.error(e)
+            logger.error(*self.lfm.error("Request", request,
+                                        DownloadAgent,
+                                        '下载过程中出现错误:'),
+                         extra=
+                         {
+                             'exception': e,
+                         }, exc_info=True)
+
         return d
-    """
-    测试区
-    """
-    def fun_err(self,content):
-        print("接受信息错误")
-        return content
 
-    def fun_print(self,content,request):
-        logger.info("fun_print 成功")
-        logger.info(content)
-        if content.status == 301:
-            logger.critical("再次下载")
-            content = self.download_request(request)
-
-        return content
-
-    def fun_cancel(self,obj):
-        logger.debug("test cancel")
-        obj.cancel()
-
-    def fun_delay(self,content,num):
-        logger.debug("休眠 :%d s"%num)
-        for i in range(num,0,-1):
-            print("倒计时：%d" %i)
-            time.sleep(1)
-        return content
-
-
-    """
-    测试区
-    """
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
-        request.meta['download_latency'] = time.time() - start_time
-        logger.debug("记录延迟时间 %d "%request.meta['download_latency'])
+        request.meta['download_latency'] = time.clock() - start_time
+        #logger.debug("记录延迟时间 %d " %request.meta['download_latency'])
         return result
 
     def _cb_timeout(self,result,url,timeout):
-        logger.debug("进入下载超时处理方法")
+        # logger.debug("进入下载超时处理方法")
+        logger.debug(*self.lfm.crawled(
+                    'Request',
+                    self.request,
+                    '判断是否下载超时...')
+                     )
         # 如果_timeout_cl还没触发，就取消掉，不用再延迟了
         if self._timeout_cl.active():
-            logger.debug("下载没有超时")
+            # logger.debug("下载没有超时")
+            logger.debug(*self.lfm.crawled(
+                    'Request',
+                    self.request,
+                    '下载没有超时...'))
             self._timeout_cl.cancel()
             return result
         #  当规定的时间内_RequestBodyProducer没有收到connectionLost()的时候，强制退出
         if self._transferdata:
-            logger.error("接收body的程序要停止了")
+            # logger.error("接收body的程序要停止了"
+            logger.error(*self.lfm.error("Request",self.request,
+                     'DownloadAgent',
+                          '在规定的时间内，body没有接收完毕,',),
+             extra=
+             {
+                 'exception':'',
+                'time':"\n时间是{:6.3f}".format(time.clock())
+             })
             self._transferdata._transport.stopProducing()
 
         raise TimeoutError("下载 %s 花费的时间超过 %s 秒." % (url, timeout))
@@ -208,14 +233,18 @@ class DownloadAgent(object):
 
         finished = defer.Deferred(_cancel)
         transferdata.deliverBody(_ResponseReader(
-            finished,transferdata,request,maxsize,warnsize,fail_on_dataloss
+            finished,transferdata,request,maxsize,warnsize,fail_on_dataloss,self.lfm
         ))
         # 表示接收到了数据，用于延迟的判定
         self._transferdata = transferdata
         return finished
 
     def _cb_body_done(self,result,request,url):
-        logger.debug("生成Response")
+        # logger.debug("Request:<%s> Response 已创建..."%request)
+        logger.debug(*self.lfm.crawled("Request",
+                                       request,
+                          ' Response 已创建...'))
+
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         status = int(txresponse.code)
         header = dict()
@@ -223,11 +252,10 @@ class DownloadAgent(object):
             for k,v in txresponse.headers.getAllRawHeaders():
                 header[k] = v
         except KeyError :
-            logger.error("header is None")
+            logger.error(*self.lfm.error("request", request,
+                                         'header为None'))
         response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
         return response
-
-
 
 
 @implementer(IBodyProducer)
@@ -250,8 +278,11 @@ class _RequestBodyProducer(object):
 
 @implementer(IBodyProducer)
 class _ResponseReader(Protocol):
-    def __init__(self, finished,transferdata,request,maxsize,warnsize,fail_on_dataloss):
-        logger.debug("生成ResponseReader")
+    def __init__(self, finished,transferdata,request,maxsize,warnsize,fail_on_dataloss,logformater):
+        self.lfm = logformater
+        # logger.debug("ResponseReader 已初始化...")
+        logger.debug(*self.lfm.crawled("DownloadAgent", '_ResponseReader',
+                                       '已初始化...'))
         self._finished = finished
         # 用来保存传输的数据，当数据完整后可以使用json转换为python对象
         self._transferdata = transferdata
@@ -264,6 +295,8 @@ class _ResponseReader(Protocol):
 
         self._bytes_received = 0  # 记录body的大小
         self._bodybuf = BytesIO()  # 记录body的内容
+
+
 
     def dataReceived(self, datas):
         """
@@ -279,11 +312,16 @@ class _ResponseReader(Protocol):
         self._bytes_received += len(datas)
 
         if self._maxsize and self._bytes_received > self._maxsize:
-            logger.error("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
-                         "最大值(%(maxsize)s) bytes " % {
-                'request_and_response' : self._request,
-                'bytes' : self._bytes_received,
-                'maxsize' : self._maxsize})
+            logger.error(*self.lfm.error('Request',self._request,'dataReceived',
+                        '收取到的信息容量({bytes}) bytes 超过了下载信息的最大值({maxsize}) bytes '.format(
+                            bytes= self._bytes_received,
+                            maxsize = self._maxsize)
+            ))
+            # "从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+            #          "最大值(%(maxsize)s) bytes " % {
+            # 'request_and_response' : self._request,
+            # 'bytes' : self._bytes_received,
+            # 'maxsize' : self._maxsize})
             # 当下载量超过最大值的时候，把数据缓存变量情况，取消下载
             self._bodybuf.truncate(0)
             """
@@ -294,13 +332,20 @@ class _ResponseReader(Protocol):
         if not self._warnsize_flag:
             if self._warnsize and self._bytes_received > self._warnsize:
                 self._reached_warnsize = True
-                logger.warning("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
-                             "警戒值(%(warnsize)s) bytes " % {
-                    'request' : self._request,
-                    'bytes' : self._bytes_received,
-                    'warnsize' : self._warnsize
-                })
+                # logger.warning("从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+                #              "警戒值(%(warnsize)s) bytes " % {
+                #     'request' : self._request,
+                #     'bytes' : self._bytes_received,
+                #     'warnsize' : self._warnsize
+                # })
+                logger.warning(*self.lfm.crawled('Request', self._request,
+                                             '收取到的信息容量({bytes}) bytes 超过了下载信息的警戒值({warnsize}) bytes '.format(
+                                                 bytes=self._bytes_received,
+                                                 warnsize=self._warnsize),
+                                            'dataReceived'
+                                             ))
             self._warnsize_flag = True
+
 
     def connectionLost(self, reason):
         if self._finished.called:
@@ -310,37 +355,58 @@ class _ResponseReader(Protocol):
 
         #  针对不同的loss connection进行问题的处理
         if reason.check(ResponseDone): #  正常完成数据下载
-            logger.info('%s Finished receiving body!!'%self._request.url)
             # callback(data)调用后，能够向defer数据链中传入一个list数据：
             # [True，传入的参数data]，可以实现将获取的body传输到下一个函数中去
-            #print(body)
             if body == b'':
-                logger.error("%s 取到的数据为空，查看是否header设置错误"%self._request.url)
+                # logger.error("<%s> 没有下载到数据..."%self._request.url)
+                logger.error(*self.lfm.error('Request', self._request, '',
+                                             '没有下载到数据...'
+                                             ))
+            else:
+                # logger.warning('<%s> 成功下载' % self._request.url)
+                logger.warning(*self.lfm.crawled('Request', self._request,
+                                                 '数据下载完整'
+                                             ))
             self._finished.callback((self._transferdata,body,None))
             return
 
         #  当body中没有设置Content-Length或者是Transfer-Encoding的时候，
         # response传输完后，会引起这个错误
         if reason.check(PotentialDataLoss):
-            logger.warning("数据有部分丢失")
+            # logger.warning("<%s> 内容下载不完整...",self._request.url)
+            logger.warning(*self.lfm.crawled('Request', self._request,
+                                             '数据下载不完整'
+                                             ))
             self._finished.callback((self._transferdata,body,['partial']))
             return
 
         #  any(x)判断x对象是否为空对象，如果都为空、0、false，则返回false，如果不都为空、0、false，则返回true
         if reason.check(ResponseFailed) and any(r.check(_DataLoss) for r in reason.value.reasons):
-            logger.info("%s 下载失败，详情在debug模式下查看"%self._request.url)
-            logger.debug("%s 数据收到错误: %s"%(self._request.url,reason.getErrorMessage()))
+            # logger.error("<%s> 内容下载失败，详情在debug模式下查看..."%self._request.url)
+            # logger.debug("<%s> 内容下载失败:%s..."%(self._request.url,reason.getErrorMessage()))
+            logger.error(*self.lfm.error('Request', self._request, '',
+                                         '内容下载失败:'
+                                         ),
+                        extra =
+                        {
+                            'exception': reason.getErrorMessage(),
+                        }
+            )
             if not self._fail_on_dataloss:
                 #  当数据超过下载值得时候，_fail_on_dataloss是用来控制，要不要接收已收的部分数据
                 #  默认是将数据抛掉·
-                logger.debug("%s 接收残缺数据"%self._request)
+                # logger.debug("<%s> 内容下载不完整..."%self._request)
+                logger.debug(*self.lfm.crawled('Request', self._request,
+                                                 '数据下载不完整'))
                 self._finished.callback((self._transferdata,body,['dataloss']))
                 return
 
             elif not self._fail_on_dataloss_warned :
-                logger.debug("%s 数据有丢失，如果要处理这个错误的话，在默认设置中"
-                               "将DOWNLOAD_FAIL_ON_DATALOSS = False"
-                               %self._transferdata.request.absoluteURI.decode())
+                # logger.debug("<%s> 内容有丢失，如果要处理这个错误的话，在默认设置中"
+                #                "将DOWNLOAD_FAIL_ON_DATALOSS = False"
+                #                %self._transferdata.request.absoluteURI.decode())
+                logger.debug(*self.lfm.crawled('Request', self._transferdata.request.absoluteURI.decode(),
+                            '内容有丢失，如果要处理这个错误的话，在默认设置中将DOWNLOAD_FAIL_ON_DATALOSS = False'))
                 self._fail_on_dataloss_warned = True
 
         self._finished.errback(reason)

@@ -28,7 +28,7 @@ class SimpleSpider_08(Spider):
         self.result_len = 0
         self.sale_url = dict()
         self.sold_url = dict()
-
+        self.headers = {"User-Agent":['Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)']}
     @property
     def name(self):
         return self._name
@@ -52,7 +52,7 @@ class SimpleSpider_08(Spider):
 
     def start_requests(self):
         for url in self.start_urls:
-            yield Request(url, callback=self._parse_getAllCommunity)
+            yield Request(url, callback=self._parse_getAllCommunity,headers=self.headers)
 
     def _parse_getAllCommunity(self,response):
         seletor = etree.HTML(response.body)
@@ -86,8 +86,9 @@ class SimpleSpider_08(Spider):
 
             self.sale_url['sale_'+name] = sale_url
             self.sold_url['sold_'+name] = sold_url
-
+        #
         # total_dict = dict(self.sale_url,**self.sold_url)
+        # print(pprint.pformat(total_dict))
 
         url_list = [
             "https://sh.lianjia.com/chengjiao/c5011000004404/",
@@ -102,7 +103,7 @@ class SimpleSpider_08(Spider):
             yield cr.start()
         except Exception as e :
             print(e)
-        return None
+        # return None
 
 
     def _get_onePage(self,all_communities):

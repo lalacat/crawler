@@ -7,10 +7,13 @@ class Change_Request_Header(object):
         self._settings = crawler.settings
         self._headers = self._settings["HEADER_COLLECTION"]
 
+
     @classmethod
     def from_crawler(cls,crawler):
         return cls(crawler)
 
     def process_request(self,request,spider):
-        request.headers.setRawHeaders("User-Agent", random.choice(self._headers))
-
+        if request.meta.get('header_flag'):
+            if request.meta['header_flag']:
+                request.headers.setRawHeaders("User-Agent", random.choice(self._headers))
+        return None

@@ -46,7 +46,6 @@ class HTTPDownloadHandler(object):
 
     @classmethod
     def from_crawler(cls,crawler):
-
         return cls(crawler.logformatter,crawler.settings)
 
 
