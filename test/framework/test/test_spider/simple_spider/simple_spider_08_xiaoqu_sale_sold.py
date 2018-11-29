@@ -5,6 +5,7 @@ from collections import defaultdict
 
 from lxml import etree
 from twisted.internet import defer
+from twisted.web.http_headers import Headers
 
 from spider import  Spider
 import logging
@@ -92,14 +93,14 @@ class SimpleSpider_08(Spider):
 
         url_list = [
             "https://sh.lianjia.com/chengjiao/c5011000004404/",
-            "https://sh.lianjia.com/chengjiao/c5011000004433/",
-            "https://sh.lianjia.com/chengjiao/c5011000015792/",
-            "https://sh.lianjia.com/chengjiao/c5011000014671/",
-            'https://sh.lianjia.com/chengjiao/c5011000013940/',
-            'https://sh.lianjia.com/chengjiao/c5011000014456/'
+            # "https://sh.lianjia.com/chengjiao/c5011000004433/",
+            # "https://sh.lianjia.com/chengjiao/c5011000015792/",
+            # "https://sh.lianjia.com/chengjiao/c5011000014671/",
+            # 'https://sh.lianjia.com/chengjiao/c5011000013940/',
+            # 'https://sh.lianjia.com/chengjiao/c5011000014456/'
         ]
         try:
-            cr = CrawlerRunner(self.sold_url,self.settings,SoldOrSale)
+            cr = CrawlerRunner(url_list,self.settings,SoldOrSale)
             yield cr.start()
         except Exception as e :
             print(e)

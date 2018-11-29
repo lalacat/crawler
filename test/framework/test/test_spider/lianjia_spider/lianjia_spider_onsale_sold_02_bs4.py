@@ -103,13 +103,31 @@ class SoldOrSale(Spider):
         return None
 
     def _parse_sold(self,response):
-        print(response.headers)
-        self.seletor = BeautifulSoup(response.body, "html.parser")
+        # self.seletor = BeautifulSoup(response.body, "html.parser")
         try:
-            base_xpath = './div[@class="info"]'
-            total_num = self.seletor.find('div',class_="total fl").span.text
+            # base_xpath = './div[@class="info"]'
+            # total_num = self.seletor.find('div',class_="total fl").span.text
 
-            sold_houses = self.seletor.find('ul',class_='listContent')
+            # sold_houses = self.seletor.find('ul',class_='listContent')
+            total_num = 0
+            if total_num == 0 :
+                if response.request.meta.get('download_time'):
+                    download_time = response.request.meta['download_time']
+
+                    if download_time > 3 :
+                        return None
+                    print("sold："+response.url+str(download_time)+response.request.headers.getRawHeaders('User-Agent'))
+                    download_time = download_time + 1
+                else:
+                    download_time= 0
+
+                return Request(response.url, callback=self._parse_sold,meta={
+                    'download_time':download_time,
+                    'header_flag':True,
+                    'last_header':response.request.headers
+                                                                             })
+
+
 
             # sold_houses = self._xpath_filter(seletor.xpath("//ul[@class='listContent']")).xpath('./li')
             # total_num = seletor.xpath('//div[@class="total fl"]/span/text()')

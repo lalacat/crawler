@@ -220,7 +220,7 @@ class ExecutionEngine(object):
                 logger.error(*self.lfm.error("Spider",spider.name,
                       'Engine'
                       ,e),
-             exc_info = False)
+             exc_info = True)
             #  没有发生异常执行此段代码
             else:
                 self.crawl(request, spider)
@@ -341,7 +341,7 @@ class ExecutionEngine(object):
                 # logger.debug("%s 下载成功" % request.url)
                 logger.debug(*self.lfm.crawled("Spider", spider.name,
                                                '下载成功', request))
-                response.requset = request
+                response.request = request
             return response
 
         def _on_complete(_,request):
