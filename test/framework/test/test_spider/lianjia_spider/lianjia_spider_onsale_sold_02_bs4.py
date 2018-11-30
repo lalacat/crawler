@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 
 from bs4 import BeautifulSoup
@@ -5,7 +6,8 @@ from lxml import etree
 
 from spider import Spider
 from test.framework.https.request import Request
-
+import logging
+logger = logging.getLogger(__name__)
 
 class SoldOrSale(Spider):
     """
@@ -19,6 +21,7 @@ class SoldOrSale(Spider):
         self.total_number_community = 0
         self.result = defaultdict(list)
         self.result_len = 0
+        self.lfm = self.crawler.logformatter
 
     @property
     def name(self):
@@ -103,39 +106,46 @@ class SoldOrSale(Spider):
         return None
 
     def _parse_sold(self,response):
-        # self.seletor = BeautifulSoup(response.body, "html.parser")
+        seletor = BeautifulSoup(response.body, "html.parser")
         try:
-            # base_xpath = './div[@class="info"]'
-            # total_num = self.seletor.find('div',class_="total fl").span.text
+            base_xpath = './div[@class="info"]'
+            total_num = seletor.find('div',class_="total fl").span.text
 
-            # sold_houses = self.seletor.find('ul',class_='listContent')
-            total_num = 0
-            if total_num == 0 :
-                if response.request.meta.get('download_time'):
-                    download_time = response.request.meta['download_time']
-
-                    if download_time > 3 :
-                        return None
-                    print("sold："+response.url+str(download_time)+response.request.headers.getRawHeaders('User-Agent'))
-                    download_time = download_time + 1
+            sold_houses = seletor.find('ul',class_='listContent')
+            if int(total_num) == 0 :
+                if response.request.meta.get('download_times'):
+                    download_times = response.request.meta['download_times']
+                    logger.warning(*self.lfm.crawled_time(
+                        'Spider',self.name,
+                        '{0}再次下载,时间为：'.format(response.request.headers.getRawHeaders('User-Agent')[0]),
+                        time.clock(),
+                        {
+                            'function':'第{0}次'.format(download_times),
+                            'request':response.request
+                        }
+                    ))
+                    # print("再次下载："+response.url+' 第'+str(download_times)+'次 '+response.request.headers.getRawHeaders('User-Agent')[0])
+                    download_times = download_times + 1
                 else:
-                    download_time= 0
+                    # print("再次下载："+response.url+'  '+response.request.headers.getRawHeaders('User-Agent')[0]+'重新下载')
+                    download_times= 1
 
-                return Request(response.url, callback=self._parse_sold,meta={
-                    'download_time':download_time,
-                    'header_flag':True,
-                    'last_header':response.request.headers
+                if download_times < 4:
+                    return Request(response.url, callback=self._parse_sold,meta={
+                            'download_times':download_times,
+                            'header_flag':True,
+                            'last_header':response.request.headers
                                                                              })
-
-
+                else:
+                    print(response.url+'下载大于4次了！！！！！！！！！！！')
+            print("sold：" + self.name +': '+response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
+            return None
 
             # sold_houses = self._xpath_filter(seletor.xpath("//ul[@class='listContent']")).xpath('./li')
             # total_num = seletor.xpath('//div[@class="total fl"]/span/text()')
             # total_num = seletor.xpath("/html/body/div[5]/div[1]/div[2]/div[1]/span/text()")[0]
             #
             #
-            # print("sold："+response.url+': '+str(total_num)+"==="+str(len(sold_houses)))
-            return None
 
             # for sold_house in sold_houses:
             #     sold_title = \

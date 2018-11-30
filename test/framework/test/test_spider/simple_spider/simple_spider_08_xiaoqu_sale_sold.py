@@ -56,6 +56,7 @@ class SimpleSpider_08(Spider):
             yield Request(url, callback=self._parse_getAllCommunity,headers=self.headers)
 
     def _parse_getAllCommunity(self,response):
+        print(self.crawler)
         seletor = etree.HTML(response.body)
         #  获取下属城镇的小区总页数
         page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
@@ -65,14 +66,14 @@ class SimpleSpider_08(Spider):
         logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
         # for i in range(1, self.total_page_number+1):
-        for i in range(1, 2):
+        for i in range(1, self.total_page_number+1):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
     @defer.inlineCallbacks
     def _parse_getCommunityInfo(self,response):
         seletor = etree.HTML(response.body)
-        page_num = response.requset.meta["page_num"]
+        page_num = response.request.meta["page_num"]
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
         self.result[str(page_num)]=self._get_onePage(all_communities)
         self.result_len += len(self.result[str(page_num)])
@@ -100,7 +101,7 @@ class SimpleSpider_08(Spider):
             # 'https://sh.lianjia.com/chengjiao/c5011000014456/'
         ]
         try:
-            cr = CrawlerRunner(url_list,self.settings,SoldOrSale)
+            cr = CrawlerRunner(self.sold_url,self.settings,SoldOrSale)
             yield cr.start()
         except Exception as e :
             print(e)

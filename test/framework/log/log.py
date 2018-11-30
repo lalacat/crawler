@@ -109,9 +109,9 @@ class LogFormat(object):
                     'module': module,
                     'name': module_name,
                     'msg': msg,
+                    'time':time,
                     'function': extra['function'],
                     'request': extra['request'],
-                    'time':time
 
                 }
             }

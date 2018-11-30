@@ -115,7 +115,7 @@ class Crawler(object):
 
     def create_spider_from_task(self,spider_name,spider_start_urls):
         logger.warning(*self.logformatter.crawled('Spider',spider_name,"已创建..."))
-        self.spider = self.spidercls.from_task(spider_name,spider_start_urls)
+        self.spider = self.spidercls.from_task(self,spider_name,spider_start_urls)
 
     @inlineCallbacks
     def stop(self):

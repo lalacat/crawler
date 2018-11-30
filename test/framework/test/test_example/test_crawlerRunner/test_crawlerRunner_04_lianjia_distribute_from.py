@@ -90,7 +90,7 @@ town_urls_dict= {
 #     'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
 #     'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
 }
-
+#
 s = Setting()
 cr = CrawlerRunner(town_urls_dict,s,SimpleSpider_08)
 d = cr.start()
@@ -98,7 +98,3 @@ d.addBoth(lambda _:reactor.stop())
 # reactor.callLater(2,cr.stop)
 reactor.run()
 
-# b =lambda x: url if url else None
-#
-# c = b(town_urls_dict)
-# print(c)
