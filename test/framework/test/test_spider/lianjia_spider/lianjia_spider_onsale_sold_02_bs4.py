@@ -21,7 +21,6 @@ class SoldOrSale(Spider):
         self.total_number_community = 0
         self.result = defaultdict(list)
         self.result_len = 0
-        self.lfm = self.crawler.logformatter
 
     @property
     def name(self):

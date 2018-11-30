@@ -55,6 +55,7 @@ class Spider(object_ref):
         spider._set_crawler(crawler)
         spider._set_name(spider_name)
         spider._set_start_urls(spider_start_urls)
+        spider._set_logformat(crawler.logformatter)
         return spider
 
     def _set_crawler(self,crawler):
@@ -65,6 +66,10 @@ class Spider(object_ref):
 
     def _set_start_urls(self,start_urls):
         self.start_urls = start_urls
+
+    def _set_logformat(self,logformat):
+        self.lfm = logformat
+
 
     def __str__(self):
         return '<%s %s>'%(self.name,self.start_urls)
