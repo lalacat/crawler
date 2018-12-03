@@ -12,7 +12,7 @@ import logging
 
 from test.framework.https.request import Request
 from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import CrawlerRunner
-from test.framework.test.test_spider.lianjia_spider.lianjia_spider_onsale_sold_02_bs4 import SoldOrSale
+from test.framework.test.test_spider.lianjia_spider.lianjia_spider_onsale_sold_01_xpath import SoldOrSale
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ class SimpleSpider_08(Spider):
         logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
         # for i in range(1, self.total_page_number+1):
-        for i in range(1,2+1):
+        for i in range(1,1+1):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 

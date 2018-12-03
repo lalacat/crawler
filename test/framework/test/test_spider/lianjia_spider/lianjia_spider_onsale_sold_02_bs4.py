@@ -116,17 +116,15 @@ class SoldOrSale(Spider):
                     download_times = response.request.meta['download_times']
                     logger.warning(*self.lfm.crawled_time(
                         'Spider',self.name,
-                        '{0}再次下载,时间为：'.format(response.request.headers.getRawHeaders('User-Agent')[0]),
+                        '{{0}}再次下载,时间为：'.format(response.request.headers.getRawHeaders('User-Agent')[0]),
                         time.clock(),
                         {
                             'function':'第{0}次'.format(download_times),
                             'request':response.request
                         }
                     ))
-                    # print("再次下载："+response.url+' 第'+str(download_times)+'次 '+response.request.headers.getRawHeaders('User-Agent')[0])
                     download_times = download_times + 1
                 else:
-                    # print("再次下载："+response.url+'  '+response.request.headers.getRawHeaders('User-Agent')[0]+'重新下载')
                     download_times= 1
 
                 if download_times < 4:
@@ -136,7 +134,15 @@ class SoldOrSale(Spider):
                             'last_header':response.request.headers
                                                                              })
                 else:
-                    print(response.url+'下载大于4次了！！！！！！！！！！！')
+                    logger.warning(*self.lfm.crawled_time(
+                        'Spider',self.name,
+                        '重复下载次数已超过最大值，判断此网页没有数据',
+                        time.clock(),
+                        {
+                            'function':'第{0}次'.format(download_times),
+                            'request':response.request
+                        }
+                    ))
             print("sold：" + self.name +': '+response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
             return None
 
