@@ -41,9 +41,21 @@ logger.error(*a.error("Spider","lala",
                  'exception':'info',
                 'time':"\n时间是{:d}".format(34)
              })
+logger.error(*a.error("Spider","lala",
+                      {
+                          'function':'Scraper',
+                          'request':'www'
+                      },
+                          '出现错误{name}'.format(name='lili')),
+             extra=
+             {
+                'reason':'finish',
+                 'exception':'info',
+                'time':"\n时间是{:d}".format(34)
+             })
 error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
 error_args = {'url': 'wwww', "size": 20, 'maxsize': 30}
-logger.error(error_msg, error_args)
+# logger.error(error_msg, error_args)
 logger.error(*a.error("Spider","lala",
                       {
                           'function':'Scraper',
@@ -74,7 +86,7 @@ logger.warning(*a.crawled(
                }
 
                )
-logger.info("添加或重写的设置如下：\n %s", pprint.pformat(args))
+# logger.info("添加或重写的设置如下：\n %s", pprint.pformat(args))
 
 
 logger.warning(*a.crawled(
@@ -88,3 +100,8 @@ logger.error(*a.error('Spider',"asdsa",'',
                                  bytes= 20,
                                  maxsize=10)
                              ))
+logger.error('www.baidu.com', extra={
+    'exception': '重复下载次数已超过最大值，判断此网页没有数据',
+    'time': 120,
+    'reason': 'No Data'
+})

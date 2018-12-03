@@ -56,7 +56,6 @@ class SimpleSpider_08(Spider):
             yield Request(url, callback=self._parse_getAllCommunity,headers=self.headers)
 
     def _parse_getAllCommunity(self,response):
-        print(self.crawler)
         seletor = etree.HTML(response.body)
         #  获取下属城镇的小区总页数
         page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
@@ -77,7 +76,6 @@ class SimpleSpider_08(Spider):
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
         self.result[str(page_num)]=self._get_onePage(all_communities)
         self.result_len += len(self.result[str(page_num)])
-        # print(self.name+':'+str(page_num)+"============================")
         for result in self.result[str(page_num)]:
             community_url = result["community_url"]
             name = result['community_name']

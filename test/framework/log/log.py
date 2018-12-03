@@ -33,9 +33,10 @@ class LogFormat(object):
         # log文件的全路径
         logfile_path = os.path.join(logfile_dir, logfile_name)
         '''
-        self.settings =settings
+        self.settings = settings
         self.level = settings['LOG_LEVEL']
         self.file_name = self._get_filename()
+        self.file_errorurl = self.file_name+'_error_url'
         self._update_loggingdict()
         self._load_format()
 
@@ -52,6 +53,8 @@ class LogFormat(object):
 
     def error(self, module, name,function, msg):
         return self._logformatter_adapter(self._error(module, name,function, msg))
+
+
 
     def crawled_time(self,module,name,msg,time,extra=None):
         return self._logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
@@ -161,12 +164,16 @@ class LogFormat(object):
             if name is 'handlers':
                 if isinstance(logset, dict):
                     for key,value in logset.items():
-                        if value.get('filename'):
-                            value['filename'] = self.file_name
+                        if key == 'onefile':
+                            if value.get('filename'):
+                                value['filename'] = self.file_name+'.log'
+                        if key == 'ErrorUrl':
+                            if value.get('filename'):
+                                value['filename'] = self.file_errorurl+'.log'
 
     def _get_filename(self):
         time_now = time.localtime(time.time())
-        time_str = time.strftime('%Y%m%d', time_now)+'.log'
+        time_str = time.strftime('%Y%m%d', time_now)
         root_path = os.getcwd()
         root_num = root_path.index('crawler')
         logfile_dir = os.path.join(root_path[:root_num+len('crawler')],'log_record')

@@ -1,3 +1,4 @@
+import json
 import logging
 from logging.handlers import RotatingFileHandler
 logging.FileHandler
@@ -87,3 +88,50 @@ class OnlyOneFileHandler(logging.FileHandler):
         if self.stream is None:
             self.stream = self._open()
         logging.StreamHandler.emit(self, record)
+
+
+class RecordErrorUrl(logging.FileHandler):
+    def __init__(self,filename, mode='a', encoding=None, delay=False):
+        super(RecordErrorUrl, self).__init__(filename=filename,mode=mode,
+                                                  encoding=encoding,
+                                                  delay=delay)
+
+    def emit(self, record):
+        """
+        Emit a record.
+
+        If the stream was not opened because 'delay' was specified in the
+        constructor, open it before calling the superclass's emit.
+        """
+        if not hasattr(record, 'reason'):
+            return
+        if self.stream is None:
+            self.stream = self._open()
+        try:
+            msg = self._format(record)
+            stream = self.stream
+            json.dump(msg,stream,ensure_ascii=False)
+            stream.write(self.terminator)
+            self.flush()
+        except Exception:
+            self.handleError(record)
+        # logging.StreamHandler.emit(self, record)
+
+    def _format(self,record):
+        format_data = dict()
+        if hasattr(record, 'asctime'):
+            format_data['asctime'] = record.__dict__['asctime']
+        if hasattr(record,'msg'):
+            format_data['url'] = record.__dict__['msg']
+        if hasattr(record,'filename'):
+            format_data['filename'] = record.__dict__['filename']
+        if hasattr(record,'reason'):
+            format_data['reason'] = record.__dict__['reason']
+        if hasattr(record,'exception'):
+            format_data['exception'] = record.__dict__['exception']
+        if hasattr(record,'time'):
+            format_data['time'] = record.__dict__['time']
+        return format_data
+
+# d = json.loads("[ERROR] [12/04/2018 00:26:46 AM]-[test_for_log_3.py][line:54]: Error:[Spider:lala Scraper www] 出现错误lili  finish")
+# print(d)

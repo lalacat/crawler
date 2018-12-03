@@ -25,8 +25,8 @@ _data = {
     'author': 'Scott'
 }
 house_info = {'community_name': '和平花苑', 'community_url': 'https://sh.lianjia.com/xiaoqu/5011000017889/',
-              'community_sale_num': '1', 'community_rent_num': '1',
-              'community_onsale_num': '10',
+              'community_sale_num': ['1'], 'community_rent_num': ['1'],
+              'community_onsale_num': ['10'],
               'community_bulid_year': '1997年建成',
               'community_avr_price': '75616'}
 house_info_01 = {'community_name': '和平花苑', 'community_url': 'https://sh.lianjia.com/xiaoqu/5011000017889/',
@@ -51,40 +51,40 @@ house_info_02 = {'community_name': '和平花苑', 'community_url': 'https://sh.
 # 如果指定的键已经存在，会向已有的数组末尾加入一个元素，要是没有就会创建一个新的数组。
 
 # db_coll.insert(house_info)
-#
+
 # a = db_coll.find(house_info).count()
 # print(a)
 # b = db_coll.find({'community_name':house_info_01['community_name']}).count()
-# print(b)
-# db_coll.update({'community_name':house_info_01['community_name']},
-#                {'$set':{
-#                    'community_sale_num': house_info_01['community_sale_num'],
-#                    'community_rent_num': house_info_01['community_rent_num'],
-#                    'community_onsale_num': house_info_01['community_onsale_num'],
-#                    'community_avr_price': house_info_01['community_avr_price']
-#                 }},
-#                multi=True)
+# # print(b)
+db_coll.update({'community_name':house_info_01['community_name']},
+               {'$set':{
+                   'community_sale_num': house_info_01['community_sale_num'],
+                   'community_rent_num': house_info_01['community_rent_num'],
+                   'community_onsale_num': house_info_01['community_onsale_num'],
+                   'community_avr_price': house_info_01['community_avr_price']
+                }},
+               multi=True)
 
 
-def db_filter(item):
-    print(type(item))
-    #  1.防止重复写入
-    #  2.对某条字段更新
-    num_01 = db_coll.find(item).count()
-    print(num_01)
-    print(type(num_01))
-    num_02 = db_coll.find({'community_name':item['community_name']}).count()
-    print(num_02)
-    print(type(num_02))
-
-    # if num_01 == 1:
-    #     return 'exist'
-    # elif num_02 == 1:
-    #     return 'update'
-    # else:
-    #     return 'insert'
-
-
-
-a = db_filter(house_info_02)
-print(a)
+# def db_filter(item):
+#     print(type(item))
+#     #  1.防止重复写入
+#     #  2.对某条字段更新
+#     num_01 = db_coll.find(item).count()
+#     print(num_01)
+#     print(type(num_01))
+#     num_02 = db_coll.find({'community_name':item['community_name']}).count()
+#     print(num_02)
+#     print(type(num_02))
+#
+#     # if num_01 == 1:
+#     #     return 'exist'
+#     # elif num_02 == 1:
+#     #     return 'update'
+#     # else:
+#     #     return 'insert'
+#
+#
+#
+# a = db_filter(house_info_02)
+# print(a)

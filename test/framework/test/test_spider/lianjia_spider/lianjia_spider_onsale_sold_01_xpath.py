@@ -1,5 +1,7 @@
 import json
 import time
+import re
+
 from collections import defaultdict
 
 from bs4 import BeautifulSoup
@@ -117,30 +119,33 @@ class SoldOrSale(Spider):
         try:
             sold_houses = self._xpath_filter(selector.xpath("//ul[@class='listContent']")).xpath('./li')
             total_num = selector.xpath('//div[@class="total fl"]/span/text()')[0]
-            # total_num = seletor.xpath("/html/body/div[5]/div[1]/div[2]/div[1]/span/text()")[0]
 
+            if self.name == 'Task_sold_鞍山八村':
+                total_num = 0
             if int(total_num) == 0:
                 return self._reload_sold(response,sold_houses)
             else:
-                print("sold：" + self.name + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
+                self._resolve_sold(sold_houses)
                 if int(total_num) > len(sold_houses):
-                    self._print_sold(sold_houses)
-                    page_number = selector.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
-                    total_page_number = json.loads(page_number[0])["totalPage"]
-                    base_name = response.url.split('/')[-2]
-                    for pg in range(2,total_page_number+1):
-                        url = response.url.replace(base_name,'pg'+str(pg)+base_name)
-                        yield Request(url, callback=self._resolve_sold)
 
-                else:
-                    return self._resolve_sold(sold_houses)
+                    if not re.search('pg',response.url):
+                        print("sold：" + self.name + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
+                        page_number = selector.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
+                        total_page_number = json.loads(page_number[0])["totalPage"]
+                        base_name = response.url.split('/')[-2]
+                        for pg in range(2,total_page_number+1):
+                            url = response.url.replace(base_name,'pg'+str(pg)+base_name)
+                            yield Request(url, callback=self._parse_sold)
+                    else:
+                        pg = re.findall('pg\d+',response.url)[0]
+                        print("sold：" + self.name + '_' + pg + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
+
+                        return None
         except Exception as e:
             print(e)
             # raise Exception(e)
             return None
 
-
-    # TODO 重复下载后没有后续处理，后续的判断也要处理
     def _reload_sold(self,response,sold_houses):
         if response.request.meta.get('download_times'):
             download_times = response.request.meta['download_times']
@@ -173,23 +178,15 @@ class SoldOrSale(Spider):
                     'request': response.request
                 }
             ))
+            logger.error(response.url,extra={
+                'exception':'重复下载次数已超过最大值，判断此网页没有数据',
+                'time':time.clock(),
+                'reason':'No Data'
+            })
             print("sold：" + self.name + ': ' + response.url + ': ' + str(0) + "===" + str(len(sold_houses)))
             return None
 
-    def _resolve_sold(self,result):
-        if isinstance(result,Response):
-            selector = etree.HTML(result.body)
-            sold_houses = self._xpath_filter(selector.xpath("//ul[@class='listContent']/li")).xpath('./li')
-        elif isinstance(result,list):
-            sold_houses = result
-        else:
-            return None
-        if len(sold_houses) == 0 :
-            return self._reload_sold(result,sold_houses)
-        self._print_sold(sold_houses)
-        return None
-
-    def _print_sold(self,sold_houses):
+    def _resolve_sold(self,sold_houses):
         base_xpath = './div[@class="info"]'
 
         for sold_house in sold_houses:
@@ -197,34 +194,34 @@ class SoldOrSale(Spider):
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="title"]/a/text()'))
             print("小区名称："+sold_title)
 
-            # sold_address = \
-            # self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="houseInfo"]/text()'))
-            # print("小区地址："+sold_address)
-            #
-            # sold_dealDate = \
-            # self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="dealDate"]/text()'))
-            # print("成交日期："+sold_dealDate)
-            #
-            # sold_totalPrice = \
-            # self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="totalPrice"]/span/text()'))
-            # print("成交价格："+sold_totalPrice)
-            #
-            # sold_unitPrice = \
-            # self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))
-            # print('成交均价：'+sold_unitPrice)
-            #
-            # sold_positionInfo = \
-            # self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="positionInfo"]/text()'))
-            # print("楼层高度："+sold_positionInfo)
-            #
-            # sold_saleonborad = \
-            # self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[1]/text()'))
-            #
-            # print("挂牌价："+sold_saleonborad)
-            #
-            # sold_dealcycle = \
-            # self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]/text()'))
-            # print("成交周期："+sold_dealcycle)
+            sold_address = \
+            self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="houseInfo"]/text()'))
+            print("小区地址："+sold_address)
+
+            sold_dealDate = \
+            self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="dealDate"]/text()'))
+            print("成交日期："+sold_dealDate)
+
+            sold_totalPrice = \
+            self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="totalPrice"]/span/text()'))
+            print("成交价格："+sold_totalPrice)
+
+            sold_unitPrice = \
+            self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))
+            print('成交均价：'+sold_unitPrice)
+
+            sold_positionInfo = \
+            self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="positionInfo"]/text()'))
+            print("楼层高度："+sold_positionInfo)
+
+            sold_saleonborad = \
+            self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[1]/text()'))
+
+            print("挂牌价："+sold_saleonborad)
+
+            sold_dealcycle = \
+            self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]/text()'))
+            print("成交周期："+sold_dealcycle)
 
     def _xpath_filter(self,xpath):
         if xpath:
@@ -234,9 +231,17 @@ class SoldOrSale(Spider):
 
 
 
+
+
 # url = 'https://sh.lianjia.com/chengjiao/c5011000013330/'
 # url_01 ='https://sh.lianjia.com/chengjiao/c5011000013330/'
 # name = url_01.split('/')[-2]
-# print(name)
+# # print(name)
 # url_02 = url_01.replace(name,'pg2'+name)
-# print(url_02)
+# # print(url_02)
+# url_03 = re.search('pg',url_01)
+# if url_03:
+#     print(url_03)
+# url_04 = re.findall('pg\d+',url_02)
+# if url_04:
+#     print(url_04)

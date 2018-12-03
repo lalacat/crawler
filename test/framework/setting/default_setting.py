@@ -119,6 +119,7 @@ LOG_DEBUG_FORMAT_01 = '%(message)s%(extra_info)s-[%(filename)s:%(lineno)d]'
 LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 
 LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
+LOG_FILE_ERROR_URL_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(reason)s'
 # LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
 
 
@@ -139,6 +140,7 @@ LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %
 
 LOG_FILE_PATH = 'C:\\Users\\scott\\PycharmProjects\\crawler\\log_record\\'
 LOG_FILE_NAME  = LOG_FILE_PATH+'default_log_name.log'
+LOG_FILE_ERROR_URL = 'default_error_url.log'
 LOG_LEVEL = "DEBUG"
 
 LOGGING_DIC = {
@@ -162,6 +164,10 @@ LOGGING_DIC = {
             'format': LOG_ERROR_FORMAT,
             'datefmt': LOG_DATE_FORMAT
         },
+        'error_url':{
+            'format': LOG_FILE_ERROR_URL_FORMAT,
+            'datefmt': LOG_DATE_FORMAT
+        }
 
     },
     'filters': {
@@ -185,16 +191,16 @@ LOGGING_DIC = {
             'formatter': 'error_format',
         },
         # 打印到文件的日志,收集info及以上的日志
-        'rollfile': {
-            'level': 'DEBUG',
-            'class': 'test.framework.log.loghandler.RotateFileHandler',  # 保存到文件
-            'formatter': 'file_format',
-            # 'filters': ['error_filter'],
-            'filename': LOG_FILE_NAME,  # 日志文件
-            'maxBytes': 1024 * 1024 * 5,  # 日志大小 5M
-            'backupCount': 5,  # 当一个文件超过大小的时候，最多再添加5个文件
-            'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
-        },
+        # 'rollfile': {
+        #     'level': 'DEBUG',
+        #     'class': 'test.framework.log.loghandler.RotateFileHandler',  # 保存到文件
+        #     'formatter': 'file_format',
+        #     # 'filters': ['error_filter'],
+        #     'filename': LOG_FILE_NAME,  # 日志文件
+        #     'maxBytes': 1024 * 1024 * 5,  # 日志大小 5M
+        #     'backupCount': 5,  # 当一个文件超过大小的时候，最多再添加5个文件
+        #     'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
+        # },
         'onefile': {
             'level': 'DEBUG',
             'class': 'test.framework.log.loghandler.OnlyOneFileHandler',  # 保存到文件
@@ -204,12 +210,21 @@ LOGGING_DIC = {
             'mode': 'w',  # 文件的读写模式
             'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
         },
+        'ErrorUrl': {
+            'level': 'ERROR',
+            'class': 'test.framework.log.loghandler.RecordErrorUrl',  # 保存到文件
+            'formatter': 'error_url',
+            # 'filters': ['error_filter'],
+            'filename': LOG_FILE_ERROR_URL,  # 日志文件
+            'mode': 'w',  # 文件的读写模式
+            'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
+        },
 
     },
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['onefile','console_info'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['onefile','console_info','ErrorUrl'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
