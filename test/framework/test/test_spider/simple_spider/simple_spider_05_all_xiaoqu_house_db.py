@@ -11,14 +11,14 @@ from test.framework.https.request import Request
 
 logger = logging.getLogger(__name__)
 
-class SimpleSpider(Spider):
+class SimpleSpider_05(Spider):
     """
     将所有小区的地址都写入数据库中
     """
     def __init__(self):
         self.name = ""
         self._start_urls = []
-        self.handler_db = False
+        self.handler_db = True
         self.total_number_community = 0
         self.result = defaultdict(list)
         self.result_len = 0
@@ -62,16 +62,16 @@ class SimpleSpider(Spider):
 
     def _parse_getCommunityInfo(self,response):
         seletor = etree.HTML(response.body)
-        page_num = response.requset.meta["page_num"]
-        all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
-        self.result[str(page_num)]=self._get_onePage(all_communities)
-        self.result_len += len(self.result[str(page_num)])
-        print(self.name+':'+str(page_num))
+        try:
+            page_num = response.request.meta["page_num"]
+            all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
+            self.result[str(page_num)]=self._get_onePage(all_communities)
+            self.result_len += len(self.result[str(page_num)])
+            print(self.name+':'+str(page_num))
 
-        return self.result[str(page_num)]
-
-    def _parse_get_HouseInfo(self,response):
-        pass
+            return self.result[str(page_num)]
+        except Exception as e :
+            print(e)
 
 
 
@@ -96,9 +96,9 @@ class SimpleSpider(Spider):
             community_rent_num = community_info.xpath('./div[@class="houseInfo"]/a[2]')[0].text
             community_onsale_num = community_info.xpath('../div[@class="xiaoquListItemRight"]/div[2]/a/span/text()')[0]
 
-            result["community_sale_num"] = re.findall('\d+', community_sale_num)[1]
-            result["community_rent_num"] = re.findall('\d+', community_rent_num)[0]
-            result["community_onsale_num"] = community_onsale_num
+            result["community_sale_num"] = [re.findall('\d+', community_sale_num)[1]]
+            result["community_rent_num"] = [re.findall('\d+', community_rent_num)[0]]
+            result["community_onsale_num"] = [community_onsale_num]
 
             # 小区年限
             community_bulid_year = community_info.xpath('./div[@class="positionInfo"]/text()')[3].replace('/',"").strip()
@@ -112,7 +112,7 @@ class SimpleSpider(Spider):
 
             # 小区均价
             community_avr_price = community_info.xpath('../div[@class="xiaoquListItemRight"]/div/div/span/text()')[0]
-            result["community_avr_price"] = community_avr_price
+            result["community_avr_price"] = [community_avr_price]
             one_page.append(result)
 
         return one_page

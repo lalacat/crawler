@@ -72,7 +72,7 @@ HEADER_COLLECTION = [
 #T
 ITEM_PIPELINES = {
     # "test.framework.pipelines.mongoDB.MongoDB":20,
-    # "test.framework.test.test_middleware.test_db.lianjia_xiaoqu_mongoDB_01.LJ_XQ_DB":10,
+    "test.framework.test.test_middleware.test_db.lianjia_xiaoqu_mongoDB_01.LJ_XQ_DB":10,
     # "test.framework.pipelines.print_result.Print_Result":10,
     # "test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
@@ -179,7 +179,7 @@ LOGGING_DIC = {
     'handlers': {
         #  打印到终端的日志
         'console_info': {
-            'level': 'ERROR',
+            'level': 'WARNING',
             'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
             'formatter': 'debug_format',
             'filters': ['error_filter'],
@@ -224,7 +224,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['onefile','console_info','ErrorUrl'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['onefile','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
