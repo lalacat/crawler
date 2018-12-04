@@ -59,18 +59,6 @@ for query in queryArgs:
             break
 
 
-
-b = lambda x: x.split('/')[-2]
-
-all_zone_dict = {}
-
-for url in all_zone:
-    all_zone_dict[b(url)] = url
-
-print(pprint.pformat(all_zone_dict))
-
-print(len(all_zone_dict))
-
 zone_name = "yangpu"
 town_urls = [
     # 'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156

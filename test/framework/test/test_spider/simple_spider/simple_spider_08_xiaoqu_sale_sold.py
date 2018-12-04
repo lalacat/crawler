@@ -65,7 +65,7 @@ class SimpleSpider_08(Spider):
         logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
         # for i in range(1, self.total_page_number+1):
-        for i in range(1,1+1):
+        for i in range(1,self.total_page_number+1):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
@@ -86,20 +86,12 @@ class SimpleSpider_08(Spider):
 
             self.sale_url['sale_'+name] = sale_url
             self.sold_url['sold_'+name] = sold_url
-        #
+
         # total_dict = dict(self.sale_url,**self.sold_url)
         # print(pprint.pformat(total_dict))
 
-        url_list = [
-            "https://sh.lianjia.com/chengjiao/c5011000004404/",
-            # "https://sh.lianjia.com/chengjiao/c5011000004433/",
-            # "https://sh.lianjia.com/chengjiao/c5011000015792/",
-            # "https://sh.lianjia.com/chengjiao/c5011000014671/",
-            # 'https://sh.lianjia.com/chengjiao/c5011000013940/',
-            # 'https://sh.lianjia.com/chengjiao/c5011000014456/'
-        ]
         try:
-            cr = CrawlerRunner(self.sold_url,self.settings,SoldOrSale)
+            cr = CrawlerRunner(self.sold_url,self.settings,SoldOrSale,name=self.name)
             yield cr.start()
         except Exception as e :
             print(e)

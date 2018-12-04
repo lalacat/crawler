@@ -5,7 +5,7 @@ from test.framework.core.crawler import Crawler
 
 logger = logging.getLogger(__name__)
 
-class LJ_XQ_DB(object):
+class LJ_Sold_DB(object):
 
     def __init__(self,crawler):
         self.lfm = crawler.logformatter
@@ -15,7 +15,7 @@ class LJ_XQ_DB(object):
         ))
         self.settings = crawler.settings
         self.db_url = self.settings["MONGODB_URL"]
-        self.db_name = self.settings["MONGODB_NAME"]
+        self.db_name = self.settings["MONGODB_NAME_SOLD"]
         self.collection_name = None
 
         self.update_query = None
@@ -41,7 +41,7 @@ class LJ_XQ_DB(object):
         self.collection_name = spider.name
 
     def process_item(self,item,spider):
-        if not hasattr(spider,"handler_db"):
+        if not hasattr(spider,"sold_db"):
             logger.debug(*self.lfm.crawled(
                 "Spider",spider.name,
                 "没有设置数据库操作标志<handler_db>",
@@ -55,8 +55,8 @@ class LJ_XQ_DB(object):
                 self._db_collection = self.db[self.collection_name]
                 if self.db_filter(item) == 'insert':
                     self._db_collection.insert_one(item)
-                # elif self.db_filter(item) == 'update':
-                #     self._db_collection.update(self.update_query,self.update_doctument)
+                elif self.db_filter(item) == 'update':
+                    self._db_collection.update(self.update_query,self.update_doctument)
                 return None
             return item
 

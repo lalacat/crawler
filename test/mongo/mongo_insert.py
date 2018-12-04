@@ -33,3 +33,24 @@ a = db_coll.find({})
 for i in a:
    for l,j in i.items() :
        print(l,j)
+
+
+
+a =    { '密云小区 3室1厅 76.05平米': {'sold_address': '南 | 其他\xa0| 无电梯',
+                                   'sold_dealDate': '2015.11.01',
+                                   'sold_dealcycle': '成交周期678天',
+                                   'sold_positionInfo': '中楼层(共6层) 1992年建板楼',
+                                   'sold_saleonborad': '挂牌370万',
+                                   'sold_totalPrice': '330',
+                                   'sold_unitPrice': '43393'},
+             '密云小区 3室1厅 79.4平米': {'sold_address': '南 | 精装\xa0| 无电梯',
+                                  'sold_dealDate': '2018.05.09',
+                                  'sold_dealcycle': '成交周期335天',
+                                  'sold_positionInfo': '高楼层(共6层) 1990年建板楼',
+                                  'sold_saleonborad': '挂牌595万',
+                                  'sold_totalPrice': '558',
+                                  'sold_unitPrice': '70278'}}
+
+c =dict()
+c .update(a)
+print(c)

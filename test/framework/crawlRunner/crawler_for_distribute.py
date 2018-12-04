@@ -20,13 +20,15 @@ class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
     # 装载爬虫，导入爬虫的网页
     # 将爬虫导入到引擎中
-    def __init__(self,spidercls=None,settings=None,logformat=None):
+    def __init__(self,spidercls=None,settings=None,logformat=None,father_name=None):
         self.crawling = False
         self.spider = None
         self.engine = None
 
         # 导入的是爬虫对应的模块，不是名称
         self.spidercls = spidercls
+
+        self.father_name = father_name
         self.settings = settings.copy()
 
         # 获取log的格式
@@ -115,7 +117,7 @@ class Crawler(object):
 
     def create_spider_from_task(self,spider_name,spider_start_urls):
         logger.warning(*self.logformatter.crawled('Spider',spider_name,"已创建..."))
-        self.spider = self.spidercls.from_task(self,spider_name,spider_start_urls)
+        self.spider = self.spidercls.from_task(self,spider_name,spider_start_urls,self.father_name)
 
     @inlineCallbacks
     def stop(self):

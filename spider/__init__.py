@@ -50,12 +50,13 @@ class Spider(object_ref):
         return cls(schedule)
 
     @classmethod
-    def from_task(cls,crawler,spider_name,spider_start_urls):
+    def from_task(cls,crawler,spider_name,spider_start_urls,father_name):
         spider = cls()
         spider._set_crawler(crawler)
         spider._set_name(spider_name)
         spider._set_start_urls(spider_start_urls)
         spider._set_logformat(crawler.logformatter)
+        spider._set_father_name(father_name)
         return spider
 
     def _set_crawler(self,crawler):
@@ -70,6 +71,9 @@ class Spider(object_ref):
     def _set_logformat(self,logformat):
         self.lfm = logformat
 
+    def _set_father_name(self,father_name):
+        if father_name:
+            self.father_name = father_name
 
     def __str__(self):
         return '<%s %s>'%(self.name,self.start_urls)

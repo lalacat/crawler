@@ -12,7 +12,6 @@ from test.framework.https.request import Request
 
 import logging
 
-from test.framework.https.response import Response
 
 logger = logging.getLogger(__name__)
 
@@ -24,11 +23,11 @@ class SoldOrSale(Spider):
     def __init__(self):
         self.name = ""
         self._start_urls = []
-        self.handler_db = False
+        self.sold_db = True
         self.total_number_community = 0
-        self.result = defaultdict(list)
+        self.result = dict()
         self.result_len = 0
-
+        self.sold_num = 0
     @property
     def name(self):
         return self._name
@@ -57,7 +56,8 @@ class SoldOrSale(Spider):
                 yield Request(url,callback=self._parse_sale)
             else:
                 print(url+'出错！！')
-
+        # for url in self.url:
+        #     yield Request(url,callback=self._parse_sold)
 
     def _parse_sale(self,response):
 
@@ -77,37 +77,38 @@ class SoldOrSale(Spider):
             total_num = seletor.xpath('//h2[@class="total fl"]/span/text()')
             print('sale：'+response.url+': '+str(total_num)+"==="+str(len(houses)))
 
-            # for on_house in houses:
-            #     # 总价及均价
-            #     total_price = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='priceInfo']/div[@class='totalPrice']/span/text()"))
-            #     print(str(total_price)+'万')
-            #
-            #     unit_prince = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='priceInfo']/div[@class='unitPrice']/span/text()"))
-            #     print('均价: '+unit_prince)
-            #
-            #     # 小区名称及网址
-            #     title = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='title']/a/text()"))
-            #     title_url = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='title']/a/@href"))
-            #     print('小区名称: '+title)
-            #     print('小区url: '+title_url)
-            #
-            #     # 小区地址
-            #     address = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='address']/div/text()"))
-            #     print('小区地址: '+address)
-            #
-            #     # 房屋层数及年代
-            #     flood = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='flood']/div/text()"))
-            #     print('房屋层数及年代: '+flood)
-            #
-            #     # 跟进信息
-            #     followInfo = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='followInfo']/text()"))
-            #     print('跟进信息: '+followInfo)
-            #
-            #     # 页码总数
-            #     # page_number = self._xpath_filter(seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data"))
-            #     # if page_number:
-            #     #     num = json.loads(page_number)["totalPage"]
-            #     #     print(num)
+
+            for on_house in houses:
+                # 总价及均价
+                total_price = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='priceInfo']/div[@class='totalPrice']/span/text()"))
+                print(str(total_price)+'万')
+
+                unit_prince = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='priceInfo']/div[@class='unitPrice']/span/text()"))
+                print('均价: '+unit_prince)
+
+                # 小区名称及网址
+                title = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='title']/a/text()"))
+                title_url = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='title']/a/@href"))
+                print('小区名称: '+title)
+                print('小区url: '+title_url)
+
+                # 小区地址
+                address = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='address']/div/text()"))
+                print('小区地址: '+address)
+
+                # 房屋层数及年代
+                flood = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='flood']/div/text()"))
+                print('房屋层数及年代: '+flood)
+
+                # 跟进信息
+                followInfo = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='followInfo']/text()"))
+                print('跟进信息: '+followInfo)
+
+                # 页码总数
+                # page_number = self._xpath_filter(seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data"))
+                # if page_number:
+                #     num = json.loads(page_number)["totalPage"]
+                #     print(num)
 
         except Exception as e:
             raise Exception(e)
@@ -120,8 +121,6 @@ class SoldOrSale(Spider):
             sold_houses = self._xpath_filter(selector.xpath("//ul[@class='listContent']")).xpath('./li')
             total_num = selector.xpath('//div[@class="total fl"]/span/text()')[0]
 
-            if self.name == 'Task_sold_鞍山八村':
-                total_num = 0
             if int(total_num) == 0:
                 return self._reload_sold(response,sold_houses)
             else:
@@ -139,7 +138,6 @@ class SoldOrSale(Spider):
                     else:
                         pg = re.findall('pg\d+',response.url)[0]
                         print("sold：" + self.name + '_' + pg + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
-
                         return None
         except Exception as e:
             print(e)
@@ -190,38 +188,49 @@ class SoldOrSale(Spider):
         base_xpath = './div[@class="info"]'
 
         for sold_house in sold_houses:
+            house_info = dict()
             sold_title = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="title"]/a/text()'))
-            print("小区名称："+sold_title)
+            # print("小区名称："+sold_title)
+            house_info['sold_title'] = sold_title
 
             sold_address = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="houseInfo"]/text()'))
-            print("小区地址："+sold_address)
+            # print("小区地址："+sold_address)
+            house_info['sold_address'] = sold_address
 
             sold_dealDate = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="dealDate"]/text()'))
-            print("成交日期："+sold_dealDate)
+            # print("成交日期："+sold_dealDate)
+            house_info['sold_dealDate'] = sold_dealDate
 
             sold_totalPrice = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="totalPrice"]/span/text()'))
-            print("成交价格："+sold_totalPrice)
+            # print("成交价格："+sold_totalPrice)
+            house_info['sold_totalPrice'] = sold_totalPrice
 
             sold_unitPrice = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))
-            print('成交均价：'+sold_unitPrice)
+            # print('成交均价：'+sold_unitPrice)
+            house_info['sold_unitPrice'] = sold_unitPrice
 
             sold_positionInfo = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="positionInfo"]/text()'))
-            print("楼层高度："+sold_positionInfo)
+            # print("楼层高度："+sold_positionInfo)
+            house_info['sold_positionInfo'] = sold_positionInfo
+
 
             sold_saleonborad = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[1]/text()'))
-
-            print("挂牌价："+sold_saleonborad)
+            # print("挂牌价："+sold_saleonborad)
+            house_info['sold_saleonborad'] = sold_saleonborad
 
             sold_dealcycle = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]/text()'))
-            print("成交周期："+sold_dealcycle)
+            # print("成交周期："+sold_dealcycle)
+            house_info['sold_dealcycle'] = sold_dealcycle
+            self.result[str(self.sold_num)] = house_info
+            self.sold_num  += 1
 
     def _xpath_filter(self,xpath):
         if xpath:

@@ -71,8 +71,7 @@ class SimpleSpider_05(Spider):
 
             return self.result[str(page_num)]
         except Exception as e :
-            print(e)
-
+            raise Exception(e)
 
 
     def _get_onePage(self,all_communities):

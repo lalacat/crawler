@@ -55,16 +55,17 @@ class Slot(object):
 
 class CrawlerRunner(object):
 
-    def __init__(self,tasks,settings=None,spidercls=None):
+    def __init__(self,tasks,settings=None,spidercls=None,name=None):
         if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
 
         self.lfs = load_object(self.settings['LOG_FORMATTER_CLASS'])
         self.lfm = self.lfs.from_settings(self.settings)
+        self.name = name if name else ''
 
         logger.info(*self.lfm.crawled(
-            "CrawlerRunner", '',
+            "CrawlerRunner", self.name,
             '已初始化...')
                      )
         if isinstance(tasks,dict):
@@ -122,7 +123,7 @@ class CrawlerRunner(object):
             self._crawlers.discard(crawler.spider.name)
             self._active.discard(d1)
             logger.warning(*self.lfm.crawled(
-                "CrawlerRunner", '',
+                "CrawlerRunner", self.name,
                 '从队列中清除掉{0}'.format(crawler.spider.name))
                          )
             return result
@@ -142,10 +143,10 @@ class CrawlerRunner(object):
             start_url = start_urls[1]
             # logger.debug("当前爬取的网页是:%s"%start_urls)
             logger.info(*self.lfm.crawled(
-                "CrawlerRunner", name,
+                "CrawlerRunner", self.name,
                 '当前爬取的网页',start_url)
                          )
-            crawler = Crawler(self.spidercls, self.settings,self.lfm)
+            crawler = Crawler(self.spidercls, self.settings,self.lfm,self.name)
             crawler.create_spider_from_task(name,start_url)
             return crawler
         except Empty:

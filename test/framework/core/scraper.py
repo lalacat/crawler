@@ -204,6 +204,11 @@ class Scraper(object):
                             'exception':_failure,
                             'time':'错误时间为：{:6.3f}s'.format(end_time-self.start_time)
                         },exc_info = True)
+            logger.error(request.url,extra ={
+                'reason':'no data',
+                'exception':exc,
+                'time':time.clock()
+            })
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")
 
