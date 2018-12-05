@@ -56,32 +56,32 @@ class LJ_Sold_DB(object):
                     self._db_collection = self.db[self.collection_name]
                     if self.db_filter(item) == 'insert':
                         self._db_collection.insert_one(item)
-                    # elif self.db_filter(item) == 'update':
-                    #     self._db_collection.update(self.update_query, self.update_doctument)
+                    elif self.db_filter(item) == 'update':
+                        self._db_collection.update(self.update_query, self.update_doctument)
                     return None
                 return None
         except Exception as e :
-            print(e)
+            print('close_spider'+e)
         self.db.logout()
 
     def db_filter(self,item):
         #  1.防止重复写入
         #  2.对某条字段更新
-        if self._db_collection.find(item).count() >= 1:
+        exist = self._db_collection.find(item)
+        update = self._db_collection.find({'community_name':item['community_name']})
+        if exist.count() >= 1:
             #  爬到的对象未更新
             return 'exist'
-        elif self._db_collection.find({'community_name':item['community_name']}).count() >= 1:
-            self.update_query = {'community_name':item['community_name']}
-            new_house = dict()
-            self.update_doctument ={'$set':{
-                   'community_sale_num': item['community_sale_num'],
-                   'community_rent_num': item['community_rent_num'],
-                   'community_onsale_num': item['community_onsale_num'],
-                   'community_avr_price': item['community_avr_price']
-                }}
+        elif update.count() >= 1:
+            old_item = update.next()
+            self.update_query = {'community_name':old_item['community_name']}
+            diff_key = item.keys()-old_item.keys()
+            new_item = {key:item[key] for key in diff_key}
+            if new_item is None:
+                print(new_item)
+            self.update_doctument ={'$set':new_item}
             return 'update'
-        else:
-            # self._db_collection.find(item).count() == 0:
+        elif exist.count() == 0:
             return 'insert'
         # else:
         #     print('Nothing')

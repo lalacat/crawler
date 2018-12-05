@@ -1,6 +1,8 @@
 import json
 import logging
+import pymongo
 from logging.handlers import RotatingFileHandler
+
 logging.FileHandler
 
 
@@ -133,5 +135,30 @@ class RecordErrorUrl(logging.FileHandler):
             format_data['time'] = record.__dict__['time']
         return format_data
 
-# d = json.loads("[ERROR] [12/04/2018 00:26:46 AM]-[test_for_log_3.py][line:54]: Error:[Spider:lala Scraper www] 出现错误lili  finish")
-# print(d)
+
+class LogToMongDB(logging.Handler):
+
+    def __init__(self,MongDB_URL,MongDB_DATABASE,MongDB_Collection_Name,*args, **kwargs):
+        super(LogToMongDB,self).__init__(*args, **kwargs)
+        self.MongDB_URl = MongDB_URL
+        self.MongDB_DATABASE = MongDB_DATABASE
+        self.MongDB_Collection_Name = MongDB_Collection_Name
+        self.time = 0
+
+        try:
+            self.client = pymongo.MongoClient(self.MongDB_URl)
+            self.db = self.client[self.MongDB_DATABASE]
+
+        except Exception as e:
+            raise Exception(e)
+
+    def emit(self, record):
+        if not hasattr(record, 'reason'):
+            record.__dict__['reason'] = ' '
+        # time_key = '%s,%6,3f' % (record.__dict__['asctime'],record.msecs)
+        # print(time_key)
+        self.format(record)
+        time_key = '%d :%s,%6.3f' % (self.time,record.__dict__['asctime'],record.msecs)
+        self.time +=1
+        #
+        print(time_key)

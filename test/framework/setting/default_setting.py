@@ -117,7 +117,7 @@ LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
 LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
 LOG_DEBUG_FORMAT_01 = '%(message)s%(extra_info)s-[%(filename)s:%(lineno)d]'
 
-LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 
 LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
 LOG_FILE_ERROR_URL_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(reason)s'
@@ -144,6 +144,10 @@ LOG_FILE_NAME  = LOG_FILE_PATH+'default_log_name.log'
 LOG_FILE_ERROR_URL = 'default_error_url.log'
 LOG_LEVEL = "DEBUG"
 
+
+LOG_MONGODB_URL = "127.0.0.1:27017"
+LOG_MONGODB_DATABASE = "LianJia"
+
 LOGGING_DIC = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -168,6 +172,10 @@ LOGGING_DIC = {
         'error_url':{
             'format': LOG_FILE_ERROR_URL_FORMAT,
             'datefmt': LOG_DATE_FORMAT
+        },
+        'db_format':{
+            'format': LOG_FILE_ERROR_URL_FORMAT,
+            'datefmt': LOG_DATE_FORMAT
         }
 
     },
@@ -180,7 +188,7 @@ LOGGING_DIC = {
     'handlers': {
         #  打印到终端的日志
         'console_info': {
-            'level': 'WARNING',
+            'level': 'DEBUG',
             'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
             'formatter': 'debug_format',
             'filters': ['error_filter'],
@@ -215,17 +223,25 @@ LOGGING_DIC = {
             'level': 'ERROR',
             'class': 'test.framework.log.loghandler.RecordErrorUrl',  # 保存到文件
             'formatter': 'error_url',
-            # 'filters': ['error_filter'],
             'filename': LOG_FILE_ERROR_URL,  # 日志文件
             'mode': 'w',  # 文件的读写模式
             'encoding': 'utf-8',  # 日志文件的编码，再也不用担心中文log乱码了
         },
+        'logtoMongdb':{
+            'level': 'DEBUG',
+            'class': 'test.framework.log.loghandler.LogToMongDB',  # 保存到文件
+            'MongDB_URL':LOG_MONGODB_URL,
+            'MongDB_DATABASE':LOG_MONGODB_DATABASE,
+            'MongDB_Collection_Name':'test',
+            'formatter': 'db_format',
+
+        }
 
     },
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['onefile','console_error','ErrorUrl'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['logtoMongdb','console_info'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },

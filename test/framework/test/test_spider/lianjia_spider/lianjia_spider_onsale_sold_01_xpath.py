@@ -111,8 +111,16 @@ class SoldOrSale(Spider):
                 #     print(num)
 
         except Exception as e:
-            raise Exception(e)
-        return None
+            logger.error(*self.lfm.error(
+                'Spider', self.name,
+                '解析房子信息时出现错误',
+                response.request),
+                extra={
+                    'exception':e,
+                    'time':time.clock()
+                }
+                )
+            return None
 
     def _parse_sold(self,response):
         selector = etree.HTML(response.body)
@@ -124,7 +132,7 @@ class SoldOrSale(Spider):
             if int(total_num) == 0:
                 return self._reload_sold(response,sold_houses)
             else:
-                self._resolve_sold(sold_houses)
+                self._resolve_sold(sold_houses,response.url)
                 if int(total_num) > len(sold_houses):
 
                     if not re.search('pg',response.url):
@@ -140,8 +148,18 @@ class SoldOrSale(Spider):
                         print("sold：" + self.name + '_' + pg + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
                         return None
         except Exception as e:
-            print(e)
-            # raise Exception(e)
+            logger.error(*self.lfm.error(
+                'Spider', self.name,
+                '解析房子信息时出现错误',
+                {
+                    'request':response.request,
+                    'function':'total_num={0} sold_houses={1}'.format(int(total_num),len(sold_houses))
+                }),
+                extra={
+                    'exception':e,
+                    'time':time.clock()
+                }
+                )
             return None
 
     def _reload_sold(self,response,sold_houses):
@@ -184,7 +202,7 @@ class SoldOrSale(Spider):
             print("sold：" + self.name + ': ' + response.url + ': ' + str(0) + "===" + str(len(sold_houses)))
             return None
 
-    def _resolve_sold(self,sold_houses):
+    def _resolve_sold(self,sold_houses,url):
         base_xpath = './div[@class="info"]'
 
         for sold_house in sold_houses:
@@ -192,7 +210,7 @@ class SoldOrSale(Spider):
             sold_title = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="title"]/a/text()'))
             # print("小区名称："+sold_title)
-            solf_title_key = sold_title.replace('.','_')
+            # solf_title_key = sold_title.replace('.','_')
             # house_info['sold_title'] = sold_title
 
             sold_address = \
@@ -205,10 +223,18 @@ class SoldOrSale(Spider):
             # print("成交日期："+sold_dealDate)
             house_info['sold_dealDate'] = sold_dealDate
 
+            sold_house_url = self._xpath_filter(sold_house.xpath('./a/@href'))
+            house_info['sold_house_url'] = sold_house_url
+
             sold_totalPrice = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="totalPrice"]/span/text()'))
             # print("成交价格："+sold_totalPrice)
             house_info['sold_totalPrice'] = sold_totalPrice
+            if re.search('\*+',sold_totalPrice):
+                logger.error(sold_house_url,extra={
+                    'reason':'价格隐藏',
+                    'exception':sold_title
+                })
 
             sold_unitPrice = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))
@@ -230,7 +256,7 @@ class SoldOrSale(Spider):
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]/text()'))
             # print("成交周期："+sold_dealcycle)
             house_info['sold_dealcycle'] = sold_dealcycle
-            self.result[solf_title_key] = house_info
+            self.result[(sold_title+'('+sold_totalPrice+')').replace('.','_')] = house_info
 
     def _xpath_filter(self,xpath):
         if xpath:

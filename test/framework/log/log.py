@@ -3,13 +3,8 @@ logging配置
 """
 import os
 import logging.config
-import pprint
 import time
 import warnings
-
-from test.framework.log.test_logger_A import Log_A
-# 定义三种日志输出格式 开始
-from test.framework.setting import Setting
 logger = logging.getLogger(__name__)
 
 

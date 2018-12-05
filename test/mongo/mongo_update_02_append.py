@@ -64,11 +64,19 @@ house_info_02 = {'community_name': '和平花苑', 'community_url': 'https://sh.
 #                    'community_avr_price': 40
 #                 }},
 #                )
-a = db_coll.find({'_id':ObjectId("5c0787a90821332ca45c13d6")},{'_id':False})
-# db_coll.update({'_id':ObjectId("5c0787a90821332ca45c13d6")},
-#                {'$set':house_info_02
-#
-#                })
-c = a.next().keys() - house_info_02.keys()
-print(c)
+# ObjectId("5c07da8a8908818904559442")
+a = db_coll.find({'_id':ObjectId("5c07da8a8908818904559442")},{'_id':False})
+# db_coll.update({'_id':ObjectId("5c07cd0889088171a04b0ccf")},
+#                {'$set':house_info_02})
+b = a.next()
+# print(b)
+c =  house_info_02.keys() - b.keys()
+# print(c)
+new_dict={x:house_info_02[x] for x in c}
+print(new_dict)
+db_coll.update({'_id':ObjectId("5c07da8a8908818904559442")},
+             {'$set':new_dict})
+
+d = db_coll.find({})
+print(d.next())
 
