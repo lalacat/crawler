@@ -68,16 +68,18 @@ class LJ_Sold_DB(object):
         #  1.防止重复写入
         #  2.对某条字段更新
         if self._db_collection.find(item).count() >= 1:
+            #  爬到的对象未更新
             return 'exist'
-        # elif self._db_collection.find({'community_name':item['community_name']}).count() >= 1:
-        #     self.update_query = {'community_name':item['community_name']}
-        #     self.update_doctument ={'$set':{
-        #            'community_sale_num': item['community_sale_num'],
-        #            'community_rent_num': item['community_rent_num'],
-        #            'community_onsale_num': item['community_onsale_num'],
-        #            'community_avr_price': item['community_avr_price']
-        #         }}
-        #     return 'update'
+        elif self._db_collection.find({'community_name':item['community_name']}).count() >= 1:
+            self.update_query = {'community_name':item['community_name']}
+            new_house = dict()
+            self.update_doctument ={'$set':{
+                   'community_sale_num': item['community_sale_num'],
+                   'community_rent_num': item['community_rent_num'],
+                   'community_onsale_num': item['community_onsale_num'],
+                   'community_avr_price': item['community_avr_price']
+                }}
+            return 'update'
         else:
             # self._db_collection.find(item).count() == 0:
             return 'insert'

@@ -4,6 +4,8 @@ import pymongo
 
 
 # mongodb服务的地址和端口号
+from bson import ObjectId
+
 mongo_url = "127.0.0.1:27017"
 
 # 连接到mongodb，如果参数不填，默认为“localhost:27017”
@@ -54,15 +56,19 @@ house_info_02 = {'community_name': '和平花苑', 'community_url': 'https://sh.
 
 # db_coll.insert(house_info)
 
-db_coll.update({'community_name':house_info_01['community_name']},
-               {'$push':{
-                   'community_sale_num': 10,
-                   'community_rent_num': 20,
-                   'community_onsale_num': 30,
-                   'community_avr_price': 40
-                }},
-               )
-a = db_coll.find({})
-for i in a:
-   print(i)
+# db_coll.update({'community_name':house_info_01['community_name']},
+#                {'$push':{
+#                    'community_sale_num': 10,
+#                    'community_rent_num': 20,
+#                    'community_onsale_num': 30,
+#                    'community_avr_price': 40
+#                 }},
+#                )
+a = db_coll.find({'_id':ObjectId("5c0787a90821332ca45c13d6")},{'_id':False})
+# db_coll.update({'_id':ObjectId("5c0787a90821332ca45c13d6")},
+#                {'$set':house_info_02
+#
+#                })
+c = a.next().keys() - house_info_02.keys()
+print(c)
 

@@ -27,7 +27,7 @@ class SoldOrSale(Spider):
         self.total_number_community = 0
         self.result = dict()
         self.result_len = 0
-        self.sold_num = 0
+
     @property
     def name(self):
         return self._name
@@ -192,7 +192,8 @@ class SoldOrSale(Spider):
             sold_title = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="title"]/a/text()'))
             # print("小区名称："+sold_title)
-            house_info['sold_title'] = sold_title
+            solf_title_key = sold_title.replace('.','_')
+            # house_info['sold_title'] = sold_title
 
             sold_address = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="houseInfo"]/text()'))
@@ -229,8 +230,7 @@ class SoldOrSale(Spider):
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]/text()'))
             # print("成交周期："+sold_dealcycle)
             house_info['sold_dealcycle'] = sold_dealcycle
-            self.result[str(self.sold_num)] = house_info
-            self.sold_num  += 1
+            self.result[solf_title_key] = house_info
 
     def _xpath_filter(self,xpath):
         if xpath:
