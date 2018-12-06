@@ -87,7 +87,7 @@ class MiddlewareManager(object):
                 #             extra={'crawler': crawler})
                 logger.info(*cls.lfm.crawled(
                     "Middleware", cls.component_name,
-                    '生效:\n'),
+                    '生效:'),
                             extra={
                                 'extra_info': pprint.pformat(enabled)
                             }

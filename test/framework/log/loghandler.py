@@ -1,5 +1,8 @@
 import json
 import logging
+import time
+from collections import defaultdict
+
 import pymongo
 from logging.handlers import RotatingFileHandler
 
@@ -138,13 +141,21 @@ class RecordErrorUrl(logging.FileHandler):
 
 class LogToMongDB(logging.Handler):
 
-    def __init__(self,MongDB_URL,MongDB_DATABASE,MongDB_Collection_Name,*args, **kwargs):
+    def __init__(self,MongDB_URL,MongDB_DATABASE,*args, **kwargs):
         super(LogToMongDB,self).__init__(*args, **kwargs)
         self.MongDB_URl = MongDB_URL
         self.MongDB_DATABASE = MongDB_DATABASE
-        self.MongDB_Collection_Name = MongDB_Collection_Name
-        self.time = 0
+        # self.MongDB_Collection_Name = MongDB_Collection_Name
+        # self.default_format = MONGODB_FORMAT
 
+        self.collection_name = time.strftime('%m/%d/%Y',time.localtime())
+        self.bulid_time = time.strftime('%m/%d/%Y %H:%M:%S',time.localtime())
+
+        self.base_date = {'bulid_time':self.bulid_time}
+        self.bulid_Flag = True
+
+
+        self.log_num = 0
         try:
             self.client = pymongo.MongoClient(self.MongDB_URl)
             self.db = self.client[self.MongDB_DATABASE]
@@ -153,12 +164,51 @@ class LogToMongDB(logging.Handler):
             raise Exception(e)
 
     def emit(self, record):
-        if not hasattr(record, 'reason'):
-            record.__dict__['reason'] = ' '
+
         # time_key = '%s,%6,3f' % (record.__dict__['asctime'],record.msecs)
-        # print(time_key)
-        self.format(record)
-        time_key = '%d :%s,%6.3f' % (self.time,record.__dict__['asctime'],record.msecs)
-        self.time +=1
-        #
-        print(time_key)
+        # print(time_key)\
+        if self.bulid_Flag:
+            self.bulid_Flag = False
+            self.db_coll = self.db[self.collection_name]
+            self.db_coll.insert(self.base_date)
+            self._id = self.db_coll.find(self.base_date).next()['_id']
+            # print(self._id)
+        assert self._id,'没有创建基础信息'
+
+        db_msg = defaultdict(list)
+        msg = self.format(record).replace('.','!')
+
+        extra_msg = self._get_extra_info(record)
+        key = str(self.log_num)+':['+record.levelname+']'
+        # db_msg[key] = [msg]
+        db_msg[msg] = [{
+            'levelname':record.levelname,
+            'filename':record.__dict__['filename'],
+            'lineno':record.__dict__['lineno']
+        }]
+
+
+
+        if extra_msg:
+            db_msg[msg].append(extra_msg)
+        self.log_num +=1
+
+        from bson import ObjectId
+        self.db_coll.update(
+            {'_id':ObjectId(self._id)},
+            {'$set':db_msg})
+
+    def _get_extra_info(self,record):
+        extra_msg = {}
+        if hasattr(record,'extra_info'):
+            extra_msg['extra_info'] =record.__dict__['extra_info']
+        if hasattr(record,'exception'):
+            extra_msg['exception'] =record.__dict__['exception']
+        if hasattr(record,'time'):
+            extra_msg['time'] =record.__dict__['time']
+        if hasattr(record, 'reason'):
+            extra_msg['reason'] = record.__dict__['reason']
+        return extra_msg
+
+
+

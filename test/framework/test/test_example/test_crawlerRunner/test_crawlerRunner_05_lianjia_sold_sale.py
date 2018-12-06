@@ -45,6 +45,7 @@ queryArgs = [
 
 searchRes = db_coll.find({"total_zone_name":"pudong"},{'_id':False})
 pudong = searchRes.next()
+print(len(pudong))
 all_zone =[]
 for query in queryArgs:
     search = db_coll.find(query,{'_id':False})
@@ -85,10 +86,10 @@ town_urls_dict= {
 #     'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
 }
 #
-s = Setting()
-cr = CrawlerRunner(pudong,s,SimpleSpider_08)
-d = cr.start()
-d.addBoth(lambda _:reactor.stop())
-# reactor.callLater(2,cr.stop)
-reactor.run()
+# s = Setting()
+# cr = CrawlerRunner(pudong,s,SimpleSpider_08)
+# d = cr.start()
+# d.addBoth(lambda _:reactor.stop())
+# # reactor.callLater(2,cr.stop)
+# reactor.run()
 

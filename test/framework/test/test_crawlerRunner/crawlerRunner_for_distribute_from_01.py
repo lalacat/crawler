@@ -303,7 +303,7 @@ class CrawlerRunner(object):
             self.slot = None
         if self._closewait:
             self._closewait.callback("Finish")
-        logger.critical(*self.lfm.crawled_time('CrawlerRunner', '',
+        logger.critical(*self.lfm.crawled_time('CrawlerRunner', self.name,
                                 'CrawlRunner停止,时间为:',
                                             time.clock(),reason))
         self._push_task_finish = False
