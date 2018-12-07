@@ -1,6 +1,3 @@
-import pprint
-from collections import Iterable
-
 import pymongo
 
 from twisted.internet import reactor
@@ -9,7 +6,7 @@ from test.framework.setting import Setting
 from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import CrawlerRunner
 
 # mongodb服务的地址和端口号
-from test.framework.test.test_spider.simple_spider.simple_spider_08_xiaoqu_sale_sold import SimpleSpider_08
+from test.framework.test.test_example.get_all_community_url_info.simple_spider_05_all_xiaoqu_house_db import SimpleSpider_05
 
 mongo_url = "127.0.0.1:27017"
 
@@ -43,9 +40,8 @@ queryArgs = [
     {"total_zone_name":"huangpu"},
     ]
 
-searchRes = db_coll.find({"total_zone_name":"pudong"},{'_id':False})
-pudong = searchRes.next()
-print(len(pudong))
+searchRes = db_coll.find({"total_zone_name":"putuo"},{'_id':False})
+
 all_zone =[]
 for query in queryArgs:
     search = db_coll.find(query,{'_id':False})
@@ -60,36 +56,19 @@ for query in queryArgs:
             break
 
 
-zone_name = "yangpu"
-town_urls = [
-    # 'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
-    {'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',
-    'dongwaitan':'https://sh.lianjia.com/xiaoqu/dongwaitan/'
-     }
-    #'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-    #'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
-    #'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-    #'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-    #'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-    #'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-    #'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
 
-]
-town_urls_dict= {
-    'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
-#     'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-#     'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
-#     'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-#     'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-#     'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-#     'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-#     'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
-}
-#
-# s = Setting()
-# cr = CrawlerRunner(pudong,s,SimpleSpider_08)
-# d = cr.start()
-# d.addBoth(lambda _:reactor.stop())
-# # reactor.callLater(2,cr.stop)
-# reactor.run()
+b = lambda x: x.split('/')[-2]
+
+all_zone_dict = {}
+
+for url in all_zone:
+    all_zone_dict[b(url)] = url
+
+
+s = Setting()
+cr = CrawlerRunner(all_zone_dict,s,SimpleSpider_05)
+d = cr.start()
+d.addBoth(lambda _:reactor.stop())
+# reactor.callLater(2,cr.stop)
+reactor.run()
 

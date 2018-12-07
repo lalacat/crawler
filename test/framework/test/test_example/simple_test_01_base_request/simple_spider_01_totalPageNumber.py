@@ -16,7 +16,7 @@ class SimpleSpider(Spider):
     def __init__(self):
         self.name = ""
         self._start_urls = []
-        self.handler_db = True
+        self.handler_db = False
         self.total_number_community = 0
         self.all_zones = {}
 

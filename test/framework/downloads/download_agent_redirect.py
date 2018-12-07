@@ -48,9 +48,7 @@ class HTTPDownloadHandler(object):
     def from_crawler(cls,crawler):
         return cls(crawler.logformatter,crawler.settings)
 
-
     def download_request(self,request,spider):
-        # logger.debug("Spider:%s <%s> 执行download_request..."%(spider.name,request))
         logger.debug(*self.lfm.crawled(
             'Spider',
             spider.name,
@@ -124,14 +122,14 @@ class DownloadAgent(object):
         return self._RedirectAgent(self._getAgent(timeout))
 
     def download_request(self,request):
+        # 设定多长时间内下载不报错
         timeout = request.meta.get('download_timeout') or self._connectTimeout
         redirect = request.meta.get('download_redirect') or self._redirect
         self.request = request
         try:
-            # logger.info("<%s> 执行download_request,延迟时间:%d...",request,timeout)
             logger.debug(*self.lfm.crawled_time(
                         'Request',request,
-                        '执行download_request,延迟时间:',
+                        '执行download_request,超时时间:',
                          timeout)
                         )
             if redirect:

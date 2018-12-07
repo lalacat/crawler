@@ -73,7 +73,7 @@ HEADER_COLLECTION = [
 ITEM_PIPELINES = {
     # "test.framework.pipelines.mongoDB.MongoDB":20,
     # "test.framework.test.test_middleware.test_db.lianjia_xiaoqu_mongoDB_01.LJ_XQ_DB":10,
-    "test.framework.test.test_middleware.test_db.test_close_spider_db_03_lianjia_xiaoqu_sold.LJ_Sold_DB":10,
+    # "test.framework.test.test_middleware.test_db.test_close_spider_db_03_lianjia_xiaoqu_sold.LJ_Sold_DB":10,
     # "test.framework.pipelines.print_result.Print_Result":10,
     # "test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
@@ -247,7 +247,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['logtoMongdb','console_info','ErrorUrl'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_info',],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },

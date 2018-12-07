@@ -55,13 +55,16 @@ class Slot(object):
 
 class CrawlerRunner(object):
 
-    def __init__(self,tasks,settings=None,spidercls=None,name=None):
+    def __init__(self,tasks,settings=None,spidercls=None,name=None,logformat=None):
         if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
 
-        self.lfs = load_object(self.settings['LOG_FORMATTER_CLASS'])
-        self.lfm = self.lfs.from_settings(self.settings)
+        if logformat:
+            self.lfm = logformat
+        else:
+            self.lfs = load_object(self.settings['LOG_FORMATTER_CLASS'])
+            self.lfm = self.lfs.from_settings(self.settings)
         self.name = name if name else ''
 
         logger.info(*self.lfm.crawled(
@@ -151,7 +154,7 @@ class CrawlerRunner(object):
             return crawler
         except Empty:
             logger.debug(*self.lfm.crawled(
-                "CrawlerRunner", '',
+                "CrawlerRunner", self.name,
                 '队列中的task分配完毕')
                          )
             if not self._push_task_finish:
@@ -159,7 +162,7 @@ class CrawlerRunner(object):
             else:
                 self._pull_task_finish = True
         except Exception as e :
-            logger.error(*self.lfm.error("CrawlerRunner","",
+            logger.error(*self.lfm.error("CrawlerRunner",self.name,
                                          "",
                                          '出现错误:',),
                          extra=
@@ -170,7 +173,7 @@ class CrawlerRunner(object):
 
     def _create_task(self):
         logger.info(*self.lfm.crawled(
-            "CrawlerRunner", '',
+            "CrawlerRunner", self.name,
             'task装载入队列中')
                      )
         try:
@@ -196,7 +199,7 @@ class CrawlerRunner(object):
                     '载入队列...',filter_data))
         except StopIteration:
             logger.debug(*self.lfm.crawled(
-                "CrawlerRunner", '',
+                "CrawlerRunner", self.name,
                 'task载入完毕')
                          )
             self._tasks = None
@@ -236,7 +239,7 @@ class CrawlerRunner(object):
         try:
             self.running = True
             # logger.debug("开始时间是%f"%self.start_time)
-            logger.critical(*self.lfm.crawled_time('CrawlerRunner','','开始时间:',
+            logger.critical(*self.lfm.crawled_time('CrawlerRunner',self.name,'开始时间:',
                                                    time.clock()))
 
             # 将task导入到队列中
@@ -264,7 +267,7 @@ class CrawlerRunner(object):
     def pause(self,pause):
         if pause:
             if self._pause :
-                logger.debug(*self.lfm.crawled('CrawlerRunner', '',
+                logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
                                    '已经暂停了...'))
             else:
                 self._pause = True
@@ -277,7 +280,7 @@ class CrawlerRunner(object):
 
     def next_task_from_schedule(self):
         # logger.debug("调用next_task_from_schedule")
-        logger.debug(*self.lfm.crawled('CrawlerRunner', '',
+        logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
                                        '调用next_task_from_schedule'))
         if self.pause:
             return

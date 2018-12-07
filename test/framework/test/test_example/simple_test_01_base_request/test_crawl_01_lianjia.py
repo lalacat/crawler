@@ -1,4 +1,4 @@
-from framework.test import LJSpider
+from test.framework.test import LJSpider
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
 from twisted.internet import reactor, defer

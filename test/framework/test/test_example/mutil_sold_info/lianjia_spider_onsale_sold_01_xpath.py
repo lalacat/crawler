@@ -49,15 +49,14 @@ class SoldOrSale(Spider):
             self._start_urls = urls
 
     def start_requests(self):
-        for url in self.start_urls:
-            if 'chengjiao' in url:
-                yield Request(url,callback=self._parse_sold)
-            elif 'ershoufang' in url:
-                yield Request(url,callback=self._parse_sale)
-            else:
-                print(url+'出错！！')
-        # for url in self.url:
-        #     yield Request(url,callback=self._parse_sold)
+        # for url in self.start_urls:
+        #     if 'chengjiao' in url:
+        #         yield Request(url,callback=self._parse_sold)
+        #     elif 'ershoufang' in url:
+        #         yield Request(url,callback=self._parse_sale)
+        #     else:
+        #         print(url+'出错！！')
+            yield Request(self.start_urls[0],callback=self._parse_sold)
 
     def _parse_sale(self,response):
 
