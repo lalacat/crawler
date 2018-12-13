@@ -1,3 +1,4 @@
+import base64
 import re
 from pprint import pformat
 
@@ -7,6 +8,8 @@ from twisted.python.log import err
 from twisted.web.client import ProxyAgent, readBody
 from twisted.internet import reactor, defer
 from twisted.internet.endpoints import TCP4ClientEndpoint,SSL4ClientEndpoint
+from twisted.web.http_headers import Headers
+
 
 def display(response,url):
     print("Received response: %s"%url)
@@ -86,19 +89,27 @@ def cbRequest(response):
     print('Response phrase:', response.phrase)
 
 
-    d = readBody(response)
-    d.addCallback(get_onePage)
-    return d
-host = "149.28.192.96"
+    # d = readBody(response)
+    # d.addCallback(get_onePage)
+    # return d
+host_01 = "149.28.192.96"
+host = '47.105.165.81'
 port = 5527
-def main():
-    endpoint = TCP4ClientEndpoint(reactor, host, port)
-    agent = ProxyAgent(endpoint)
-    d = agent.request(b"GET", b"https://sh.lianjia.com/xiaoqu/anshan")
-    d.addCallback(cbRequest)
-    d.addErrback(err)
-    d.addCallback(lambda ignored: reactor.stop())
-    reactor.run()
-
-if __name__ == "__main__":
-    main()
+# header = Headers()
+user_name = base64.b64encode('spider:123456'.encode('utf_8'))
+encode_user = 'Basic '+str(user_name,'utf-8')
+decode_user = base64.b64decode(user_name)
+print(encode_user)
+print(decode_user)
+# header.addRawHeader('Proxy-Authenticate',user_name)
+# def main():
+endpoint = TCP4ClientEndpoint(reactor, host, port)
+agent = ProxyAgent(endpoint)
+d = agent.request(b"GET", b"https://sh.lianjia.com/xiaoqu/anshan",  Headers({'Proxy-Authenticate': [decode_user]}),)
+d.addCallback(cbRequest)
+d.addErrback(err)
+d.addCallback(lambda ignored: reactor.stop())
+reactor.run()
+#
+# if __name__ == "__main__":
+#     main()
