@@ -111,7 +111,7 @@ class DownloadAgent(object):
         self._fail_on_dataloss = fail_on_dataloss
         self._redirect = True
 
-    def _getAgent(self,timeout):
+    def _getBaseAgent(self,timeout):
 
         return self._Agent(reactor,contextFactory=self._contextFactory,
                            connectTimeout=timeout,
@@ -119,7 +119,7 @@ class DownloadAgent(object):
                            pool=self._pool)
 
     def _getRedirectAgent(self,timeout):
-        return self._RedirectAgent(self._getAgent(timeout))
+        return self._RedirectAgent(self._getBaseAgent(timeout))
 
     def download_request(self,request):
         # 设定多长时间内下载不报错

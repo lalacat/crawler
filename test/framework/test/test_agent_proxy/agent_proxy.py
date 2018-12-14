@@ -9,10 +9,12 @@ from twisted.internet.ssl import ClientContextFactory
 from twisted.python.log import err
 from twisted.web.client import ProxyAgent, readBody, RedirectAgent
 from twisted.internet import reactor, defer
-from twisted.internet.endpoints import TCP4ClientEndpoint,SSL4ClientEndpoint
+from twisted.internet.endpoints import TCP4ClientEndpoint, SSL4ClientEndpoint, _WrappingFactory
 from twisted.web.http_headers import Headers
 from twisted.web.iweb import IBodyProducer
 from zope.interface import implementer
+
+from test.framework.https.parse_url import to_bytes
 
 
 def display(response):
@@ -130,8 +132,8 @@ def redirect(response):
     # d.addCallback(cbRequest)
     # d.addCallback(get_onePage)
 
-    # d = readBody(response)
-    # d.addCallback(get_onePage)
+    d = readBody(response)
+    d.addCallback(get_onePage)
 
 
     return d
@@ -142,11 +144,10 @@ port = 5527
 # header = Headers()
 user_name = base64.b64encode('spider:123456'.encode('utf-8')).strip()
 encode_user = b'Basic '+user_name
-print(encode_user)
 endpoint = TCP4ClientEndpoint(reactor, host, port)
 
-agent = RedirectAgent(ProxyAgent(endpoint))
-d = agent.request(b"GET", b"https://sh.lianjia.com/xiaoqu/anshan",  Headers({'Proxy-Authorization': [encode_user]}))
+agent = ProxyAgent(endpoint)
+d = agent.request(b"GET", b"http://www.zimuzu.tv/",  Headers({'Proxy-Authorization': [encode_user]}))
 d.addCallback(redirect)
 d.addErrback(display)
 d.addCallback(lambda ignored: reactor.stop())
