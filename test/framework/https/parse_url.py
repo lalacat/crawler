@@ -16,6 +16,9 @@ def to_bytes(text, encoding=None, errors='strict'):
         result = text.encode("utf-8", errors)
     return result
 
+def to_native_str(text, encoding=None, errors='strict'):
+    return text.decode(encoding, errors)
+
 def _parsed_url_agrs(parsed):
     """
     将分割后的url不同块进行byte化，返回 scheme, netloc, host, port, path
