@@ -2,6 +2,7 @@ import base64
 import json
 import re
 
+from OpenSSL import SSL
 from twisted.internet import defer, reactor
 from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.protocol import Protocol
@@ -100,13 +101,13 @@ def tunnel_request_data(host, port, proxy_auth_header=None):
     r"""
     Return binary content of a CONNECT request.
 
-
-    >>> to_unicode(tunnel_request_data("example.com", 8080))
-    'CONNECT example.com:8080 HTTP/1.1\r\nHost: example.com:8080\r\n\r\n'
-    >>> s(tunnel_request_data("example.com", 8080, b"123"))
-    'CONNECT example.com:8080 HTTP/1.1\r\nHost: example.com:8080\r\nProxy-Authorization: 123\r\n\r\n'
-    >>> s(tunnel_request_data(b"example.com", "8090"))
-    'CONNECT example.com:8090 HTTP/1.1\r\nHost: example.com:8090\r\n\r\n'
+    #
+    # >>> to_unicode(tunnel_request_data("example.com", 8080))
+    # 'CONNECT example.com:8080 HTTP/1.1\r\nHost: example.com:8080\r\n\r\n'
+    # >>> s(tunnel_request_data("example.com", 8080, b"123"))
+    # 'CONNECT example.com:8080 HTTP/1.1\r\nHost: example.com:8080\r\nProxy-Authorization: 123\r\n\r\n'
+    # >>> s(tunnel_request_data(b"example.com", "8090"))
+    # 'CONNECT example.com:8090 HTTP/1.1\r\nHost: example.com:8090\r\n\r\n'
     """
     host_value = to_bytes(host, encoding='ascii') + b':' + to_bytes(str(port))
     tunnel_req = b'CONNECT ' + host_value + b' HTTP/1.1\r\n'
@@ -170,12 +171,64 @@ class ScrapyProxyAgent(Agent):
                                          URI.fromBytes(uri), headers, bodyProducer, uri)
 
 
-class WebClientContextFactory(ClientContextFactory):
-    '''
-    用来实现https网页的访问验证
-    '''
-    def getContext(self,hostname, port):
-        return ClientContextFactory.getContext(self)
+
+
+
+def get_onePage(response):
+    print(response)
+    one_page = list()
+
+    seletor = etree.HTML(response)
+
+    #  总小区数
+    total_number_community = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
+
+    # 所有小区列表
+    all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
+    for community in all_communities:
+        result = dict()
+        # 小区总信息
+        community_info = community.xpath('./div[@class="info"]')[0]
+
+        # 小区名称
+        community_name = community_info.xpath('./div[@class="title"]/a')[0].text
+        result["community_name"] = community_name
+        print(community_name)
+
+        # 小区url
+        community_url = community_info.xpath('./div[@class="title"]/a')[0].get('href')
+        result["community_url"] = community_url
+        print(community_url)
+
+        # 小区房屋信息
+        community_sale_num = community_info.xpath('./div[@class="houseInfo"]/a[1]')[0].text
+        community_rent_num = community_info.xpath('./div[@class="houseInfo"]/a[2]')[0].text
+        community_onsale_num = community_info.xpath('../div[@class="xiaoquListItemRight"]/div[2]/a/span/text()')[0]
+
+        result["community_sale_num"] = re.findall('\d+',community_sale_num)[1]
+        result["community_rent_num"] = re.findall('\d+',community_rent_num)[0]
+        result["community_onsale_num"] = community_onsale_num
+
+        print(community_sale_num,re.findall('\d+',community_sale_num)[1])
+        print(community_rent_num,re.findall('\d+',community_rent_num)[0])
+        print("正在出售的房屋有：%s"%community_onsale_num)
+        # 小区年限
+        community_bulid_year = community_info.xpath('./div[@class="positionInfo"]/text()')[3].replace('/',"").strip()
+        if str(community_bulid_year) == '未知年建成':
+            print(community_bulid_year)
+        else:
+            print(community_bulid_year,re.findall('\d+',community_bulid_year)[0])
+        result["community_bulid_year"] = community_bulid_year
+
+
+        # 小区均价/html/body/div[4]/div[1]/ul/li[1]/div[2]
+        community_avr_price = community_info.xpath('../div[@class="xiaoquListItemRight"]/div/div/span/text()')[0]
+        result["community_avr_price"] = community_avr_price
+
+        print(community_avr_price)
+        one_page.append(result)
+        print("\n")
+    return one_page
 
 @implementer(IBodyProducer)
 class BeginningPrinter(Protocol):
@@ -195,30 +248,48 @@ class BeginningPrinter(Protocol):
 
     def connectionLost(self, reason):
         print('Finished receiving body:', reason)
-        r = json.loads(self.result)
         #callback(data)调用后，能够向defer数据链中传入一个list数据：[True，传入的参数data]，可以实现将获取的
         #body传输到下一个函数中去
-        self.finished.callback(r)
+        self.finished.callback(self.result)
 
 
 def cbRequest(response):
     print('Redirect Response code:', response.code)
     finished = defer.Deferred()
     response.deliverBody(BeginningPrinter(finished))
+    finished.addCallback(get_onePage)
     return finished
 
 
 user_name = base64.b64encode('spider:123456'.encode('utf-8')).strip()
 encode_user = b'Basic '+user_name
 header = {'Proxy-Authorization': [encode_user]}
-proxy_config = ('47.105.165.81',5527)
+proxy_config = ('47.105.165.81',5527,encode_user)
 
 
-contextFactory = WebClientContextFactory()
+class ScrapyClientContextFactory(ClientContextFactory):
+    "A SSL context factory which is more permissive against SSL bugs."
+
+    # see https://github.com/scrapy/scrapy/issues/82
+    # and https://github.com/scrapy/scrapy/issues/26
+    # and https://github.com/scrapy/scrapy/issues/981
+
+    def __init__(self, method=SSL.SSLv23_METHOD):
+        self.method = method
+
+    def getContext(self, hostname=None, port=None):
+        ctx = ClientContextFactory.getContext(self)
+        # Enable all workarounds to SSL bugs as documented by
+        # https://www.openssl.org/docs/manmaster/man3/SSL_CTX_set_options.html
+        ctx.set_options(SSL.OP_ALL)
+        return ctx
+
+
+contextFactory = ScrapyClientContextFactory()
 
 agent = TunnelingAgent(reactor,proxy_config,contextFactory,10,None,None)
 
-d = agent.request(b'GET',b'https://baidu.com',headers=Headers(header),bodyProducer=None)
+d = agent.request(b'GET',b'https://smzdm.com',None,None)
 d.addCallback(cbRequest)
 d.addErrback(lambda _:print(_))
 d.addBoth(lambda _:reactor.stop())
