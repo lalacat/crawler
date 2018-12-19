@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from twisted.web.client import Agent,readBody
 from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
@@ -61,23 +63,23 @@ class BeginningPrinter(Protocol):
     def __init__(self, finished):
         self.finished = finished
         #用来保存传输的数据，当数据完整后可以使用json转换为python对象
-        self.result = bytes()
+        self._bodybuf = BytesIO()  # 记录body的内容
 
     def dataReceived(self, datas):
         '''
         直接传输的数据datas为bytes类型的，不加解码转化为str类型是带有转义符号'\':(\'\\u5929\\u732b\\u7cbe\\u9009\')
         datas进行了decode("utf-8")解码后，数据变成了('\u5929\u732b\u7cbe\u9009'),此时解码后的数据类型是str
-        因为传输的datas并不是一次性传输完的，所以不能直接使用json转换，而是当数据全部传输完毕后，使用json.loads()
+         因为传输的datas并不是一次性传输完的，所以不能直接使用json转换，而是当数据全部传输完毕后，使用json.loads()
         这时候就不涉及到转码和转义字符的问题了。
         '''
-        self.result += datas
+        self._bodybuf.write(datas)
 
     def connectionLost(self, reason):
         print('Finished receiving body:', reason.getErrorMessage())
-        r = json.loads(self.result)
+        body = self._bodybuf.getvalue()
         #callback(data)调用后，能够向defer数据链中传入一个list数据：[True，传入的参数data]，可以实现将获取的
         #body传输到下一个函数中去
-        self.finished.callback(r)
+        self.finished.callback(body)
 
 
 url = 'https://www.smzdm.com/homepage/json_more?p='

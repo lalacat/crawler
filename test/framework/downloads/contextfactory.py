@@ -3,7 +3,7 @@ from zope.interface.declarations import implementer
 
 from twisted.internet.ssl import (optionsForClientTLS,
                                   CertificateOptions,
-                                  platformTrust)
+                                  platformTrust, ClientContextFactory)
 from twisted.web.client import BrowserLikePolicyForHTTPS
 from twisted.web.iweb import IPolicyForHTTPS
 
@@ -13,6 +13,7 @@ from test.framework.downloads.tls import ScrapyClientTLSOptions, DEFAULT_CIPHERS
 @implementer(IPolicyForHTTPS)
 class ScrapyClientContextFactory(BrowserLikePolicyForHTTPS):
     """
+    在加代理的情况下,https验证
     Non-peer-certificate verifying HTTPS context factory
 
     Default OpenSSL method is TLS_METHOD (also called SSLv23_METHOD)
@@ -79,3 +80,9 @@ class BrowserLikeContextFactory(ScrapyClientContextFactory):
                                    extraCertificateOptions={
                                         'method': self._ssl_method,
                                    })
+
+
+class DownloaderClientContextFactory(ClientContextFactory):
+    """用于Https验证,不加代理的情况下"""
+    def getContext(self,host=None,port=None):
+        return ClientContextFactory.getContext(self)
