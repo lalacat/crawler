@@ -1,5 +1,5 @@
-from twisted.web.client import Agent,ResponseDone,ResponseFailed, \
-    HTTPConnectionPool
+from twisted.web.client import Agent, ResponseDone, ResponseFailed, \
+    HTTPConnectionPool, RedirectAgent, ProxyAgent
 from twisted.web.http import _DataLoss, PotentialDataLoss
 from twisted.internet import reactor,defer
 from twisted.internet.ssl import ClientContextFactory
@@ -10,16 +10,15 @@ from io import BytesIO
 from urllib.parse import urldefrag
 from zope.interface import implementer
 import time, logging
+
+from test.framework.downloads.contextfactory import DownloaderClientContextFactory, ScrapyClientContextFactory
+from test.framework.downloads.proxy_agent import TunnelingAgent
 from test.framework.https.parse_url import to_bytes
 from test.framework.https.response import Response
 
 logger = logging.getLogger(__name__)
 
 
-class DownloaderClientContextFactory(ClientContextFactory):
-    """用于Https验证"""
-    def getContext(self,host=None,port=None):
-        return ClientContextFactory.getContext(self)
 
 
 class HTTPDownloadHandler(object):
@@ -37,7 +36,8 @@ class HTTPDownloadHandler(object):
         self._pool.maxPersistentPerHost = settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
         self._pool._factory.noisy = False # 用于设置proxy代理
 
-        self._contextFactory = DownloaderClientContextFactory()
+        self._contextFactory_without_proxy = DownloaderClientContextFactory()
+        self._contextFactory_with_proxy = ScrapyClientContextFactory()
 
         self._default_maxsize = settings.getint('DOWNLOAD_MAXSIZE')
         self._default_warnsize = settings.getint('DOWNLOAD_WARNSIZE')
@@ -48,9 +48,7 @@ class HTTPDownloadHandler(object):
     def from_crawler(cls,crawler):
         return cls(crawler.logformatter,crawler.settings)
 
-
     def download_request(self,request,spider):
-        # logger.debug("Spider:%s <%s> 执行download_request..."%(spider.name,request))
         logger.debug(*self.lfm.crawled(
             'Spider',
             spider.name,
@@ -59,7 +57,7 @@ class HTTPDownloadHandler(object):
         ))
         """返回一个http download 的 defer"""
         self.spider = spider
-        agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
+        agent = DownloadAgent(contextFactory=self._contextFactory_without_proxy,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
                               warnsize=getattr(spider,'download_warnsize',self._default_warnsize),
                               fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm
@@ -93,6 +91,9 @@ class HTTPDownloadHandler(object):
 
 class DownloadAgent(object):
     _Agent = Agent
+    _RedirectAgent = RedirectAgent
+    _TunnelingAgent = TunnelingAgent
+    _ProxyAgent = ProxyAgent
 
     def __init__(self,contextFactory=None, connectTimeout=10, bindAddress=None,
                  pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False,logformatter=None):
@@ -110,43 +111,58 @@ class DownloadAgent(object):
         self._maxsize = maxsize # 规定最大的下载信息，防止下载的网页内容过大，占资源
         self._warnsize = warnsize# 给下载的网页设置一个警戒线
         self._fail_on_dataloss = fail_on_dataloss
+        self._redirect = True
 
-    def _getAgent(self,timeout):
+    def _getAgent(self,request,timeout):
+        proxy = request.meta.get('proxy')
+        if proxy:
+            
+
+
+
 
         return self._Agent(reactor,contextFactory=self._contextFactory,
                            connectTimeout=timeout,
                            bindAddress=self._bindAddress,
                            pool=self._pool)
 
+    def _getRedirectAgent(self,timeout):
+        return self._RedirectAgent(self._getAgent(timeout))
+
     def download_request(self,request):
+        # 设定多长时间内下载不报错
         timeout = request.meta.get('download_timeout') or self._connectTimeout
-        logger.debug(*self.lfm.crawled_time(
-            'Request', request,
-            '执行download_request,延迟时间:',
-            timeout)
-                     )
-        agent = self._getAgent(timeout)
-        #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
-        #  urldefrag去掉fragment
-        url = urldefrag(request.url)[0]
-        method = to_bytes(request.method)
-        headers = request.headers
+        redirect = request.meta.get('download_redirect') or self._redirect
         self.request = request
-
-        if request.body:
-            bodyproducer = _RequestBodyProducer(request.body)
-        elif method == b'POST':
-            bodyproducer = _RequestBodyProducer(b'')
-        else :
-            bodyproducer = None
-        start_time = time.time()
-
-        d = agent.request(method,
-              to_bytes(url),
-              headers,
-              bodyproducer)
-        d.addCallback(self._cb_latency,request,start_time)
         try:
+            logger.debug(*self.lfm.crawled_time(
+                        'Request',request,
+                        '执行download_request,超时时间:',
+                         timeout)
+                        )
+            if redirect:
+                agent = self._getRedirectAgent(timeout)
+            else:
+                agent = self._getAgent(request,timeout)
+            #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
+            #  urldefrag去掉fragment
+            url = urldefrag(request.url)[0]
+            method = to_bytes(request.method)
+            headers = request.headers
+            if request.body:
+                bodyproducer = _RequestBodyProducer(request.body)
+            elif method == b'POST':
+                bodyproducer = _RequestBodyProducer(b'')
+            else :
+                bodyproducer = None
+            start_time = time.clock()
+
+            d = agent.request(method,
+                  to_bytes(url),
+                  headers,
+                  bodyproducer)
+            d.addCallback(self._cb_latency,request,start_time)
+
             #  下载request.body
             d.addCallback(self._cb_body_get,request)
             d.addCallback(self._cb_body_done,request,url)
@@ -235,12 +251,12 @@ class DownloadAgent(object):
         transferdata.deliverBody(_ResponseReader(
             finished,transferdata,request,maxsize,warnsize,fail_on_dataloss,self.lfm
         ))
-
         # 表示接收到了数据，用于延迟的判定
         self._transferdata = transferdata
         return finished
 
     def _cb_body_done(self,result,request,url):
+        # logger.debug("Request:<%s> Response 已创建..."%request)
         logger.debug(*self.lfm.crawled("Request",
                                        request,
                           ' Response 已创建...'))
@@ -248,18 +264,27 @@ class DownloadAgent(object):
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         status = int(txresponse.code)
         header = dict()
-        try:
-            for k,v in txresponse.headers.getAllRawHeaders():
-                header[k] = v
-        except KeyError :
-            logger.error(*self.lfm.error("request", request,
-                                         'header为None'))
-        response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
+        if status == 301 or status == 302:
+            # logger.critical("%s 网页重定向，重新下载"%url)
+            logger.warning(*self.lfm.crawled("Request",
+                                       request,
+                          '网页重定向，重新下载...'))
+            request.meta["download_redirect"] = True
+            response = request
+        else:
+            try:
+                for k,v in txresponse.headers.getAllRawHeaders():
+                    header[k] = v
+            except KeyError :
+                # logger.error("header is None")
+                logger.error(*self.lfm.error("request", request,
+                                             'header为None'))
+            response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
+
         return response
 
 
 @implementer(IBodyProducer)
-# 向网站发送数据的时候使用的类
 class _RequestBodyProducer(object):
 
     def __init__(self, body):
@@ -318,6 +343,11 @@ class _ResponseReader(Protocol):
                             bytes= self._bytes_received,
                             maxsize = self._maxsize)
             ))
+            # "从(%(request)s)收取到的信息容量(%(bytes)s) bytes 超过了下载信息的"
+            #          "最大值(%(maxsize)s) bytes " % {
+            # 'request_and_response' : self._request,
+            # 'bytes' : self._bytes_received,
+            # 'maxsize' : self._maxsize})
             # 当下载量超过最大值的时候，把数据缓存变量情况，取消下载
             self._bodybuf.truncate(0)
             """
@@ -341,6 +371,7 @@ class _ResponseReader(Protocol):
                                             'dataReceived'
                                              ))
             self._warnsize_flag = True
+
 
     def connectionLost(self, reason):
         if self._finished.called:

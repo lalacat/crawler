@@ -1,3 +1,8 @@
+from twisted.internet import reactor
+
+from test.framework.objectimport.loadobject import load_object
+
+
 class HTTP10DownloadHandler(object):
 
     def __init__(self, settings):
