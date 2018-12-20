@@ -19,7 +19,8 @@ DOWNLOAD_FAIL_ON_DATALOSS = True
 
 DOWNLOAD_DELAY = 2
 DOWNLOADER_MIDDLEWARE = {
-   "test.framework.test.test_middleware.test_process_request_01.Change_Request_Header":10
+   "test.framework.downloads\download_middleware.user_agent.Change_Request_UserAgent":10,
+
 }
 
 
@@ -68,7 +69,7 @@ HEADER_COLLECTION = [
     ['Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)'],
     ['Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)']
 ]
-
+HTTPPROXY_AUTH_ENCODING = 'utf-8'
 #T
 ITEM_PIPELINES = {
     # "test.framework.pipelines.mongoDB.MongoDB":20,

@@ -1,4 +1,5 @@
 from urllib.parse import urlparse,urlsplit,urlunparse
+from urllib.request import _parse_proxy
 
 
 def to_bytes(text, encoding=None, errors='strict'):
@@ -25,13 +26,12 @@ def _parsed_url_agrs(parsed):
     :return:
     """
     # b是一个匿名函数s是变量，用于将字符串byte化
-    b = lambda s: to_bytes(s,encoding='ascii')
+    b = lambda s: to_bytes(s,encoding='utf-8')
     scheme = b(parsed.scheme)
     netloc = b(parsed.netloc)
     # 将urlparse分解的各个变量合成标准的url
     path = urlunparse(['','',parsed.path or '/',parsed.params,parsed.query,''])
     path = b(path)
-    print(path)
     host = b(parsed.hostname)
     port = parsed.port
     if port is None:

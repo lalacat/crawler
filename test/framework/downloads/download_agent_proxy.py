@@ -13,7 +13,7 @@ import time, logging
 
 from test.framework.downloads.contextfactory import DownloaderClientContextFactory, ScrapyClientContextFactory
 from test.framework.downloads.proxy_agent import TunnelingAgent
-from test.framework.https.parse_url import to_bytes
+from test.framework.https.parse_url import to_bytes, _parsed
 from test.framework.https.response import Response
 
 logger = logging.getLogger(__name__)
@@ -116,7 +116,10 @@ class DownloadAgent(object):
     def _getAgent(self,request,timeout):
         proxy = request.meta.get('proxy')
         if proxy:
-            
+            scheme = _parsed(request.url)[0]
+            proxyPort, proxyParams = _parsed(proxy)
+
+
 
 
 
