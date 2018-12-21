@@ -117,9 +117,9 @@ def cbRequest(response):
     return finished
 
 
-host= "211.147.239.101"
-port = 44370
-proxy_config = (host,port,"")
+host= "118.163.125.36"
+port = 8080
+proxy_config = (host,port,None)
 
 
 

@@ -24,20 +24,18 @@ class Change_Request_UserAgent(object):
         return cls(crawler)
 
     def process_request(self,request,spider):
-        # TODO 修改Header值得修改方式
-        if request.meta.get('header_flag'):
-            if request.meta['header_flag']:
+        if hasattr(spider,'change_header'):
+            if spider.change_header:
                 if request.meta.get('last_header'):
                     last_header = request.meta['last_header']
-                    new_header = Headers({'User-Agent':random.choice(self._headers)})
+                    # new_header = Headers({'User-Agent':random.choice(self._headers)})
+                    new_header = random.choice(self._headers)
                     while new_header == last_header:
-                        new_header = Headers({'User-Agent':random.choice(self._headers)})
+                        new_header = random.choice(self._headers)
                         # self.used_header.add(new_header)
-        else:
-            new_header = Headers({'User-Agent':random.choice(self._headers)})
-            # self.used_header.add(new_header)
-        request.headers = new_header
+                else:
+                    new_header = random.choice(self._headers)
+                    request.meta['header_flag'] = new_header
+                request.headers.setRawHeaders('User-Agent',new_header)
         return None
 
-    def _set_user_agent(self,name = 'User-Agent',value = None):
-        if

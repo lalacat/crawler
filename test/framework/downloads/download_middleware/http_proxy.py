@@ -4,6 +4,8 @@ from urllib.parse import urlunparse
 
 from twisted.web.http_headers import Headers
 
+from test.framework.https.parse_url import _parsed
+
 logger = logging.getLogger(__name__)
 class AddHttpProxy(object):
 
@@ -28,9 +30,9 @@ class AddHttpProxy(object):
 
     def _get_proxy(self,proxy):
         if len(proxy) == 2:
-            proxy += ('',)
+            proxy += (None,)
         hostname, hostport, creds = proxy
-        proxy_url = urlunparse(hostname, hostport, '', '', '', '')
+        proxy_url = urlunparse((hostname, str(hostport), '', '', '', ''))
         if creds:
             creds = self._basic_auth_header(creds)
         return creds,proxy_url
@@ -41,10 +43,9 @@ class AddHttpProxy(object):
         proxy = request.meta.get('proxy')
         if proxy:
             creds,proxy_url = self._get_proxy(proxy)
-            if creds and not request.headers.getRawHeaders('Proxy-Authorization',False):
-                request.headers.addR
-
+            request.meta['proxy'] = proxy_url
+            if creds and not request.headers.getRawHeaders('Proxy-Authorization'):
+                request.headers.setRawHeaders('Proxy-Authorization',[creds])
+            return
         else:
             return
-
-
