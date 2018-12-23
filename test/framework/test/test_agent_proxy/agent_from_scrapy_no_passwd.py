@@ -106,41 +106,29 @@ class BeginningPrinter(Protocol):
 
 def cbRequest(response):
     print('Redirect Response code:', response.code)
-    # print('Response version:', response.version)
-    # print('Response headers:')
-    # print(pformat(list(response.headers.getAllRawHeaders())))
-    # print('Response code:', response.code)
-    # print('Response phrase:', response.phrase)
-    print(time.clock())
+    print('Response version:', response.version)
+    print('Response headers:')
+    print(pformat(list(response.headers.getAllRawHeaders())))
+    print('Response code:', response.code)
+    print('Response phrase:', response.phrase)
     finished = defer.Deferred()
     response.deliverBody(BeginningPrinter(finished))
     finished.addCallback(lambda _:print(_))
     return finished
 
 
-user_name = base64.b64encode('spider:123456'.encode('utf-8')).strip()
-encode_user = b'Basic '+user_name
-header = {'Proxy-Authorization': [encode_user]}
-proxy_config = ('47.105.165.81',5527,encode_user)
-
-url = "http://go2mars.top/solo/articles/2018/12/18/1545131102995.html"
+host= "118.163.125.36"
+port = 8080
+proxy_config = (host,port,None)
 
 
 
-print(time.clock())
+
 contextFactory = ScrapyClientContextFactory()
 
-agent = RedirectAgent(TunnelingAgent(reactor,proxy_config,contextFactory,10,None,None))
+agent = TunnelingAgent(reactor,proxy_config,contextFactory,10,None,None)
 
-
-
-
-host = '47.105.165.81'
-port = 5527
-# endpoint = TCP4ClientEndpoint(reactor, host, port)
-# agent_http = ProxyAgent(endpoint)
-# d = agent_http.request(b'GET',b'http://go2mars.top/solo/articles/2018/12/18/1545131102995.html',Headers({'Proxy-Authorization': [encode_user]}),None)
-d = agent.request(b'GET',b'http://go2mars.top/solo/articles/2018/12/18/1545131102995.html')
+d = agent.request(b'GET',b'https://www.baidu.com')
 d.addCallback(cbRequest)
 d.addErrback(lambda _:print(_))
 d.addCallback(lambda _:print(time.clock()))

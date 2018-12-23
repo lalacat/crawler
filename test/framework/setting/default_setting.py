@@ -9,7 +9,7 @@ CONCURRENT_ITEMS = 100 #  控制同时处理的爬取到的item的数据数目
 #D
 DOWNLOADER = "test.framework.downloads.Downloader"
 # 默认下载器
-DOWNLOAD_HANDLER = "test.framework.downloads.download_agent_redirect.HTTPDownloadHandler"
+DOWNLOAD_HANDLER = "test.framework.downloads.download_agent_proxy.HTTPDownloadHandler"
 DOWNLOAD_TIMEOUT = 180      # 3mins
 
 DOWNLOAD_MAXSIZE = 1024*1024*1024   # 1024m 下载网页大小的最大值
@@ -19,7 +19,8 @@ DOWNLOAD_FAIL_ON_DATALOSS = True
 
 DOWNLOAD_DELAY = 2
 DOWNLOADER_MIDDLEWARE = {
-   "test.framework.test.test_middleware.test_process_request_01.Change_Request_Header":10
+   "test.framework.downloads\download_middleware.user_agent.Change_Request_UserAgent":10,
+
 }
 
 
@@ -68,7 +69,7 @@ HEADER_COLLECTION = [
     ['Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)'],
     ['Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)']
 ]
-
+HTTPPROXY_AUTH_ENCODING = 'utf-8'
 #T
 ITEM_PIPELINES = {
     # "test.framework.pipelines.mongoDB.MongoDB":20,
@@ -193,7 +194,7 @@ LOGGING_DIC = {
     'handlers': {
         #  打印到终端的日志
         'console_info': {
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
             'formatter': 'debug_format',
             'filters': ['error_filter'],
@@ -247,7 +248,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console_info',],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
@@ -274,32 +275,7 @@ SCHEDULER = "test.framework.core.scheduler.Scheduler"
 SPIDER_MIDDLEWARES = {}
 SPIDER_CHILD_CLASS = 'test.framework.test.test_spider.simple_spider.simple_spider_05_xiaoqu_house.SimpleSpider'
 #T
-'''
-TEST_MIDDLEWARE = {
-                   "test.framework.middleware.test_for_add_mw_01.Test_MW_A":300,
-                   "test.framework.middleware.test_for_add_mw_01.test_fun_common":320,
-                   "test.framework.middleware.test_for_add_mw_01.test_fun_A":750,
-                   "test.framework.middleware.test_for_add_mw_02.Test_MW_B":200,
-                   "test.framework.middleware.test_for_add_mw_02.test_fun_B":150,
-                   "test.framework.middleware.test_for_add_mw_02.test_fun_common":140,
-                   "test.framework.middleware.test_for_add_mw_03.Test_MW_C":100,
-                   "test.framework.middleware.test_for_add_mw_03.test_fun_C":450,
-                   "test.framework.middleware.test_for_add_mw_03.test_fun_common":350,
-                 }
-TEST_DOWNLOADER_MIDDLEWARE = {
-    "test.framework.downloads.test_for_download_middleware_01.Test_MW_D_01":100,
-    "test.framework.downloads.test_for_download_middleware_01.test_fun_D_A":200,
-    "test.framework.downloads.test_for_download_middleware_01.test_fun_common":150,
-    "test.framework.downloads.test_for_download_middleware_02.Test_MW_D_02":160,
-    "test.framework.downloads.test_for_download_middleware_02.test_fun_D_B":210,
-    "test.framework.downloads.test_for_download_middleware_02.test_fun_common":500,
-    "test.framework.downloads.test_for_download_middleware_03.Test_MW_D_03":10,
-    "test.framework.downloads.test_for_download_middleware_03.test_fun_D_C":300,
-    "test.framework.downloads.test_for_download_middleware_03.test_fun_common":400,
 
-}
-'''
-TEST_DOWNLOADER_MIDDLEWARE = {}
 #U
 #V
 #W

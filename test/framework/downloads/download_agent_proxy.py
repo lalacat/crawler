@@ -1,3 +1,4 @@
+from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.web.client import Agent, ResponseDone, ResponseFailed, \
     HTTPConnectionPool, RedirectAgent, ProxyAgent
 from twisted.web.http import _DataLoss, PotentialDataLoss
@@ -13,7 +14,7 @@ import time, logging
 
 from test.framework.downloads.contextfactory import DownloaderClientContextFactory, ScrapyClientContextFactory
 from test.framework.downloads.proxy_agent import TunnelingAgent
-from test.framework.https.parse_url import to_bytes
+from test.framework.https.parse_url import to_bytes, _parsed
 from test.framework.https.response import Response
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,7 @@ class HTTPDownloadHandler(object):
 
         self._contextFactory_without_proxy = DownloaderClientContextFactory()
         self._contextFactory_with_proxy = ScrapyClientContextFactory()
+        self._contextFactory = (self._contextFactory_without_proxy,self._contextFactory_with_proxy)
 
         self._default_maxsize = settings.getint('DOWNLOAD_MAXSIZE')
         self._default_warnsize = settings.getint('DOWNLOAD_WARNSIZE')
@@ -57,7 +59,7 @@ class HTTPDownloadHandler(object):
         ))
         """返回一个http download 的 defer"""
         self.spider = spider
-        agent = DownloadAgent(contextFactory=self._contextFactory_without_proxy,pool=self._pool,
+        agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
                               warnsize=getattr(spider,'download_warnsize',self._default_warnsize),
                               fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm
@@ -103,7 +105,7 @@ class DownloadAgent(object):
             'DownloadAgent',
             '已初始化...'
         ))
-        self._contextFactory = contextFactory
+        self._contextFactory,self._contextFactoryProxy = contextFactory
         self._connectTimeout = connectTimeout
         self._bindAddress = bindAddress
         self._pool = pool
@@ -116,15 +118,32 @@ class DownloadAgent(object):
     def _getAgent(self,request,timeout):
         proxy = request.meta.get('proxy')
         if proxy:
-            
+            scheme = _parsed(request.url)[0]
+            proxyHost, proxyPort,_,_ = _parsed(proxy)
+            creds = request.headers.getRawHeaders('Proxy-Authorization',None)
+            if scheme == b'https':
+                proxyConfig = (proxyHost,proxyPort,creds)
+                request.headers.removeHeader('Proxy-Authorization')
 
+                print('_getAgent:https')
+                print(proxyConfig)
 
+                return TunnelingAgent(reactor,proxyConfig,contextFactory=self._contextFactoryProxy,
+                                      connectTimeout=timeout,
+                                      bindAddress=self._bindAddress,
+                                        pool=self._pool)
+            else:
+                print('_getAgent:http')
 
+                endpoint = TCP4ClientEndpoint(reactor,proxyHost,proxyPort)
+                return ProxyAgent(endpoint=endpoint,pool=self._pool)
 
-        return self._Agent(reactor,contextFactory=self._contextFactory,
-                           connectTimeout=timeout,
-                           bindAddress=self._bindAddress,
-                           pool=self._pool)
+        else:
+            print('_getAgent: no proxy')
+            return self._Agent(reactor,contextFactory=self._contextFactory,
+                               connectTimeout=timeout,
+                               bindAddress=self._bindAddress,
+                               pool=self._pool)
 
     def _getRedirectAgent(self,timeout):
         return self._RedirectAgent(self._getAgent(timeout))

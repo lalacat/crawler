@@ -7,8 +7,8 @@ header = { 'User-Agent' :'MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20
             ,'content-type':"application/json"}
 proxies = {
     #'http':'http://45.63.87.141:3128',
-    "http":"122.96.93.158:49435",
-
+    # "http":"122.96.93.158:49435",
+    "http":"180.213.169.75:8118"
 
     }
 r = requests.get("https://sh.lianjia.com/ershoufang/pg2/",headers=header,proxies=proxies)

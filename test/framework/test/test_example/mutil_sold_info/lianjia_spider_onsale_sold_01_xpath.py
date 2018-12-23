@@ -24,6 +24,7 @@ class SoldOrSale(Spider):
         self.name = ""
         self._start_urls = []
         self.sold_db = True
+        self.change_header = True
         self.total_number_community = 0
         self.result = dict()
         self.result_len = 0

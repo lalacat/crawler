@@ -22,12 +22,14 @@ class SimpleSpider_08(Spider):
         self.name = ""
         self._start_urls = []
         self.handler_db = False
+        self.change_header = False
         self.total_number_community = 0
         self.result = defaultdict(list)
         self.result_len = 0
         self.sale_url = dict()
         self.sold_url = dict()
-        self.headers = {"User-Agent":['Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)']}
+        # self.headers = {"User-Agent":['Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)']}
+
     @property
     def name(self):
         return self._name
@@ -95,7 +97,6 @@ class SimpleSpider_08(Spider):
         except Exception as e :
             print(e)
         # return None
-
 
     def _get_onePage(self,all_communities):
         one_page = list()

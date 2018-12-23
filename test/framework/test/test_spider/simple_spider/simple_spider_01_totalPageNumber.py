@@ -9,7 +9,7 @@ from test.framework.https.request import Request
 
 logger = logging.getLogger(__name__)
 
-class SimpleSpider(Spider):
+class SimpleSpider_01(Spider):
     """
     将所有小区的地址都写入数据库中
     """
