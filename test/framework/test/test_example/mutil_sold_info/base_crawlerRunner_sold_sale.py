@@ -6,7 +6,7 @@ from test.framework.setting import Setting
 from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import CrawlerRunner
 
 # mongodb服务的地址和端口号
-from test.framework.test.test_example.mutil_sold_info.simple_spider_08_xiaoqu_sale_sold import SimpleSpider_08
+from test.framework.test.test_example.mutil_sold_info.father_spider_sale_sold import SimpleSpider_08
 
 mongo_url = "127.0.0.1:27017"
 

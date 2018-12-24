@@ -19,7 +19,8 @@ DOWNLOAD_FAIL_ON_DATALOSS = True
 
 DOWNLOAD_DELAY = 2
 DOWNLOADER_MIDDLEWARE = {
-   "test.framework.downloads\download_middleware.user_agent.Change_Request_UserAgent":10,
+   "test.framework.downloads.download_middleware.user_agent.ChangeRequestUserAgent":10,
+   "test.framework.downloads.download_middleware.http_proxy.AddHttpProxy": 20,
 
 }
 

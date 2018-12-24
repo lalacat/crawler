@@ -6,7 +6,7 @@ from twisted.web.http_headers import Headers
 logger = logging.getLogger(__name__)
 
 
-class Change_Request_UserAgent(object):
+class ChangeRequestUserAgent(object):
 
     def __init__(self,crawler):
         self.lfm = crawler.logformatter
@@ -38,4 +38,5 @@ class Change_Request_UserAgent(object):
                     request.meta['header_flag'] = new_header
                 request.headers.setRawHeaders('User-Agent',new_header)
         return None
+
 

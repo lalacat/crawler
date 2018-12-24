@@ -7,9 +7,11 @@ from twisted.web.http_headers import Headers
 from test.framework.https.parse_url import _parsed
 
 logger = logging.getLogger(__name__)
+
+
 class AddHttpProxy(object):
 
-    def __int__(self,logformatter=None,auth_encoding='utf-8'):
+    def __init__(self,logformatter=None,auth_encoding='utf-8'):
         self.auth_encoding = auth_encoding
         self.lfm = logformatter
         if self.lfm:
@@ -37,7 +39,7 @@ class AddHttpProxy(object):
             creds = self._basic_auth_header(creds)
         return creds,proxy_url
 
-    def process_request(self,request):
+    def process_request(self,request,spider):
         # proxy配置格式tuple
         # (hostname,port,crdes)
         proxy = request.meta.get('proxy')

@@ -145,8 +145,8 @@ class DownloadAgent(object):
                                bindAddress=self._bindAddress,
                                pool=self._pool)
 
-    def _getRedirectAgent(self,timeout):
-        return self._RedirectAgent(self._getAgent(timeout))
+    def _getRedirectAgent(self,agent):
+        return self._RedirectAgent(agent)
 
     def download_request(self,request):
         # 设定多长时间内下载不报错
@@ -159,10 +159,14 @@ class DownloadAgent(object):
                         '执行download_request,超时时间:',
                          timeout)
                         )
+            agent = self._getAgent(request, timeout)
             if redirect:
-                agent = self._getRedirectAgent(timeout)
-            else:
-                agent = self._getAgent(request,timeout)
+                logger.debug(*self.lfm.crawled(
+                    'Request', request,
+                    '网站重定向',
+                    "Get Agent")
+                             )
+                agent = self._getRedirectAgent(agent)
             #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
             #  urldefrag去掉fragment
             url = urldefrag(request.url)[0]
@@ -195,7 +199,7 @@ class DownloadAgent(object):
         except Exception as e:
             # logger.error(e)
             logger.error(*self.lfm.error("Request", request,
-                                        DownloadAgent,
+                                        'DownloadAgent',
                                         '下载过程中出现错误:'),
                          extra=
                          {

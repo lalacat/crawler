@@ -60,23 +60,20 @@ class MiddlewareManager(object):
                     elif hasattr(mwcls,'from_settings'):
                         mw = mwcls.from_settings(settings)
                     else:
-                    #  当mwcls不是类的时候，那就是方法
                         mw = mwcls
                     middlewares.append(mw)
                     enabled.append(clspath)
                     clsnames.append(clsname)
                 except Exception as e :
                     if e.args:
-                        # logger.warning("未生效的Middleware: %(clsname)s: %(eargs)s",
-                        #                {'clsname': clsname, 'eargs': e.args[0]},
-                        #                extra={'crawler': crawler})
                         args = {'clsname': clsname, 'eargs': e.args[0]}
                         logger.warning(*cls.lfm.crawled(
                             "Middleware",cls.component_name,
                             '未生效:'),
                             extra = {
-                                'extra_info' : '{clsname}: {eargs}'.format(**args)
-                            }
+                                'extra_info' : '{clsname}: {eargs}'.format(**args),
+
+                            },exc_info=False
                         )
             if len(middlewares) != len(clsnames):
                 raise ImportError("中间件载入不完整")
@@ -89,7 +86,7 @@ class MiddlewareManager(object):
                     "Middleware", cls.component_name,
                     '生效:'),
                             extra={
-                                'extra_info': pprint.pformat(enabled)
+                                'extra_info': enabled
                             }
                             )
             return cls(clsnames, middlewares)
