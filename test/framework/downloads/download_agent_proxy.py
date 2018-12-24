@@ -33,17 +33,18 @@ class HTTPDownloadHandler(object):
             'HTTPDownloadHandler',
             '已初始化...'
         ))
+        self.settings = settings
         self._pool = HTTPConnectionPool(reactor,persistent=True)
-        self._pool.maxPersistentPerHost = settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
+        self._pool.maxPersistentPerHost = self.settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
         self._pool._factory.noisy = False # 用于设置proxy代理
 
         self._contextFactory_without_proxy = DownloaderClientContextFactory()
         self._contextFactory_with_proxy = ScrapyClientContextFactory()
         self._contextFactory = (self._contextFactory_without_proxy,self._contextFactory_with_proxy)
 
-        self._default_maxsize = settings.getint('DOWNLOAD_MAXSIZE')
-        self._default_warnsize = settings.getint('DOWNLOAD_WARNSIZE')
-        self._fail_on_dataloss = settings.getbool('DOWNLOAD_FAIL_ON_DATALOSS')
+        self._default_maxsize = self.settings.getint('DOWNLOAD_MAXSIZE')
+        self._default_warnsize = self.settings.getint('DOWNLOAD_WARNSIZE')
+        self._fail_on_dataloss = self.settings.getbool('DOWNLOAD_FAIL_ON_DATALOSS')
         self._disconnect_timeout = 1
 
     @classmethod
@@ -62,7 +63,7 @@ class HTTPDownloadHandler(object):
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
                               warnsize=getattr(spider,'download_warnsize',self._default_warnsize),
-                              fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm
+                              fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm,settings=self.settings
                               )
         return agent.download_request(request)
 
@@ -98,7 +99,7 @@ class DownloadAgent(object):
     _ProxyAgent = ProxyAgent
 
     def __init__(self,contextFactory=None, connectTimeout=10, bindAddress=None,
-                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False,logformatter=None):
+                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False,logformatter=None,settings=None):
         self.lfm = logformatter
         logger.debug(*self.lfm.crawled(
             'HTTPDownloadHandler',
@@ -114,6 +115,7 @@ class DownloadAgent(object):
         self._warnsize = warnsize# 给下载的网页设置一个警戒线
         self._fail_on_dataloss = fail_on_dataloss
         self._redirect = True
+        self.auth_encoding = settings.get('HTTPPROXY_AUTH_ENCODING')
 
     def _getAgent(self,request,timeout):
         proxy = request.meta.get('proxy')
@@ -121,25 +123,26 @@ class DownloadAgent(object):
             scheme = _parsed(request.url)[0]
             proxyHost, proxyPort,_,_ = _parsed(proxy)
             creds = request.headers.getRawHeaders('Proxy-Authorization',None)
+            creds_02 = creds[0].encode(self.auth_encoding) if isinstance(creds,list) else creds
+            proxyPort = int(proxyPort) if isinstance(proxyPort,bytes) else proxyPort
+            proxyHost = proxyHost.decode(self.auth_encoding)
+            logger.critical(*self.lfm.crawled(
+                           'Request',request,
+                           '使用代理',
+                           '%s:%s' %(proxyHost,str(proxyPort))
+                           ))
             if scheme == b'https':
-                proxyConfig = (proxyHost,proxyPort,creds)
+                proxyConfig = (proxyHost,proxyPort,creds_02)
                 request.headers.removeHeader('Proxy-Authorization')
-
-                print('_getAgent:https')
-                print(proxyConfig)
-
                 return TunnelingAgent(reactor,proxyConfig,contextFactory=self._contextFactoryProxy,
                                       connectTimeout=timeout,
                                       bindAddress=self._bindAddress,
                                         pool=self._pool)
             else:
-                print('_getAgent:http')
-
                 endpoint = TCP4ClientEndpoint(reactor,proxyHost,proxyPort)
                 return ProxyAgent(endpoint=endpoint,pool=self._pool)
 
         else:
-            print('_getAgent: no proxy')
             return self._Agent(reactor,contextFactory=self._contextFactory,
                                connectTimeout=timeout,
                                bindAddress=self._bindAddress,
@@ -295,14 +298,18 @@ class DownloadAgent(object):
             request.meta["download_redirect"] = True
             response = request
         else:
-            try:
-                for k,v in txresponse.headers.getAllRawHeaders():
-                    header[k] = v
-            except KeyError :
-                # logger.error("header is None")
-                logger.error(*self.lfm.error("request", request,
-                                             'header为None'))
-            response = Response(url=url,status=status,headers=header,body=body,flags=flags,request=request)
+            # try:
+            #     for k,v in txresponse.headers.getAllRawHeaders():
+            #         header[k] = v
+            # except KeyError :
+            #     # logger.error("header is None")
+            #     logger.error(*self.lfm.error("request", request,
+            #                                  'header为None'))
+            headers = txresponse.headers
+            if headers is None:
+                logger.error(*self.lfm.error("Response", request,
+                                                'header为None'))
+            response = Response(url=url,status=status,headers=headers,body=body,flags=flags,request=request)
 
         return response
 

@@ -106,11 +106,11 @@ class BeginningPrinter(Protocol):
 
 def cbRequest(response):
     print('Redirect Response code:', response.code)
-    # print('Response version:', response.version)
-    # print('Response headers:')
-    # print(pformat(list(response.headers.getAllRawHeaders())))
-    # print('Response code:', response.code)
-    # print('Response phrase:', response.phrase)
+    print('Response version:', response.version)
+    print('Response headers:')
+    print(pformat(list(response.headers.getAllRawHeaders())))
+    print('Response code:', response.code)
+    print('Response phrase:', response.phrase)
     print(time.clock())
     finished = defer.Deferred()
     response.deliverBody(BeginningPrinter(finished))

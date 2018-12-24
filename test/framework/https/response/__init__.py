@@ -5,7 +5,7 @@ from urllib.parse import urljoin
 class Response(object_ref):
 
     def __init__(self, url, status=200, headers=None, body=b'', flags=None, request=None):
-       self.headers = Headers(headers or {})
+       self.headers = headers or {}
        self.status = int(status)
        self._set_body(body)
        self._set_url(url)

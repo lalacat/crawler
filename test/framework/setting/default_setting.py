@@ -20,8 +20,9 @@ DOWNLOAD_FAIL_ON_DATALOSS = True
 DOWNLOAD_DELAY = 2
 DOWNLOADER_MIDDLEWARE = {
    "test.framework.downloads.download_middleware.user_agent.ChangeRequestUserAgent":10,
-   "test.framework.downloads.download_middleware.http_proxy.AddHttpProxy": 20,
-
+   #  如果使用chang proxy 必须放在add http proxy 这个类前面执行，否则会报错
+   "test.framework.downloads.download_middleware.change_proxy.ChangeProxy": 20,
+   "test.framework.downloads.download_middleware.http_proxy.AddHttpProxy": 30,
 }
 
 
@@ -147,7 +148,7 @@ LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %
 LOG_FILE_PATH = 'C:\\Users\\scott\\PycharmProjects\\crawler\\log_record\\'
 LOG_FILE_NAME  = LOG_FILE_PATH+'default_log_name.log'
 LOG_FILE_ERROR_URL = 'default_error_url.log'
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "ERROR"
 
 
 LOG_MONGODB_URL = "127.0.0.1:27017"
@@ -265,7 +266,10 @@ MONGODB_NAME_SOLD = 'Sold'
 #N
 #O
 #P
-
+PROXY = [
+    ("149.28.192.96",5527,'spider:123456'),
+    ('47.105.165.81',5527,'spider:123456'),
+]
 #Q
 #R
 REACTOR_THREADPOOL_MAXSIZE = 10

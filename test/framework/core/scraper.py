@@ -127,8 +127,8 @@ class Scraper(object):
                                                 'request': request
                                             },
                                             '处理出现错误:'),
-                         exc_info = True,
-                         extra={'exception':_.getErrorMessage()})
+                         extra={'exception':_.getErrorMessage()},
+                         exc_info=True,)
 
         dfd.addBoth(finish_scraping)
         # dfd.addErrback(lambda f: logger.error('Scraper 处理 %(request)s的结果时，出现出现错误！！\n'

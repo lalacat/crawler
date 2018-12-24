@@ -40,5 +40,5 @@ class LJSpider(Spider):
          one_page_numeber = len(house_list) - none_num
          self._item_num += one_page_numeber
          print(self._item_num)
-         return response
+         return None
         #yield Request("https://sh.lianjia.com/ershoufang/pudong/",callback=self._parse)
