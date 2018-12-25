@@ -11,14 +11,15 @@ logger = logging.getLogger("lala")  # 生成一个log实例
 
 logger.debug(*a.crawled("Spider","lala",
                        '出现出现错误',
-                       {'function':'Scraper','request':"baba"}),
+                       {'function':'Scraper','request':"baba",'time':333.333}),
             extra={'extra_info':'error'})
 
 
-logger.info(*a.crawled_time("Spider",'works',
+logger.info(*a.crawled("Spider",'works',
                             'info',
-                            6.7777777,
-                            "engine"),
+                       {
+                           'time':6.7777777,
+                            'function':"engine"}),
             extra={
                 "extra_info":" inprogress中还剩下{:d}个任务".format(3)})
 
@@ -65,7 +66,8 @@ logger.error(*a.error("Spider","lala",
              extra=
              {
                  'exception':'info',
-                'time':"\n时间是{:d}".format(34)
+                'time':"\n时间是{:d}".format(34),
+                 'recordErrUrl':True
              })
 
 args = {'clsname': "lili", 'eargs': "bibi"}

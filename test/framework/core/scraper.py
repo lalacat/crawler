@@ -110,7 +110,12 @@ class Scraper(object):
     def enqueue_scrape(self, response, request, spider):
         self.start_time = time.clock()
         # logger.info("%s.%s的response加入scrapy队列,加入时间为：%7.6f"%(spider.name,request,self.start_time))
-        logger.info(*self.lfm.crawled_time("Spider", spider.name, 'response加入队列时间', time.clock(), 'Scraper'))
+        logger.info(*self.lfm.crawled("Spider", spider.name,
+                                           'response加入队列时间',
+                                           {
+                                               'function':'Scraper',
+                                               'time': time.clock()
+                                           }))
         slot = self.slot
         dfd = slot.add_response_request(response, request)
 
@@ -164,11 +169,10 @@ class Scraper(object):
         else:
             #
             dfd = self.call_spider(response_failure, request, spider)
-            dfd.addErrback(self._log_download_errors, response_failure, request, spider)
+            # dfd.addErrback(self._log_download_errors, response_failure, request, spider)
             return dfd
 
     def call_spider(self, response, request, spider):
-
         response.request = request
         dfd = defer_result(response)
         #  这一步才是真正意义上的处理爬到的结果，之前的都是在过滤错误
@@ -207,7 +211,8 @@ class Scraper(object):
             logger.error(request.url,extra ={
                 'reason':'no data',
                 'exception':exc,
-                'time':time.clock()
+                'time':time.clock(),
+                'recordErrorUrl':True
             })
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")
@@ -268,15 +273,24 @@ class Scraper(object):
                                }))
         if isinstance(output, Request):
             # logger.info("处理的output%(request)s的类型是<Request>，将添加到下载序列中！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
-            logger.info(*self.lfm.crawled_time('Spider',spider.name,'Output的类型是<Request>,将添加到下载队列中,加入时间:',time.clock(),output))
+            logger.info(*self.lfm.crawled('Spider',spider.name,
+                                               'Output的类型是<Request>,将添加到下载队列中,加入时间:',
+                                               {
+                                                   'function':output,
+                                                   'time':time.clock()
+                                               }))
             self.crawler.engine.crawl(request=output, spider=spider)
         elif isinstance(output, (BaseItem, dict,int)):
             # logger.info("处理的output%(request)s的类型是<BaseItem, dict,int>，
             # 将由自定义的process_item方法进行处理！！添加时间是：%(time)f",
             # {"request":output,"time":time.clock()})
-            logger.info(*self.lfm.crawled_time(
+            logger.info(*self.lfm.crawled(
                 'Spider',spider.name,
-                'Output的类型是<BaseItem, dict,int>,将通过自定义的process_item方法进行处理,处理时间:',time.clock()))
+                'Output的类型是<BaseItem, dict,int>,将通过自定义的process_item方法进行处理,处理时间:',
+                {
+                    'time':time.clock()
+                }
+            ))
 
             self.slot.itemproc_size += 1
             dfd = self.itemproc.process_item(item=output,spider=spider)
@@ -328,14 +342,14 @@ class Scraper(object):
                                            ))
         return None
 
-    def _log_download_errors(self,context,request_result, request, spider):
+    def _log_spider_callback_errors(self,context,request_result, request, spider):
         # logger.error(context)
         logger.error(*self.lfm.error("Spider", spider.name,
                               {
                                   'function': 'Scraper',
                                   'request': request
                               },
-                              '出现错误', ),
+                              '调用Spider(Request) parse 出错', ),
                      extra=
                      {
                          'exception': context,
@@ -346,10 +360,12 @@ class Scraper(object):
     def _process_item_time(self,_):
         end_time = time.clock()
         # logger.info("经过process_item处理后，此时时间为%f,完成Scraper模块使用了%7.6f"%(end_time,end_time-self.start_time))
-        logger.debug(*self.lfm.crawled_time("Spider",self.spider.name,
+        logger.debug(*self.lfm.crawled("Spider",self.spider.name,
                             'process_item处理完毕后的时间:',
-                            end_time,
-                            "Scraper"),
+                                            {
+                                                'time':end_time,
+                                                'function':"Scraper"}
+                                            ),
                     extra={'extra_info':",完成Scraper模块使用了{:6.3f}".format(end_time-self.start_time)}
                             )
         return None

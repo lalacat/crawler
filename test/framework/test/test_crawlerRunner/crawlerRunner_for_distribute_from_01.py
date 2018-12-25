@@ -243,8 +243,8 @@ class CrawlerRunner(object):
         try:
             self.running = True
             # logger.debug("开始时间是%f"%self.start_time)
-            logger.critical(*self.lfm.crawled_time('CrawlerRunner',self.name,'开始时间:',
-                                                   time.clock()))
+            logger.critical(*self.lfm.crawled('CrawlerRunner',self.name,'开始时间:',
+                                              {'time':time.clock()}))
 
             # 将task导入到队列中
             self._tasks = make_generator(self.tasks)
@@ -309,9 +309,12 @@ class CrawlerRunner(object):
             self.slot = None
         if self._closewait:
             self._closewait.callback("Finish")
-        logger.critical(*self.lfm.crawled_time('CrawlerRunner', self.name,
+        logger.critical(*self.lfm.crawled('CrawlerRunner', self.name,
                                 'CrawlRunner停止,时间为:',
-                                            time.clock(),reason))
+                                               {
+                                                   'time':time.clock(),
+                                                   'function':reason}
+                                               ))
         self._push_task_finish = False
         self._pull_task_finish = False
 

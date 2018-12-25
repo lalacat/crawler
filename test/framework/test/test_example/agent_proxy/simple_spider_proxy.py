@@ -15,11 +15,11 @@ class LJSpiderProxy(Spider):
         self._total_house = 0
         self.headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0)'],'content-type':['application/json']}
         self._item_num = 0
-        self._maxnum = 5
+        self._maxnum = 1
         self.download_delay = 0
-        self.change_header = True
+        # self.change_header = True
         # self.proxy = ('47.105.165.81',5527,'spider:123456')
-        self.change_proxy = True
+        # self.change_proxy = False
 
     def start_requests(self):
         start_url = list()

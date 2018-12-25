@@ -127,10 +127,10 @@ class DownloadAgent(object):
         redirect = request.meta.get('download_redirect') or self._redirect
         self.request = request
         try:
-            logger.debug(*self.lfm.crawled_time(
+            logger.debug(*self.lfm.crawled(
                         'Request',request,
                         '执行download_request,超时时间:',
-                         timeout)
+                {'time':timeout})
                         )
             if redirect:
                 agent = self._getRedirectAgent(timeout)

@@ -254,8 +254,10 @@ class CrawlerRunner(object):
             self.running = True
             self.start_time = time.clock()
             # logger.debug("开始时间是%f"%self.start_time)
-            logger.critical(*self.lfm.crawled_time('CrawlerRunner','','开始时间:',
-                                                self.start_time))
+            logger.critical(*self.lfm.crawled('CrawlerRunner','','开始时间:',
+                                                   {
+                                                       'time':self.start_time
+                                                   }))
             nextcall = CallLaterOnce(self.next_task_from_schedule)
 
             #  将task导入到队列中
@@ -289,9 +291,9 @@ class CrawlerRunner(object):
         slot = self.slot
         slot.heartbeat.stop()
         end_time = time.clock()
-        logger.critical(*self.lfm.crawled_time('CrawlerRunner', '',
+        logger.critical(*self.lfm.crawled('CrawlerRunner', '',
                                 '任务分配完毕，任务停止,时间为:',
-                                            end_time,))
+                                               {'time':end_time}))
         # logger.debug("运行时间:%ds" % end_time)
         self.task_finish = False
         return None

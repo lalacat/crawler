@@ -115,7 +115,7 @@ class DownloadAgent(object):
         self._maxsize = maxsize # 规定最大的下载信息，防止下载的网页内容过大，占资源
         self._warnsize = warnsize# 给下载的网页设置一个警戒线
         self._fail_on_dataloss = fail_on_dataloss
-        self._redirect = True
+        self._redirect = False
         self.auth_encoding = settings.get('HTTPPROXY_AUTH_ENCODING')
 
     def _getAgent(self,request,timeout):
@@ -158,10 +158,10 @@ class DownloadAgent(object):
         redirect = request.meta.get('download_redirect') or self._redirect
         self.request = request
         try:
-            logger.debug(*self.lfm.crawled_time(
+            logger.debug(*self.lfm.crawled(
                         'Request',request,
                         '执行download_request,超时时间:',
-                         timeout)
+                        {'time': timeout})
                         )
             agent = self._getAgent(request, timeout)
             if redirect:
@@ -169,7 +169,7 @@ class DownloadAgent(object):
                     'Request', request,
                     '网站重定向',
                     "Get Agent")
-                             )
+                     )
                 agent = self._getRedirectAgent(agent)
             #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
             #  urldefrag去掉fragment
@@ -290,7 +290,7 @@ class DownloadAgent(object):
 
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         status = int(txresponse.code)
-        header = dict()
+        # header = dict()
         if status == 301 or status == 302:
             # logger.critical("%s 网页重定向，重新下载"%url)
             logger.warning(*self.lfm.crawled("Request",
@@ -403,7 +403,6 @@ class _ResponseReader(Protocol):
                                              ))
             self._warnsize_flag = True
 
-
     def connectionLost(self, reason):
         if self._finished.called:
             return
@@ -416,9 +415,11 @@ class _ResponseReader(Protocol):
             # [True，传入的参数data]，可以实现将获取的body传输到下一个函数中去
             if body == b'':
                 # logger.error("<%s> 没有下载到数据..."%self._request.url)
-                logger.error(*self.lfm.error('Request', self._request, '',
-                                             '没有下载到数据...'
-                                             ))
+                status =int(self._transferdata.code)
+                if status != 301 and status != 302:
+                    logger.error(*self.lfm.error('Request', self._request, '',
+                                                 '没有下载到数据...'
+                                                 ))
             else:
                 # logger.warning('<%s> 成功下载' % self._request.url)
                 logger.warning(*self.lfm.crawled('Request', self._request,

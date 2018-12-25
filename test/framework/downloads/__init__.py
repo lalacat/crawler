@@ -160,7 +160,11 @@ class Downloader(object):
     def _enqueue_request(self, request, spider):
         #  key就是hostname
         # logger.info("Spider:%s <%s> 添加进入下载队列时间:[%6.3f]..."%(spider.name,request,time.clock()))
-        logger.warning(*self.lfm.crawled_time('Spider', self.spider.name, "添加进入下载队列时间:", time.clock(),request))
+        logger.warning(*self.lfm.crawled('Spider', self.spider.name, "添加进入下载队列时间:",
+                                              {
+                                                  'time':time.clock(),
+                                                  'request':request
+                                              }))
         key, slot = self._get_slot(request, spider)
         request.meta['download_slot'] = key
 

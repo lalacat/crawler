@@ -149,8 +149,12 @@ class ExecutionEngine(object):
         self.running = True
         engine_start_time = time.clock()
         # logger.warning("%s Engine开始,时间:[%6.3f]s..." %(self.spider.name,engine_start_time))
-        logger.warning(*self.lfm.crawled_time("Spider", self.spider.name,
-                                       '开始时间',engine_start_time, 'Engine'))
+        logger.warning(*self.lfm.crawled("Spider", self.spider.name,
+                        '开始时间',
+                       {
+                        'function':'Engine',
+                        'time':engine_start_time
+                        }))
 
         self._closewait = defer.Deferred()
         self._closewait.addBoth(self._finish_stopping_engine)
@@ -167,8 +171,8 @@ class ExecutionEngine(object):
     def _finish_stopping_engine(self,_):
         end_time = time.clock()
         # logger.warning("%s Engine关闭,运行时间:[%7.6f]s...",self.engine_name,end_time)
-        logger.warning(*self.lfm.crawled_time("Spider", 'Engine',
-                                              '关闭时间', end_time ))
+        logger.warning(*self.lfm.crawled("Spider", 'Engine',
+                                              '关闭时间', {'time':end_time} ))
         return None
 
     def pause(self):
@@ -438,12 +442,12 @@ class ExecutionEngine(object):
         #                 'reason': reason
         #             },
         #             extra={'spider': spider}))
-        dfd.addBoth(lambda _:logger.warning(*self.lfm.crawled_time("Spider", spider.name,
+        dfd.addBoth(lambda _:logger.warning(*self.lfm.crawled("Spider", spider.name,
                                        '关闭时间:',
-                                        time.clock(),
                                         {
                                          'function': 'Spider',
-                                         'request' : '{'+reason+'}'
+                                         'request' : '{'+reason+'}',
+                                        'time': time.clock(),
                                         })))
 
         #  引擎中的slot清空

@@ -154,13 +154,13 @@ class CollectSold(Spider):
     def _reload_sold(self,response,sold_houses):
         if response.request.meta.get('download_times'):
             download_times = response.request.meta['download_times']
-            logger.critical(*self.lfm.crawled_time(
+            logger.critical(*self.lfm.crawled(
                 'Spider', self.name,
                 '({0})再次下载,时间为：'.format(response.request.headers.getRawHeaders('User-Agent')[0]),
-                time.clock(),
                 {
                     'function': '第{0}次'.format(download_times),
-                    'request': response.request
+                    'request': response.request,
+                    'time': time.clock(),
                 }
             ))
             download_times = download_times + 1
@@ -174,13 +174,13 @@ class CollectSold(Spider):
                 'last_header': response.request.headers
             })
         else:
-            logger.critical(*self.lfm.crawled_time(
+            logger.critical(*self.lfm.crawled(
                 'Spider', self.name,
                 '重复下载次数已超过最大值，判断此网页没有数据,时间为：',
-                time.clock(),
                 {
                     'function': '第{0}次'.format(download_times),
-                    'request': response.request
+                    'request': response.request,
+                    'time': time.clock(),
                 }
             ))
             logger.error(response.url,extra={

@@ -49,82 +49,28 @@ class LogFormat(object):
     def error(self, module, name,function, msg):
         return self._logformatter_adapter(self._error(module, name,function, msg))
 
-
-
-    def crawled_time(self,module,name,msg,time,extra=None):
-        return self._logformatter_adapter(self._crawled_time(module, name, msg,time, extra))
-
     def _crawled(self,module,name,msg,extra=None):
         module_name = name if name is '' else ':'+str(name)
-        if not extra:
-            return {
-                'msg': self.settings['LOG_CRAWLED_MSG'],
-                'args': {
-                    'module':module,
-                    'name':module_name,
-                    'msg':msg
-                }
-            }
-        elif isinstance(extra,dict):
+        base_info = {
+            'module': module,
+            'name': module_name,
+            'msg': msg,
+            'function':'',
+            'request':'',
+            'time': str(float('%6.4f' % extra.pop('time')))+'s ' if isinstance(extra,dict) and extra.get('time') else ''
+        }
+        if extra:
             if isinstance(extra,dict):
-                return {
-                    'msg': self.settings['LOG_CRAWLED_REQUEST_EXTRA'],
-                    'args': {
-                        'module': module,
-                        'name': module_name,
-                        'function': extra['function'],
-                        'request': extra['request'],
-                        'msg': msg,
-                    }
-                }
-        else:
-            return {
-                'msg': self.settings['LOG_CRAWLED_EXTRA'],
-                'args': {
-                    'module': module,
-                    'name':module_name,
-                    'extra_model':extra,
-                    'msg':msg
-                }
-            }
-
-    def _crawled_time(self,module,name,msg,time,extra=None):
-        module_name = name if name is '' else ':'+str(name)
-        if not extra:
-            return {
-                'msg': self.settings['LOG_CRAWLED_TIME'],
-                'args': {
-                    'module':module,
-                    'name':module_name,
-                    'msg':msg,
-                    'time':time
-                }
-            }
-        elif isinstance(extra,dict):
-            return {
-                'msg': self.settings['LOG_CRAWLED_TIME_REQUEST_EXTRA'],
-                'args': {
-                    'module': module,
-                    'name': module_name,
-                    'msg': msg,
-                    'time':time,
-                    'function': extra['function'],
-                    'request': extra['request'],
-
-                }
-            }
-        else:
-            return {
-                'msg': self.settings['LOG_CRAWLED_TIME_EXTRA'],
-                'args': {
-                    'module': module,
-                    'name':module_name,
-                    'extra_model':extra,
-                    'msg':msg,
-                    'time':time
-
-                }
-            }
+                if isinstance(extra,dict):
+                    if extra.get('time'):
+                        extra.pop(time)
+                    base_info.update(extra)
+            else:
+                base_info['function'] = extra
+        return {
+            'msg': self.settings['LOG_CRAWLED_MSG'],
+            'args': base_info
+        }
 
     def _error(self,module, name, function,msg):
         module_name = name if name is '' else ':'+str(name)
@@ -204,4 +150,30 @@ class LogFormat(object):
 # print(root)
 # print(root_path[:root+len('crawler')])
 # print(os.path.dirname(root_path[:root+len('crawler')]))
+#
+# a = {'a':1,
+#      'b':2,
+#      'c':'',
+#      'd':''}
+# b = {
+#     'c':1,
+#     'd':2,
+# }
+#
+# a.update(b)
+# print(a)
 
+# d = {
+#     'a':1
+# }
+#
+# b = {
+#     'c':2
+# }
+# c = float(b['a']) if isinstance(b,dict) and b.get('a') else ''
+# print(c
+#
+#
+# d = 6.345435
+# c = float('%6.3f' %d)
+# print(c)

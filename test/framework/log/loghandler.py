@@ -111,7 +111,7 @@ class RecordErrorUrl(logging.FileHandler):
         If the stream was not opened because 'delay' was specified in the
         constructor, open it before calling the superclass's emit.
         """
-        if not hasattr(record, 'reason'):
+        if not hasattr(record, 'recordErrUrl'):
             return
         if self.stream is None:
             self.stream = self._open()
@@ -138,7 +138,7 @@ class RecordErrorUrl(logging.FileHandler):
         if hasattr(record,'exception'):
             format_data['exception'] = record.__dict__['exception']
         if hasattr(record,'time'):
-            format_data['time'] = record.__dict__['time']
+            format_data['time'] = float('%6.4f' %record.__dict__['time'])
         return format_data
 
 

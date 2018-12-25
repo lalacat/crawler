@@ -92,13 +92,13 @@ class CollectSold(Spider):
     def _reload_sold(self,response,sold_houses):
         if response.request.meta.get('download_times'):
             download_times = response.request.meta['download_times']
-            logger.critical(*self.lfm.crawled_time(
+            logger.critical(*self.lfm.crawled(
                 'Spider', self.name,
                 '({0})再次下载,时间为：'.format(response.request.headers.getRawHeaders('User-Agent')[0]),
-                time.clock(),
                 {
                     'function': '第{0}次'.format(download_times),
-                    'request': response.request
+                    'request': response.request,
+                    'time':time.clock(),
                 }
             ))
             download_times = download_times + 1
@@ -112,19 +112,20 @@ class CollectSold(Spider):
                 'last_header': response.request.headers
             })
         else:
-            logger.critical(*self.lfm.crawled_time(
+            logger.critical(*self.lfm.crawled(
                 'Spider', self.name,
                 '重复下载次数已超过最大值，判断此网页没有数据,时间为：',
-                time.clock(),
                 {
                     'function': '第{0}次'.format(download_times),
-                    'request': response.request
+                    'request': response.request,
+                    'time':time.clock(),
                 }
             ))
             logger.error(response.url,extra={
                 'exception':'重复下载次数已超过最大值，判断此网页没有数据',
                 'time':time.clock(),
-                'reason':'No Data'
+                'reason':'No Data',
+                'recordErrorUrl':True
             })
             print("sold：" + self.name + ': ' + response.url + ': ' + str(0) + "===" + str(len(sold_houses)))
             return None
@@ -162,6 +163,7 @@ class CollectSold(Spider):
                 logger.error(sold_house_url,extra={
                     'reason':'价格隐藏',
                     'exception':sold_title,
+                    'time':time.clock(),
                     'recordErrUrl':True
                 })
 

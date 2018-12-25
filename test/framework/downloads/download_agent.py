@@ -120,10 +120,10 @@ class DownloadAgent(object):
 
     def download_request(self,request):
         timeout = request.meta.get('download_timeout') or self._connectTimeout
-        logger.debug(*self.lfm.crawled_time(
+        logger.debug(*self.lfm.crawled(
             'Request', request,
             '执行download_request,延迟时间:',
-            timeout)
+            {'time':timeout})
                      )
         agent = self._getAgent(timeout)
         #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment

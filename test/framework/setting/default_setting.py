@@ -125,19 +125,20 @@ LOG_DATE_FORMAT_SHORT = '%H:%M:%S'
 
 
 LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
+
 # 记录爬取过程中出错的URL
-LOG_FILE_ERROR_URL_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(reason)s %'
+LOG_FILE_ERROR_URL_FORMAT = '[%(asctime)s] [%(filename)s] [%(message)s] [%(reason)s] [%(exception)s][%(time)s]'
 
 
 
-LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s] %(msg)s'
-LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s'
-LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
+LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(time)s'
 
-
-LOG_CRAWLED_TIME = 'Crawled:[%(module)s%(name)s] %(msg)s%(time)6.3fs'
-LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s%(time)6.3fs'
-LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(time)6.3fs'
+# LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s] %(msg)s'
+# LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s'
+# LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(time)ss'
+# LOG_CRAWLED_TIME = 'Crawled:[%(module)s%(name)s] %(msg)s%(time)6.3fs'
+# LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s%(time)6.3fs'
+# LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s %(time)s'
 
 
 LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
@@ -248,7 +249,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_info','ErrorUrl','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
