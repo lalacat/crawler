@@ -22,7 +22,7 @@ class CollectSold(Spider):
         self.result = dict()
         self.result_len = 0
 
-        self.sold_db = False
+        self.sold_db = True
         self.change_header = True
         self.change_proxy = True
 
@@ -47,7 +47,69 @@ class CollectSold(Spider):
             self._start_urls = urls
 
     def start_requests(self):
-        yield Request(self.start_urls[0],callback=self._parse_sold)
+        yield Request(self.start_urls[0],callback=self._parse_sale)
+
+    def _parse_sale(self,response):
+        seletor = etree.HTML(response.body)
+
+        # 所有的在售房屋列表
+        try:
+            total_house = self._xpath_filter(seletor.xpath("//ul[@class='sellListContent']"))
+            if total_house is None:
+                total_house = self._xpath_filter(seletor.xpath("//ul[@class='sellListContent LOGCLICKDATA']"))
+            if total_house is None:
+                print(response.url+':0')
+                return None
+            houses = total_house.xpath('./li')
+
+            # 总的套数
+            total_num = seletor.xpath('//h2[@class="total fl"]/span/text()')
+            print('sale：'+response.url+': '+str(total_num)+"==="+str(len(houses)))
+
+
+            for on_house in houses:
+                # 总价及均价
+                total_price = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='priceInfo']/div[@class='totalPrice']/span/text()"))
+                print(str(total_price)+'万')
+
+                unit_prince = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='priceInfo']/div[@class='unitPrice']/span/text()"))
+                print('均价: '+unit_prince)
+
+                # 小区名称及网址
+                title = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='title']/a/text()"))
+                title_url = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='title']/a/@href"))
+                print('小区名称: '+title)
+                print('小区url: '+title_url)
+
+                # 小区地址
+                address = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='address']/div/text()"))
+                print('小区地址: '+address)
+
+                # 房屋层数及年代
+                flood = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='flood']/div/text()"))
+                print('房屋层数及年代: '+flood)
+
+                # 跟进信息
+                followInfo = self._xpath_filter(on_house.xpath("./div[@class='info clear']/div[@class='followInfo']/text()"))
+                print('跟进信息: '+followInfo)
+
+                # 页码总数
+                # page_number = self._xpath_filter(seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data"))
+                # if page_number:
+                #     num = json.loads(page_number)["totalPage"]
+                #     print(num)
+
+        except Exception as e:
+            logger.error(*self.lfm.error(
+                'Spider', self.name,
+                '解析房子信息时出现错误',
+                response.request),
+                extra={
+                    'exception':e,
+                    'time':time.clock()
+                }
+                )
+            return None
 
     def _parse_sold(self,response):
         selector = etree.HTML(response.body)
@@ -158,14 +220,10 @@ class CollectSold(Spider):
             # print("成交价格："+sold_totalPrice)
             house_info['sold_totalPrice'] = sold_totalPrice
             if re.search('\*+',sold_totalPrice):
-                # 记录错误呀的URL
                 logger.error(sold_house_url,extra={
                     'reason':'价格隐藏',
-                    'exception':sold_title,
-                    'recordErrUrl':True
+                    'exception':sold_title
                 })
-
-
 
             sold_unitPrice = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))

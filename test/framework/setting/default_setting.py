@@ -10,7 +10,7 @@ CONCURRENT_ITEMS = 100 #  控制同时处理的爬取到的item的数据数目
 DOWNLOADER = "test.framework.downloads.Downloader"
 # 默认下载器
 DOWNLOAD_HANDLER = "test.framework.downloads.download_agent_proxy.HTTPDownloadHandler"
-DOWNLOAD_TIMEOUT = 180      # 3mins
+DOWNLOAD_TIMEOUT = 15      # 3mins
 
 DOWNLOAD_MAXSIZE = 1024*1024*1024   # 1024m 下载网页大小的最大值
 DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
@@ -111,7 +111,7 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 '''
 LOG_FORMATTER_CLASS = 'test.framework.log.log.LogFormat'
 LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
-                  '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' #其中name为getlogger指定的名字
+                  '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' # 其中name为getlogger指定的名字
 LOG_FILE_FORMAT_01 = '[%(levelname)s][%(asctime)s]:%(message)s%(extra_info)s - [%(filename)s][line:%(lineno)d]\n '
 
 
@@ -125,12 +125,11 @@ LOG_DATE_FORMAT_SHORT = '%H:%M:%S'
 
 
 LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
-LOG_FILE_ERROR_URL_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(reason)s'
-# LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
+# 记录爬取过程中出错的URL
+LOG_FILE_ERROR_URL_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(reason)s %'
 
 
 
-#LOG_CRAWLED_MSG = 'Crawled: [Spdier:%(spider_name)s] %(msg)s'
 LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s] %(msg)s'
 LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s'
 LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
@@ -140,7 +139,6 @@ LOG_CRAWLED_TIME = 'Crawled:[%(module)s%(name)s] %(msg)s%(time)6.3fs'
 LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s%(time)6.3fs'
 LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(time)6.3fs'
 
-# LOG_CRAWLED_REQUEST = 'Crawled:[%(module)s:%(name)s %(request)s]%(msg)s'
 
 LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
 LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
@@ -250,7 +248,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },

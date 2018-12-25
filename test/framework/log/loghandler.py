@@ -35,6 +35,9 @@ class ConsoleErrorHandler(logging.StreamHandler):
 
     # 每进行一次log就会调用这个方法
     def emit(self, record):
+        if hasattr(record,'recordErrUrl'):
+            if record.recordErrUrl:
+                return None
         if not hasattr(record, 'time'):
             record.__dict__['time'] = ' '
         if not hasattr(record, 'exception'):

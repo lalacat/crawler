@@ -45,6 +45,7 @@ class HTTPDownloadHandler(object):
         self._default_maxsize = self.settings.getint('DOWNLOAD_MAXSIZE')
         self._default_warnsize = self.settings.getint('DOWNLOAD_WARNSIZE')
         self._fail_on_dataloss = self.settings.getbool('DOWNLOAD_FAIL_ON_DATALOSS')
+        self._default_download_timeout = self.settings.getint('DOWNLOAD_TIMEOUT')
         self._disconnect_timeout = 1
 
     @classmethod
@@ -60,7 +61,7 @@ class HTTPDownloadHandler(object):
         ))
         """返回一个http download 的 defer"""
         self.spider = spider
-        agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
+        agent = DownloadAgent(contextFactory=self._contextFactory,connectTimeout=self._default_download_timeout,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
                               warnsize=getattr(spider,'download_warnsize',self._default_warnsize),
                               fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm,settings=self.settings
@@ -126,7 +127,7 @@ class DownloadAgent(object):
             creds_02 = creds[0].encode(self.auth_encoding) if isinstance(creds,list) else creds
             proxyPort = int(proxyPort) if isinstance(proxyPort,bytes) else proxyPort
             proxyHost = proxyHost.decode(self.auth_encoding)
-            logger.critical(*self.lfm.crawled(
+            logger.info(*self.lfm.crawled(
                            'Request',request,
                            '使用代理',
                            '%s:%s' %(proxyHost,str(proxyPort))

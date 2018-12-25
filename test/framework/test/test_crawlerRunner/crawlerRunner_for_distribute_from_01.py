@@ -17,12 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 class Slot(object):
-    def __init__(self,nextcall):
+    def __init__(self,logformatter,nextcall):
+        self.lfm = logformatter
         self.closing = False
         self.heartbeat = task.LoopingCall(nextcall.schedule)
         self.nextcall = nextcall
         self.inprogress = list()
-
 
     def add_crawl(self,crawl):
         """
@@ -30,7 +30,7 @@ class Slot(object):
         :param crawl:
         :return:
         """
-        logger.debug("%s 添加到inprogress队列中" % crawl)
+        # logger.debug("%s 添加到inprogress队列中" % crawl)
         self.inprogress.append(crawl)
 
     def remove_crawl(self,crawl):
@@ -38,7 +38,10 @@ class Slot(object):
         self._maybe_closing()
 
     def close(self):
-        logger.debug("关闭CrawlerRunner的slot")
+        # logger.debug("关闭CrawlerRunner的slot")
+        logger.debug(*self.lfm.crawled('CrawlerRunner','Slot',
+                                        '已关闭'
+                                       ))
         self.closing = defer.Deferred()
         self._maybe_closing()
         return self.closing
@@ -46,7 +49,10 @@ class Slot(object):
     def _maybe_closing(self):
         if self.closing and not self.inprogress:
             if self.nextcall:
-                logger.warning("CrawlerRunner的LoopCall已关闭")
+                # logger.warning("CrawlerRunner的LoopCall已关闭")
+                logger.debug(*self.lfm.crawled('CrawlerRunner', 'Slot',
+                                               'LoopCall已关闭'
+                                               ))
                 self.nextcall.cancel()
                 if self.heartbeat.running:
                     self.heartbeat.stop()
@@ -215,7 +221,6 @@ class CrawlerRunner(object):
             # print(e.args)
             raise ValueError(e.args[0])
 
-
     @inlineCallbacks
     def start(self):
         try:
@@ -232,7 +237,6 @@ class CrawlerRunner(object):
             self._closewait = defer.Deferred()
             self.delay_stop = reactor.callLater(1,self.stop,'cancel')
             yield self._closewait
-            # self.stop()
 
     def init_task(self):
         assert not self.running,"task载入已启动"
@@ -247,7 +251,7 @@ class CrawlerRunner(object):
             self._create_task()
 
             nextcall = CallLaterOnce(self.next_task_from_schedule)
-            self.slot = Slot(nextcall)
+            self.slot = Slot(self.lfm,nextcall)
             self.slot.nextcall.schedule()
             self.slot.heartbeat.start(5)
 
@@ -279,7 +283,6 @@ class CrawlerRunner(object):
         return flag
 
     def next_task_from_schedule(self):
-        # logger.debug("调用next_task_from_schedule")
         logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
                                        '调用next_task_from_schedule'))
         if self.pause:
@@ -311,8 +314,6 @@ class CrawlerRunner(object):
                                             time.clock(),reason))
         self._push_task_finish = False
         self._pull_task_finish = False
-        # return None
-
 
     def runner_is_idle(self):
         if not self._push_task_finish:
