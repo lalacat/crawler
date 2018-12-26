@@ -1,10 +1,8 @@
 import logging
-import pprint
 import time
 from collections import deque, Iterable
 
 from twisted.internet import defer
-from twisted.internet.defer import Deferred
 from twisted.python.failure import Failure
 
 from test.framework.https.request import Request
@@ -69,7 +67,7 @@ class Scraper(object):
         self.crawler = crawler
         self.lfm = crawler.logformatter
         logger.debug(*self.lfm.crawled("Spider", crawler.spider.name,
-                                       '已初始化...', 'Scraper'))
+                                       '已初始化', 'Scraper'))
         self.slot = None
         self.spidermw = SpiderMiddlewareManager.from_crawler(crawler)
         #  itemproc_cls = load_object(crawler.settings['ITEM_PROCESSOR'])
@@ -81,9 +79,9 @@ class Scraper(object):
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
-        # logger.debug("Spider:%s 的Scraper已打开..."%spider.name)
+        # logger.debug("Spider:%s 的Scraper已打开"%spider.name)
         logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                       '已打开...', 'Scraper'))
+                                       '已打开', 'Scraper'))
         self.slot = Slot()
         self.spider = spider
         yield self.itemproc.open_spider(spider)
@@ -91,7 +89,7 @@ class Scraper(object):
     def close_spider(self, spider):
         # logger.info("关闭 %s 的Scraper！！"%spider.name)
         logger.warning(*self.lfm.crawled("Spider", spider.name,
-                                       '已关闭...', 'Scraper'))
+                                       '已关闭', 'Scraper'))
         slot = self.slot
         slot.closing = defer.Deferred()
         #  对所有的itemproc进行并行关闭
@@ -120,6 +118,7 @@ class Scraper(object):
         dfd = slot.add_response_request(response, request)
 
         def finish_scraping(_):
+            # defer接收的结果是 self._scrape返回的结果
             slot.finish_response(response, request)
             self._check_if_closing(spider, slot)
             self._scrape_next(spider, slot)
@@ -131,17 +130,12 @@ class Scraper(object):
                                                 'function': 'Scraper',
                                                 'request': request
                                             },
-                                            '处理出现错误:'),
+                                            '下载结果的处理过程中出现错误:'),
                          extra={'exception':_.getErrorMessage()},
                          exc_info=True,)
 
         dfd.addBoth(finish_scraping)
-        # dfd.addErrback(lambda f: logger.error('Scraper 处理 %(request)s的结果时，出现出现错误！！\n'
-        #                                       '错误信息为：%(error)s',
-        #                            {'request': request,"error":f}
-        #                            ))
         dfd.addErrback(log_error)
-
         self._scrape_next(spider, slot)
         return dfd
 
@@ -165,35 +159,32 @@ class Scraper(object):
         """Handle the different cases of request's result been a Response or a
         Failure"""
         if not isinstance(response_failure, Failure):
+            # 对response进入spider，在spider中出现的异常，离开spider进行自定义的处理
             return self.spidermw.scrape_response(self.call_spider, response_failure, request, spider)
         else:
-            #
+            # 针对download模块中出现的错误
             dfd = self.call_spider(response_failure, request, spider)
-            # dfd.addErrback(self._log_download_errors, response_failure, request, spider)
             return dfd
 
     def call_spider(self, response, request, spider):
-        response.request = request
+        if isinstance(response,Response):
+            response.request = request
         dfd = defer_result(response)
         #  这一步才是真正意义上的处理爬到的结果，之前的都是在过滤错误
-        # dfd.addCallbacks(request.callback or spider.parse, request.errback)
         dfd.addCallbacks(request.callback, request.errback)
         return dfd
 
     def handle_spider_error(self, _failure, request, response, spider):
-        # 接受来自Spider中的异常
+        # 接受来自Spider中的异常，也可能是下载的异常没有处理掉
+        # 也能收到handle_spider_output中，spider返回结果迭代过程中出现的异常
         exc = _failure.value
         end_time = time.clock()
-        # logger.error("%(request)s处理结果的时候出现错误：\n%(failure)s\nprocess item 持续时间"
-        #              "为：%(time)f",
-        #              {"request":request,"failure":exc,"time":(end_time-self.start_time)})
-
         if self.lfm.level is not 'DEBUG':
             logger.error(*self.lfm.error('Spider',self.spider.name,
                                          {
                                              'function':'Scraper',
                                              'request':request
-                                         },'调用_parse方法过程中出现错误:')
+                                         },'来自Spider或者Download模块的异常:')
                          ,extra={
                             'exception':exc,
                             'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)
@@ -203,19 +194,20 @@ class Scraper(object):
                                          {
                                              'function':'Scraper',
                                              'request':request
-                                         },'调用_parse方法过程中出现错误，详细内容为:')
+                                         },'来自Spider或者Download模块的异常，详细内容为:')
                          ,extra={
                             'exception':_failure,
                             'time':'错误时间为：{:6.3f}s'.format(end_time-self.start_time)
                         },exc_info = True)
-            logger.error(request.url,extra ={
-                'reason':'no data',
-                'exception':exc,
-                'time':time.clock(),
-                'recordErrorUrl':True
-            })
+        logger.error(request.url,extra ={
+            'reason':'no data',
+            'exception':exc,
+            'time':time.clock(),
+            'recordErrorUrl':True
+        })
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")
+        return None
 
     def handle_spider_output(self, result, request, response, spider):
         """
@@ -230,7 +222,6 @@ class Scraper(object):
         :return:
         """
         if not result:
-            # logger.warning("%s._parse或者request.callback返回的结果为None,不经过自定义process_item 处理！！"%spider.name)
             logger.warning(*self.lfm.crawled('Spider',spider.name,
                                              '返回的结果为<None>,不经过自定义{process_item}处理',
                                              '_parse(callback)'
@@ -264,7 +255,6 @@ class Scraper(object):
         """Process each Request/Item (given in the output parameter) returned
         from the given spider
         """
-        # logger.debug("在并行处理中。。。。。。。。")
         logger.debug(*self.lfm.crawled("Spider", spider.name,
                                '并行处理中',
                                {
@@ -341,21 +331,6 @@ class Scraper(object):
                                            }
                                            ))
         return None
-
-    def _log_spider_callback_errors(self,context,request_result, request, spider):
-        # logger.error(context)
-        logger.error(*self.lfm.error("Spider", spider.name,
-                              {
-                                  'function': 'Scraper',
-                                  'request': request
-                              },
-                              '调用Spider(Request) parse 出错', ),
-                     extra=
-                     {
-                         'exception': context,
-                         'time': "\n时间是{:d}".format(34)
-                     })
-        return context
 
     def _process_item_time(self,_):
         end_time = time.clock()

@@ -39,7 +39,7 @@ class Crawler(object):
             self.logformatter = logformat
         logger.debug(*self.logformatter.crawled(
             "Spider",'None',
-            '已初始化...',"Crawler"))
+            '已初始化',"Crawler"))
 
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
@@ -52,7 +52,7 @@ class Crawler(object):
 
     @inlineCallbacks
     def crawl(self,*args,**kwargs):
-        assert not self.crawling, "已经开始爬虫了........"
+        assert not self.crawling, "已经开始爬虫了.."
         self.crawling = True
 
         # try:
@@ -104,19 +104,19 @@ class Crawler(object):
     用户封装调度器以及引擎
     """
     def _create_engine(self):
-        logger.debug(*self.logformatter.crawled('Spider', self.spider.name, "已创建...","Engine"))
+        logger.debug(*self.logformatter.crawled('Spider', self.spider.name, "已创建","Engine"))
         return ExecutionEngine(self, lambda _: self.stop())
 
     def _create_spider_schedule(self,schedule):
-        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
+        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建"))
         return self.spidercls.from_schedule(schedule)
 
     def _create_spider(self,*args, **kwargs):
-        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建..."))
+        logger.warning(*self.logformatter.crawled('Spider',self.spidercls.name,"已创建"))
         return self.spidercls.from_crawler(self,*args,**kwargs)
 
     def create_spider_from_task(self,spider_name,spider_start_urls):
-        logger.warning(*self.logformatter.crawled('Spider',spider_name,"已创建..."))
+        logger.warning(*self.logformatter.crawled('Spider',spider_name,"已创建"))
         self.spider = self.spidercls.from_task(self,spider_name,spider_start_urls,self.father_name)
 
     @inlineCallbacks

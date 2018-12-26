@@ -75,7 +75,7 @@ class CrawlerRunner(object):
 
         logger.info(*self.lfm.crawled(
             "CrawlerRunner", self.name,
-            '已初始化...')
+            '已初始化')
                      )
         if isinstance(tasks,dict):
             self.tasks = iter_dict(tasks)
@@ -202,7 +202,7 @@ class CrawlerRunner(object):
                         self._next_task = None
                 logger.debug(*self.lfm.crawled(
                     "CrawlerRunner", 'schedule',
-                    '载入队列...',filter_data))
+                    '载入队列',filter_data))
         except StopIteration:
             logger.debug(*self.lfm.crawled(
                 "CrawlerRunner", self.name,
@@ -242,7 +242,6 @@ class CrawlerRunner(object):
         assert not self.running,"task载入已启动"
         try:
             self.running = True
-            # logger.debug("开始时间是%f"%self.start_time)
             logger.critical(*self.lfm.crawled('CrawlerRunner',self.name,'开始时间:',
                                               {'time':time.clock()}))
 
@@ -272,7 +271,7 @@ class CrawlerRunner(object):
         if pause:
             if self._pause :
                 logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
-                                   '已经暂停了...'))
+                                   '已经暂停了'))
             else:
                 self._pause = True
         else:

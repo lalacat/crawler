@@ -1,8 +1,8 @@
 import time
 
-from twisted.internet import defer, reactor
+from twisted.internet import reactor
 
-from spider import Spider
+from test.framework.spider import Spider
 from test.framework.core.crawler import Crawler
 from test.framework.https.request import Request
 

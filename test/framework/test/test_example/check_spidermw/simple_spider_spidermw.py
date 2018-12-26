@@ -2,12 +2,12 @@ from test.framework.spider import Spider
 from test.framework.https.request import Request
 
 
-class LJSpiderProxy(Spider):
+class LJSpiderMw(Spider):
     name = "LianJia_01"
     custom_settings = ["URL = https://sh.lianjia.com/ershoufang/"]
 
     def __init__(self):
-        super(LJSpiderProxy,self).__init__()
+        super(LJSpiderMw,self).__init__()
         self._url = self.settings["URL"]
         self._total_house = 0
         self.headers = {'User-Agent':['MMozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0)'],'content-type':['application/json']}
@@ -43,7 +43,7 @@ class LJSpiderProxy(Spider):
          #    none_num = 0
          # one_page_numeber = len(house_list) - none_num
          # self._item_num += one_page_numeber
-         request_headers = response.request.headers
+         self.request_headers = response.request.headers
          proxy = response.request.meta.get('proxy',None)
          # print(request_headers)
          # print(proxy)

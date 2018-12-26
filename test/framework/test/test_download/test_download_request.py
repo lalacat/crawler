@@ -1,6 +1,6 @@
 from twisted.internet import reactor
 
-from spider.spider1 import Spider1
+from test.framework.spider.test_spider.spider1 import Spider1
 from test.framework.core.crawler import Crawler
 from test.framework.downloads import Downloader
 from test.framework.https.request import Request

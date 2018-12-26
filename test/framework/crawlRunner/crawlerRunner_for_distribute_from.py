@@ -66,7 +66,7 @@ class CrawlerRunner(object):
 
         logger.info(*self.lfm.crawled(
             "CrawlerRunner", '',
-            '已初始化...')
+            '已初始化')
                      )
 
         self.spider_loder = []

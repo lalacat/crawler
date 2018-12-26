@@ -31,7 +31,7 @@ class HTTPDownloadHandler(object):
         logger.debug(*self.lfm.crawled(
             'Downloader',
             'HTTPDownloadHandler',
-            '已初始化...'
+            '已初始化'
         ))
         self._pool = HTTPConnectionPool(reactor,persistent=True)
         self._pool.maxPersistentPerHost = settings.getint('CONCURRENT_REQUESTS_PER_DOMAIN')
@@ -54,7 +54,7 @@ class HTTPDownloadHandler(object):
         logger.debug(*self.lfm.crawled(
             'Spider',
             spider.name,
-            '执行download_request...',
+            '执行download_request',
             request
         ))
         """返回一个http download 的 defer"""
@@ -76,7 +76,7 @@ class HTTPDownloadHandler(object):
             *self.lfm.crawled(
                 'Downloader',
                 'HTTPDownloadHandler',
-                '已关闭...'
+                '已关闭'
         ))
         delayed_call = reactor.callLater(self._disconnect_timeout,d.callback,[])
 
@@ -100,7 +100,7 @@ class DownloadAgent(object):
         logger.debug(*self.lfm.crawled(
             'HTTPDownloadHandler',
             'DownloadAgent',
-            '已初始化...'
+            '已初始化'
         ))
         self._contextFactory = contextFactory
         self._connectTimeout = connectTimeout
@@ -180,7 +180,7 @@ class DownloadAgent(object):
         logger.debug(*self.lfm.crawled(
                     'Request',
                     self.request,
-                    '判断是否下载超时...')
+                    '判断是否下载超时')
                      )
         # 如果_timeout_cl还没触发，就取消掉，不用再延迟了
         if self._timeout_cl.active():
@@ -188,7 +188,7 @@ class DownloadAgent(object):
             logger.debug(*self.lfm.crawled(
                     'Request',
                     self.request,
-                    '下载没有超时...'))
+                    '下载没有超时'))
             self._timeout_cl.cancel()
             return result
         #  当规定的时间内_RequestBodyProducer没有收到connectionLost()的时候，强制退出
@@ -243,7 +243,7 @@ class DownloadAgent(object):
     def _cb_body_done(self,result,request,url):
         logger.debug(*self.lfm.crawled("Request",
                                        request,
-                          ' Response 已创建...'))
+                          ' Response 已创建'))
 
         txresponse,body,flags = result #  对应的是finish传递的内容(_transferdata,body," ")
         status = int(txresponse.code)
@@ -283,7 +283,7 @@ class _ResponseReader(Protocol):
         self.lfm = logformater
         # logger.debug("ResponseReader 已初始化...")
         logger.debug(*self.lfm.crawled("DownloadAgent", '_ResponseReader',
-                                       '已初始化...'))
+                                       '已初始化'))
         self._finished = finished
         # 用来保存传输的数据，当数据完整后可以使用json转换为python对象
         self._transferdata = transferdata
@@ -355,7 +355,7 @@ class _ResponseReader(Protocol):
             if body == b'':
                 # logger.error("<%s> 没有下载到数据..."%self._request.url)
                 logger.error(*self.lfm.error('Request', self._request, '',
-                                             '没有下载到数据...'
+                                             '没有下载到数据'
                                              ))
             else:
                 # logger.warning('<%s> 成功下载' % self._request.url)

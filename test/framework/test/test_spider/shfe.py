@@ -3,11 +3,10 @@ import re
 from collections import defaultdict
 
 import jsonpath
-from lxml import etree
 
-from spider import Spider
+from test.framework.spider import Spider
 import logging
-from twisted.internet import defer, reactor
+from twisted.internet import reactor
 
 from test.framework.core.crawler import Crawler
 from test.framework.https.request import Request

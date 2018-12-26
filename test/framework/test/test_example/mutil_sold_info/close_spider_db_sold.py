@@ -8,7 +8,7 @@ class LJ_Sold_DB(object):
         self.lfm = crawler.logformatter
         logger.debug(*self.lfm.crawled(
             'Pipe',self.__class__.__name__,
-            '已初始化...'
+            '已初始化'
         ))
         self.settings = crawler.settings
         self.db_url = self.settings["MONGODB_URL"]

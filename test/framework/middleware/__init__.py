@@ -19,7 +19,7 @@ class MiddlewareManager(object):
         # logger.debug("MiddlewareManager:%s 已初始化..."%self.component_name)
         logger.debug(*self.lfm.crawled(
             "Middleware", self.component_name,
-            '已初始化...'
+            '已初始化'
         ))
         self.clsnames = middlewares[0]
         self.middlewares = middlewares[1]

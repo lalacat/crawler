@@ -6,7 +6,7 @@ from collections import defaultdict
 from lxml import etree
 from twisted.internet import defer
 
-from spider import Spider
+from test.framework.spider import Spider
 from test.framework.https.request import Request
 from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import CrawlerRunner
 from test.framework.test.test_example.mutil_sold_info.child_spider_sold_xpath import CollectSold

@@ -86,7 +86,7 @@ class Downloader(object):
         #  XXX missing X required positional argument
         # logger.debug("Downloader 已初始化...")
         logger.debug(*self.lfm.crawled("Spider", crawler.spider.name,
-                                       '已初始化...', 'Downloader'))
+                                       '已初始化', 'Downloader'))
         self.handler = load_object(self.settings["DOWNLOAD_HANDLER"])(self.lfm,self.settings)
         self.spider = None
         self.slots = {}
@@ -110,7 +110,7 @@ class Downloader(object):
     def fetch(self,request,spider):
         # logger.debug("Spider:%s 进入Downloader 预备下载...",spider.name)
         logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                       '下载前准备...', 'Downloader'))
+                                       '下载前准备', 'Downloader'))
         self.spider = spider
 
         def _delactivate(response):
@@ -234,7 +234,7 @@ class Downloader(object):
     def close(self):
         # logger.warning("Spider:%s Downloader已关闭..."%self.spider.name)
         logger.warning(*self.lfm.crawled("Spider", self.spider.name,
-                                      '已关闭...', 'Downloader'))
+                                      '已关闭', 'Downloader'))
         self._slot_gc_loop.stop()
         ''' 
         for slot in iter(self.slots):

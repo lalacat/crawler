@@ -2,7 +2,7 @@ from test.framework.core.crawler import Crawler
 from test.framework.downloads import Downloader
 from test.framework.setting import Setting
 from test.framework.https.request import Request
-from spider.spider1 import Spider1
+from test.framework.spider.test_spider.spider1 import Spider1
 from twisted.internet import reactor
 
 from test.public_api.web import get_smzdm_datas, print_smzdm_result

@@ -149,7 +149,7 @@ class ExecutionEngine(object):
 
 class Crawler(object):
     """
-    用户封装调度器以及引擎的...
+    用户封装调度器以及引擎的
     """
     def _create_engine(self):
         logger.info("爬虫引擎已创建")

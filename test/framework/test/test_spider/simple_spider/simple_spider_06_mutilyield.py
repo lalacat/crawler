@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from lxml import etree
 
-from spider import Spider
+from test.framework.spider import Spider
 import logging
 
 from test.framework.https.request import Request

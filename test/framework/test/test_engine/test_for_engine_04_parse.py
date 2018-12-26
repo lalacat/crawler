@@ -1,6 +1,6 @@
 from test.framework.setting import Setting
 from test.framework.core.crawler import Crawler
-from spider.test_Spider_01 import Test_Spider_1
+from test.framework.spider.test_spider.test_Spider_01 import Test_Spider_1
 from twisted.internet import reactor, defer
 import logging
 LOG_FORMAT = '%(asctime)s-%(filename)s[line:%(lineno)d]-%(levelname)s: %(message)s'

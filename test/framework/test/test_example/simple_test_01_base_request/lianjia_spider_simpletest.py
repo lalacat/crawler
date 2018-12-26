@@ -1,4 +1,4 @@
-from spider import Spider
+from test.framework.spider import Spider
 from test.framework.https.request import Request
 from bs4 import BeautifulSoup
 

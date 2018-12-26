@@ -4,7 +4,7 @@ import re
 import logging
 
 from lxml import etree
-from spider import Spider
+from test.framework.spider import Spider
 from test.framework.https.request import Request
 
 logger = logging.getLogger(__name__)
@@ -127,7 +127,7 @@ class CollectSold(Spider):
                 'reason':'No Data',
                 'recordErrorUrl':True
             })
-            print("sold：" + self.name + ': ' + response.url + ': ' + str(0) + "===" + str(len(sold_houses)))
+            # print("sold：" + self.name + ': ' + response.url + ': ' + str(0) + "===" + str(len(sold_houses)))
             return None
 
     def _resolve_sold(self,sold_houses,url):
@@ -167,8 +167,6 @@ class CollectSold(Spider):
                     'recordErrUrl':True
                 })
 
-
-
             sold_unitPrice = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))
             # print('成交均价：'+sold_unitPrice)
@@ -200,16 +198,3 @@ class CollectSold(Spider):
 
 
 
-
-# url = 'https://sh.lianjia.com/chengjiao/c5011000013330/'
-# url_01 ='https://sh.lianjia.com/chengjiao/c5011000013330/'
-# name = url_01.split('/')[-2]
-# # print(name)
-# url_02 = url_01.replace(name,'pg2'+name)
-# # print(url_02)
-# url_03 = re.search('pg',url_01)
-# if url_03:
-#     print(url_03)
-# url_04 = re.findall('pg\d+',url_02)
-# if url_04:
-#     print(url_04)

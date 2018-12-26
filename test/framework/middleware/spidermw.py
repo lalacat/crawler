@@ -47,6 +47,7 @@ class SpiderMiddlewareManager(MiddlewareManager):
                         'raise an exception, got %s ' \
                         % (fname(method), type(result))
                 except:
+                    # 这步的目的是，如果request定义了errback，先经过errorback处理，再通过process_spider_exception处理
                     return scrape_func(Failure(), request, spider)
             return scrape_func(response, request, spider)
 
@@ -64,9 +65,9 @@ class SpiderMiddlewareManager(MiddlewareManager):
         def process_spider_output(result):
             for method in self.methods['process_spider_output']:
                 result = method(response=response, result=result, spider=spider)
-                assert _isiterable(result), \
-                    'Middleware %s must returns an iterable object, got %s ' % \
-                    (fname(method), type(result))
+                # assert _isiterable(result), \
+                #     'Middleware %s must returns an iterable object, got %s ' % \
+                #     (fname(method), type(result))
             return result
 
         dfd = mustbe_deferred(process_spider_input, response)

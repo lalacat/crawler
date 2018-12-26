@@ -10,7 +10,7 @@ CONCURRENT_ITEMS = 100 #  控制同时处理的爬取到的item的数据数目
 DOWNLOADER = "test.framework.downloads.Downloader"
 # 默认下载器
 DOWNLOAD_HANDLER = "test.framework.downloads.download_agent_proxy.HTTPDownloadHandler"
-DOWNLOAD_TIMEOUT = 15      # 3mins
+DOWNLOAD_TIMEOUT = 5      # 3mins
 
 DOWNLOAD_MAXSIZE = 1024*1024*1024   # 1024m 下载网页大小的最大值
 DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
@@ -19,10 +19,11 @@ DOWNLOAD_FAIL_ON_DATALOSS = True
 
 DOWNLOAD_DELAY = 2
 DOWNLOADER_MIDDLEWARE = {
-   "test.framework.downloads.download_middleware.user_agent.ChangeRequestUserAgent":10,
+    "test.framework.downloads.download_middleware.user_agent.ChangeRequestUserAgent":10,
    #  如果使用chang proxy 必须放在add http proxy 这个类前面执行，否则会报错
    "test.framework.downloads.download_middleware.change_proxy.ChangeProxy": 20,
    "test.framework.downloads.download_middleware.http_proxy.AddHttpProxy": 30,
+
 }
 
 
@@ -249,7 +250,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console_info','ErrorUrl','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['ErrorUrl','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
@@ -276,7 +277,10 @@ RANDOMIZE_DOWNLOAD_DELAY = True  # 随机延迟
 #S
 SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.core.scheduler.Scheduler"
-SPIDER_MIDDLEWARES = {}
+SPIDER_MIDDLEWARES = {
+    # "test.framework.spider.spidermw.record_errurl.RecordErrorUrl": 10,
+
+}
 SPIDER_CHILD_CLASS = 'test.framework.test.test_spider.simple_spider.simple_spider_05_xiaoqu_house.SimpleSpider'
 #T
 

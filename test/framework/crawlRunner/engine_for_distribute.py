@@ -25,7 +25,7 @@ class Slot(object):
         """
         self.lfm = logformatter
         # logger.debug("Engine:Slot 已初始化...")
-        logger.debug(*self.lfm.crawled("Engine","Slot",'已初始化...'))
+        logger.debug(*self.lfm.crawled("Engine","Slot",'已初始化'))
 
         self.closing = False
         self.inprogress = list() #存放正在爬虫的网站,保证每个defer都执行完
@@ -41,8 +41,8 @@ class Slot(object):
         :param request:
         :return:
         """
-        # logger.debug("Engine:Slot <%s> 添加到inprogress中..."%request)
-        logger.debug(*self.lfm.crawled("Engine",'Slot','添加到inprogress中...',request))
+        # logger.debug("Engine:Slot <%s> 添加到inprogress中"%request)
+        logger.debug(*self.lfm.crawled("Engine",'Slot','添加到inprogress中',request))
         self.inprogress.append(request)
 
     def remove_request(self, request,name):
@@ -52,7 +52,7 @@ class Slot(object):
 
     def close(self,name):
         # logger.info("关闭 %s 的 slot！！"%name)
-        logger.info(*self.lfm.crawled("Engine",'Slot','关闭...',name))
+        logger.info(*self.lfm.crawled("Engine",'Slot','关闭',name))
         self.closing = defer.Deferred()
         self._maybe_fire_closing(name)
         return self.closing
@@ -66,7 +66,7 @@ class Slot(object):
         if self.closing and not self.inprogress:
             if self.nextcall:
                 # logger.warning("%s 的LoopCall已关闭"%name)
-                logger.warning(*self.lfm.crawled("Engine", 'Slot', 'LoopCall已关闭...', name))
+                logger.warning(*self.lfm.crawled("Engine", 'Slot', 'LoopCall已关闭', name))
                 self.nextcall.cancel()
                 if self.heartbeat.running:
                     self.heartbeat.stop()
@@ -81,9 +81,9 @@ class ExecutionEngine(object):
     def __init__(self,crawler,spider_closed_callback):
         # 获取log的格式
         self.lfm = crawler.logformatter
-        # logger.debug("Engine 已初始化...")
+        # logger.debug("Engine 已初始化")
         logger.debug(*self.lfm.crawled("Spider",crawler.spider.name,
-                                               '已初始化...','Engine'))
+                                               '已初始化','Engine'))
         self.crawler =crawler
         self.settings = crawler.settings
 
@@ -109,9 +109,9 @@ class ExecutionEngine(object):
     @defer.inlineCallbacks
     #  将爬虫中的网页读取出来
     def open_spider(self,spider,start_requests,close_if_idle=True):
-        # logger.info("Spider:%s 的Engine已打开..."%spider.name)
+        # logger.info("Spider:%s 的Engine已打开"%spider.name)
         logger.info(*self.lfm.crawled("Spider", spider.name,
-                                       '已打开...', 'Engine'))
+                                       '已打开', 'Engine'))
         assert self.has_capacity(),"此引擎已经在处理爬虫了，所以不能处理%s %r" %\
             spider.name
         self.engine_name = spider.name + '\'s engine'
@@ -141,7 +141,7 @@ class ExecutionEngine(object):
 
     @defer.inlineCallbacks
     def start(self):
-        assert not self.running,"%s Engine已启动..."%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
+        assert not self.running,"%s Engine已启动"%self.spider.name #running为Flase的时候，不报错，为True的时候，报错
         self.running = True
         engine_start_time = time.clock()
         # logger.warning("%s Engine开始,时间:[%6.3f]s..." %(self.spider.name,engine_start_time))
@@ -385,11 +385,11 @@ class ExecutionEngine(object):
     def schedule(self, request, spider):
         # logger.debug("Spider:%s <%s>添加到Scheduler中成功..." ,spider.name,request)
         logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                       '添加到Scheduler中成功...',request))
+                                       '添加到Scheduler中成功',request))
         if not self.slot.scheduler.enqueue_request(request):
             # logger.error("Spider:%s <%s>添加到Scheduler中失败...",spider.name,request)
             logger.error(*self.lfm.crawled("Spider", spider.name,
-                                           '添加到Scheduler中失败...',request))
+                                           '添加到Scheduler中失败',request))
     def _spider_idle(self,spider):
         if self.spider_is_idle():
             self.close_spider(spider,reason="finished")

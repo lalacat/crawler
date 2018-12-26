@@ -34,7 +34,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
             #  处理process_request的方法自定义的时候，要么返回一个处理好的response要么返回一个None,
             #  返回一个request很容易陷入死循环。
             #  最大的作用就是处理request，往里添加或者修改内容的
-            # logger.debug("Downloader Middleware: 加载process_request方法处理Request<%s>...",request)
+            # logger.debug("Downloader Middleware: 加载process_request方法处理Request<%s>",request)
             logger.debug(*self.lfm.crawled(
                 "Middleware", self.component_name,
                 '加载process_request方法处理Request',
@@ -43,7 +43,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
             for method in self.methods['process_request']:
                 response = yield method(request=request,spider =spider)
                 assert response is None or isinstance(response,(Response,Request)),\
-                'Downloader Middleware:%s.process_request 执行后返回的数据类型必须是<None>,<Response>,<Request>...'\
+                'Downloader Middleware:%s.process_request 执行后返回的数据类型必须是<None>,<Response>,<Request>'\
                 % method._class__._name__
                 #  如果结果是下载后的，就直接返回
                 if response:
@@ -54,7 +54,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
 
         @defer.inlineCallbacks
         def process_response(response):
-            # logger.debug("Downloader Middleware: 加载process_response方法处理Request<%s>...",request)
+            # logger.debug("Downloader Middleware: 加载process_response方法处理Request<%s>",request)
             logger.debug(*self.lfm.crawled(
                     "Middleware", self.component_name,
                     '加载process_response方法处理Request',
@@ -69,7 +69,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                                         spider=spider)
 
                 assert response is None or isinstance(response, (Response, Request)), \
-                    'Downloader Middleware:%s.process_response 执行后返回的数据类型必须是<None>,<Response>,<Request>...' \
+                    'Downloader Middleware:%s.process_response 执行后返回的数据类型必须是<None>,<Response>,<Request>' \
                     % method._class__._name__
                 if isinstance(response, Request):
                     defer.returnValue(response)

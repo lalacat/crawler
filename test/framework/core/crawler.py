@@ -49,7 +49,7 @@ class Crawler(object):
 
     @inlineCallbacks
     def crawl(self, *args, **kwargs):
-        assert not self.crawling, "已经开始爬虫了........"
+        assert not self.crawling, "已经开始爬虫了.."
         self.crawling = True
         try:
             # self.spider = self._spider
@@ -82,15 +82,15 @@ class Crawler(object):
     """
 
     def _create_engine(self):
-        logger.debug(*self.logformatter.crawled('Spider', self.spider.name, "已创建...","Engine"))
+        logger.debug(*self.logformatter.crawled('Spider', self.spider.name, "已创建","Engine"))
         return ExecutionEngine(self, lambda _: self.stop())
 
     def _create_spider_schedule(self, schedule):
-        logger.warning(*self.logformatter.crawled('Spider', self.spidercls.name, "已创建..."))
+        logger.warning(*self.logformatter.crawled('Spider', self.spidercls.name, "已创建"))
         return self.spidercls.from_schedule(schedule)
 
     def _create_spider(self, *args, **kwargs):
-        logger.warning(*self.logformatter.crawled('Spider', self.spidercls.name, "已创建..."))
+        logger.warning(*self.logformatter.crawled('Spider', self.spidercls.name, "已创建"))
         return self.spidercls.from_crawler(self, *args, **kwargs)
 
     @inlineCallbacks

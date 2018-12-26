@@ -20,24 +20,24 @@ class Scheduler(object):
         return len(self) > 0
 
     def open(self,spider):
-        # logger.debug("Spider:%s 的Scheduler已打开..."%spider.name)
+        # logger.debug("Spider:%s 的Scheduler已打开"%spider.name)
         logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                       '已打开...', 'Scheduler'))
+                                       '已打开', 'Scheduler'))
         self.spider = spider
         #self.mqs = self._newfifo()
         return
 
     def next_request(self):
-        # logger.debug("Spider:%s 的Scheduler中取下一个Request...",self.spider.name)
+        # logger.debug("Spider:%s 的Scheduler中取下一个Request",self.spider.name)
         logger.debug(*self.lfm.crawled("Spider",self.spider.name,
-                                       '取下一个Request...', 'Scheduler'))
+                                       '取下一个Request', 'Scheduler'))
         # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常
         try:
             requset = self.mqs.get(block=False)
         except Exception as e:
-            # logger.debug("Spider:%s 的Scheduler数据已取完...",self.spider.name)
+            # logger.debug("Spider:%s 的Scheduler数据已取完",self.spider.name)
             logger.debug(*self.lfm.crawled("Spider", self.spider.name,
-                                           'Request已取完...', 'Scheduler'))
+                                           'Request已取完', 'Scheduler'))
             requset = None
         return requset
 
@@ -51,7 +51,7 @@ class Scheduler(object):
     def close(self,reason):
         # logger.debug(reason)
         logger.debug(*self.lfm.crawled("Spider", self.spider.name,
-                                       'Scheduler已关闭...'))
+                                       'Scheduler已关闭'))
         return
 
     def _mqpush(self,requset):

@@ -1,10 +1,10 @@
-import json
 from collections import defaultdict
 from urllib.parse import urljoin, urlparse, urlunparse
 from lxml import etree
-from spider import Spider
+from test.framework.spider import Spider
 from test.framework.https.request import Request
-from bs4 import BeautifulSoup
+
+
 class LJSpider(Spider):
 
      name = "LianJia_01"

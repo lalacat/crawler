@@ -1,7 +1,7 @@
 from importlib import import_module
 from pkgutil import iter_modules
 import inspect
-from spider import Spider
+from test.framework.spider import Spider
 import logging
 import traceback
 from collections import defaultdict

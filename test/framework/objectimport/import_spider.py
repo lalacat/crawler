@@ -1,7 +1,7 @@
 import sys,os, inspect
 from pkgutil import iter_modules
 from importlib import import_module
-from spider import BaseSpider,BaseQylSpider
+from test.framework.spider import BaseQylSpider
 import logging
 
 

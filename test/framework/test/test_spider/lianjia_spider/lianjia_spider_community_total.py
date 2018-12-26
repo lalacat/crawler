@@ -2,7 +2,7 @@ from urllib.parse import urljoin, urlparse, urlunparse
 
 from lxml import etree
 
-from spider import Spider
+from test.framework.spider import Spider
 from test.framework.https.request import Request
 
 
