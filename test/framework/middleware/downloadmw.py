@@ -78,17 +78,27 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         @defer.inlineCallbacks
         def process_exception(_failure):
             exception = _failure.value
-            logger.debug(*self.lfm.crawled(
-                    "Middleware", self.component_name,
-                    '加载process_exception方法处理Request',
-                    request
-            ))
+            # logger.warning(*self.lfm.error(
+            #         "Middleware", self.component_name,
+            #     {
+            #         'request':request
+            #     },
+            #         '下载过程中出现了错误，原因是：',),
+            #     extra={
+            #       'exception':exception
+            #     }
+            # )
             for method in self.methods['process_exception']:
-                response = yield method(request=request, exception=exception,
-                                        spider=spider)
-                assert response is None or isinstance(response, (Response, Request)), \
-                    'Middleware %s.process_exception must return None, Response or Request, got %s' % \
-                    (method.__class__.__name__, type(response))
+                try:
+                    method_name = method.__class__
+                    response = yield method(request=request, exception=exception,
+                                            spider=spider)
+                    assert response is None or isinstance(response, (Response, Request)), \
+                        'Middleware %s.process_exception must return None, Response or Request, got %s' % \
+                        (method_name, type(response))
+                except Exception:
+                    raise TypeError("DownloadMW process_exception need 3 required positional arguments: 'request', 'exception', and 'spider' " )
+
                 if response:
                     defer.returnValue(response)
             defer.returnValue(_failure)

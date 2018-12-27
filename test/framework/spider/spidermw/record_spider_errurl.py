@@ -5,12 +5,12 @@ from twisted.python.failure import Failure
 logger = logging.getLogger(__name__)
 
 
-class RecordErrorUrl(object):
+class RecordSpiderErrorUrl(object):
 
     def __init__(self,crawler):
         self.lfm = crawler.logformatter
         logger.info(*self.lfm.crawled(
-            "DownloadMidder",self.__class__.__name__,
+            "SpiderMiddleware",self.__class__.__name__,
             '已初始化！！'
         ))
         self._settings = crawler.settings

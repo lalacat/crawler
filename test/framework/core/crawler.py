@@ -39,13 +39,11 @@ class Crawler(object):
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
         if d:
-            logger.info(*self.logformatter.crawled(
-                "Spider", 'None',
-                "添加或重写的设置如下：",
-                "Crawler"),
-                 extra={
-                     'extra_info':d
-                 })
+            for k,v in d.items():
+                logger.info(*self.logformatter.crawled(
+                    "Spider", 'None',
+                    "添加或重写的设置如下：%s:%s" %(k,v),
+                    "Crawler"))
 
     @inlineCallbacks
     def crawl(self, *args, **kwargs):

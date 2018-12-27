@@ -323,7 +323,6 @@ class Scraper(object):
                          ,extra=
                          {'exception':output})
         else:
-            # logger.debug("process item(%s)处理完毕"%item,extra={'spider': spider})
             logger.debug(*self.lfm.crawled('Spider',spider.name,'处理完毕',
                                            {
                                                'function': 'Scraper',
@@ -334,13 +333,18 @@ class Scraper(object):
 
     def _process_item_time(self,_):
         end_time = time.clock()
-        # logger.info("经过process_item处理后，此时时间为%f,完成Scraper模块使用了%7.6f"%(end_time,end_time-self.start_time))
         logger.debug(*self.lfm.crawled("Spider",self.spider.name,
                             'process_item处理完毕后的时间:',
                                             {
                                                 'time':end_time,
-                                                'function':"Scraper"}
-                                            ),
-                    extra={'extra_info':",完成Scraper模块使用了{:6.3f}".format(end_time-self.start_time)}
-                            )
+                                                'function':"Scraper"
+                                            }
+                                            ))
+        logger.debug(*self.lfm.crawled("Spider", self.spider.name,
+                                       "完成Scraper模块使用了",
+                                       {
+                                           'time': end_time - self.start_time,
+                                           'function': "Scraper"
+                                       }))
+
         return None

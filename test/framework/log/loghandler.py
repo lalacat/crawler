@@ -11,11 +11,14 @@ logging.FileHandler
 
 class ConsoleHandler(logging.StreamHandler):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, filter_error,*args, **kwargs):
         super(ConsoleHandler, self).__init__(*args, **kwargs)
+        self.filter_error = filter_error
 
     # 每进行一次log就会调用这个方法
     def emit(self, record):
+        if self.filter_error and record.__dict__['levelno'] >=40:
+            return
         if not hasattr(record, 'extra_info'):
             record.__dict__['extra_info'] = ' '
         try:
@@ -138,7 +141,7 @@ class RecordErrorUrl(logging.FileHandler):
         if hasattr(record,'exception'):
             format_data['exception'] = record.__dict__['exception']
         if hasattr(record,'time'):
-            format_data['time'] = float('%6.4f' %record.__dict__['time'])
+            format_data['time'] = float('%6.3f' %record.__dict__['time'])
         return format_data
 
 

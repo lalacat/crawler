@@ -261,8 +261,9 @@ class ExecutionEngine(object):
         def remove_request(_,slot,request,spider):
             slot.remove_request(request, spider.name)
             # logger.info("remove_request:%s,inprogress中还剩下%d个任务"%(request,len(slot.inprogress)))
-            logger.info(*self.lfm.crawled("Spider", spider.name,'inprogress中还剩下:','Engine'),
-                        extra={'extra_info':"{:d}个任务".format(len(slot.inprogress))})
+            logger.info(*self.lfm.crawled("Spider", spider.name,
+                                          'inprogress中还剩下:{:d}个任务'.format(len(slot.inprogress)),
+                                          'Engine'))
             return _
 
         def next_slot(_,slot):

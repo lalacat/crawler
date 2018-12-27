@@ -69,11 +69,7 @@ class MiddlewareManager(object):
                         args = {'clsname': clsname, 'eargs': e.args[0]}
                         logger.warning(*cls.lfm.crawled(
                             "Middleware",cls.component_name,
-                            '未生效:'),
-                            extra = {
-                                'extra_info' : '{clsname}: {eargs}'.format(**args),
-
-                            },exc_info=False
+                            '未生效:{clsname}: {eargs}'.format(**args))
                         )
             if len(middlewares) != len(clsnames):
                 raise ImportError("中间件载入不完整")
@@ -82,13 +78,10 @@ class MiddlewareManager(object):
                 #             {'componentname': cls.component_name,
                 #              'enabledlist': pprint.pformat(enabled)},
                 #             extra={'crawler': crawler})
-                logger.info(*cls.lfm.crawled(
-                    "Middleware", cls.component_name,
-                    '生效:'),
-                            extra={
-                                'extra_info': enabled
-                            }
-                            )
+                for mw in enabled:
+                    logger.info(*cls.lfm.crawled(
+                        "Middleware", cls.component_name,
+                        '生效的中间件: %s' %mw))
             return cls(clsnames, middlewares)
         except Exception as e :
                 logger.error(*cls.lfm.error(

@@ -110,7 +110,7 @@ class Downloader(object):
     def fetch(self,request,spider):
         # logger.debug("Spider:%s 进入Downloader 预备下载...",spider.name)
         logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                       '下载前准备', 'Downloader'))
+                                       '下一步进入自定义下载中间件', 'Downloader'))
         self.spider = spider
 
         def _delactivate(response):
@@ -126,8 +126,9 @@ class Downloader(object):
         #  进行的下载任务的个数大于等于并发数，默认并发数为16，表示下载要延缓一下
         if len(self.active) >= self.total_concurrency:
             # logger.warning("Spider:%s 下载数超过最大同时下载数[%d]..."%(self.spider.name,self.total_concurrency))
-            logger.warning(*self.lfm.crawled('Spider', self.spider.name, "已超过最大下载数:",'Downloader'),
-                           extra = {'extra_info':'{:d}'.format(self.total_concurrency)})
+            logger.warning(*self.lfm.crawled('Spider', self.spider.name,
+                                             "已超过最大下载数:{:d}".format(self.total_concurrency),
+                                             'Downloader'))
             return True
         return False
 

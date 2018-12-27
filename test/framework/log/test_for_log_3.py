@@ -32,42 +32,42 @@ logger.info(*a.crawled("Spider","lala",
                         }),
              extra={'extra_info':'error'})
 logger.error(*a.error("Spider","lala",
+                '出现错误{name}'.format(name='lili:'),
                       {
                           'function':'Scraper',
-                          'request':'www'
-                      },
-                          '出现错误{name}'.format(name='lili')),
+                          'request':'www',
+                          'exception':'info',
+                      }),
              extra=
              {
-                 'exception':'info',
                 'time':"\n时间是{:d}".format(34)
              })
 logger.error(*a.error("Spider","lala",
+                '出现错误{name}'.format(name='lili:'),
                       {
                           'function':'Scraper',
-                          'request':'www'
-                      },
-                          '出现错误{name}'.format(name='lili')),
+                          'request':'www',
+                          'exception': 'info',
+                          'reason': 'finish',
+                      }),
              extra=
              {
-                'reason':'finish',
-                 'exception':'info',
                 'time':"\n时间是{:d}".format(34)
              })
 error_msg = ("%(url)s 网页的大小(%(size)s)已经超过可容许下载的最大值(%(maxsize)s).")
 error_args = {'url': 'wwww', "size": 20, 'maxsize': 30}
 # logger.error(error_msg, error_args)
 logger.error(*a.error("Spider","lala",
+                        "{url} 网页的大小{size}已经超过可容许下载的最大值({maxsize}).".format(**error_args),
                       {
                           'function':'Scraper',
-                          'request':'www'
-                      },
-                          "{url} 网页的大小{size}已经超过可容许下载的最大值({maxsize}).".format(**error_args)),
+                          'request':'www',
+                          'exception':'info'
+                      }),
              extra=
              {
-                 'exception':'info',
                 'time':"\n时间是{:d}".format(34),
-                 'recordErrUrl':True
+                 # 'recordErrUrl':True
              })
 
 args = {'clsname': "lili", 'eargs': "bibi"}

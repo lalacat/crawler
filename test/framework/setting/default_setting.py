@@ -23,6 +23,7 @@ DOWNLOADER_MIDDLEWARE = {
    #  如果使用chang proxy 必须放在add http proxy 这个类前面执行，否则会报错
    "test.framework.downloads.download_middleware.change_proxy.ChangeProxy": 20,
    "test.framework.downloads.download_middleware.http_proxy.AddHttpProxy": 30,
+   "test.framework.downloads.download_middleware.record_download_errurl.RecordDownloadErrorUrl": 40,
 
 }
 
@@ -111,44 +112,41 @@ LOG_FORMATTER = "test.framework.log.logformatter.LogFormatter"
 %(message)s 用户输出的消息
 '''
 LOG_FORMATTER_CLASS = 'test.framework.log.log.LogFormat'
+# 时间的格式
+LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
+LOG_DATE_FORMAT_SHORT = '%H:%M:%S'
+# 写入文件的格式
 LOG_FILE_FORMAT = '[%(levelname)s]-[%(asctime)s][%(threadName)s:%(thread)d]' \
                   '[task_id:%(name)s][%(filename)s:%(lineno)d]: %(message)s' # 其中name为getlogger指定的名字
 LOG_FILE_FORMAT_01 = '[%(levelname)s][%(asctime)s]:%(message)s%(extra_info)s - [%(filename)s][line:%(lineno)d]\n '
 
 
-LOG_NORMAL_FORMAT = '[%(levelname)s]-[%(asctime)s]: %(message)s'
-
-LOG_DEBUG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
-LOG_DEBUG_FORMAT_01 = '%(message)s%(extra_info)s-[%(filename)s:%(lineno)d]'
-
-LOG_DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
-LOG_DATE_FORMAT_SHORT = '%H:%M:%S'
+# console输出的格式
+LOG_NORMAL_FORMAT = '%(message)s-[%(levelname)s-%(asctime)s]'
+LOG_DEBUG_SHORT_FORMAT = '%(message)s%(extra_info)s-[%(filename)s:%(lineno)d]'
+LOG_DEBUG_LONG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
 
 
 LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
+LOG_ERROR_SHORT_FORMAT = '%(message)s %(exception)s %(time)s -[%(levelname)s-%(filename)s-line:%(lineno)d]'
 
 # 记录爬取过程中出错的URL
 LOG_FILE_ERROR_URL_FORMAT = '[%(asctime)s] [%(filename)s] [%(message)s] [%(reason)s] [%(exception)s][%(time)s]'
 
 
+# MSG的格式
+# crawled的格式
+LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s%(function)s%(request)s] %(msg)s%(time)s'
+# error的格式
+# LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
+# LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(exception)s'
+LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(exception)s'
 
-LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(time)s'
-
-# LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s] %(msg)s'
-# LOG_CRAWLED_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s'
-# LOG_CRAWLED_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(time)ss'
-# LOG_CRAWLED_TIME = 'Crawled:[%(module)s%(name)s] %(msg)s%(time)6.3fs'
-# LOG_CRAWLED_TIME_EXTRA = 'Crawled:[%(module)s%(name)s %(extra_model)s] %(msg)s%(time)6.3fs'
-# LOG_CRAWLED_TIME_REQUEST_EXTRA = 'Crawled:[%(module)s%(name)s %(function)s %(request)s] %(msg)s %(time)s'
-
-
-LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
-LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s'
 
 LOG_FILE_PATH = 'C:\\Users\\scott\\PycharmProjects\\crawler\\log_record\\'
 LOG_FILE_NAME  = LOG_FILE_PATH+'default_log_name.log'
 LOG_FILE_ERROR_URL = 'default_error_url.log'
-LOG_LEVEL = "ERROR"
+LOG_LEVEL = "INFO"
 
 
 LOG_MONGODB_URL = "127.0.0.1:27017"
@@ -170,11 +168,11 @@ LOGGING_DIC = {
             'datefmt': LOG_DATE_FORMAT
         },
         'debug_format': {
-            'format': LOG_DEBUG_FORMAT_01,
+            'format': LOG_DEBUG_SHORT_FORMAT,
             'datefmt': LOG_DATE_FORMAT
         },
         'error_format': {
-            'format': LOG_ERROR_FORMAT,
+            'format': LOG_ERROR_SHORT_FORMAT,
             'datefmt': LOG_DATE_FORMAT
         },
         'error_url':{
@@ -199,7 +197,8 @@ LOGGING_DIC = {
             'level': 'DEBUG',
             'class': 'test.framework.log.loghandler.ConsoleHandler',  # 自定义打印到屏幕
             'formatter': 'debug_format',
-            'filters': ['error_filter'],
+            'filter_error':True
+            # 'filters': ['error_filter'],
 
         },
         'console_error': {
@@ -250,7 +249,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['ErrorUrl','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_info','ErrorUrl','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
@@ -278,7 +277,7 @@ RANDOMIZE_DOWNLOAD_DELAY = True  # 随机延迟
 SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.core.scheduler.Scheduler"
 SPIDER_MIDDLEWARES = {
-    # "test.framework.spider.spidermw.record_errurl.RecordErrorUrl": 10,
+    # "test.framework.spider.spidermw.record_errurl.RecordSpiderErrorUrl": 10,
 
 }
 SPIDER_CHILD_CLASS = 'test.framework.test.test_spider.simple_spider.simple_spider_05_xiaoqu_house.SimpleSpider'
