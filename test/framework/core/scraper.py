@@ -126,13 +126,12 @@ class Scraper(object):
 
         def log_error(_):
             logger.error(*self.lfm.error("Spider", self.spider.name,
+                                         '下载结果的处理过程中出现错误:',
                                             {
                                                 'function': 'Scraper',
-                                                'request': request
-                                            },
-                                            '下载结果的处理过程中出现错误:'),
-                         extra={'exception':_.getErrorMessage()},
-                         exc_info=True,)
+                                                'request': request,
+                                                'exception': _.getErrorMessage()
+                                            }), exc_info=True)
 
         dfd.addBoth(finish_scraping)
         dfd.addErrback(log_error)
@@ -181,30 +180,32 @@ class Scraper(object):
         end_time = time.clock()
         if self.lfm.level is not 'DEBUG':
             logger.error(*self.lfm.error('Spider',self.spider.name,
+                                         '来自Spider或者Download模块的异常: ',
                                          {
                                              'function':'Scraper',
-                                             'request':request
-                                         },'来自Spider或者Download模块的异常:')
-                         ,extra={
-                            'exception':exc,
+                                             'request':request,
+                                             'exception': exc,
+                                         }),
+                         extra={
                             'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)
                         })
         else:
             logger.error(*self.lfm.error('Spider',self.spider.name,
+                                         '来自Spider或者Download模块的异常，详细内容为:',
                                          {
                                              'function':'Scraper',
-                                             'request':request
-                                         },'来自Spider或者Download模块的异常，详细内容为:')
-                         ,extra={
-                            'exception':_failure,
+                                             'request':request,
+                                             'exception': _failure,
+                                         }),
+                         extra={
                             'time':'错误时间为：{:6.3f}s'.format(end_time-self.start_time)
                         },exc_info = True)
-        logger.error(request.url,extra ={
-            'reason':'no data',
-            'exception':exc,
-            'time':time.clock(),
-            'recordErrorUrl':True
-        })
+        # logger.error(request.url,extra ={
+        #     'reason':'no data',
+        #     'exception':exc,
+        #     'time':time.clock(),
+        #     'recordErrorUrl':True
+        # })
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")
         return None
@@ -298,11 +299,12 @@ class Scraper(object):
             #              {'request': request, 'typename': typename},
             #              extra={'spider': spider})
             logger.error(*self.lfm.error('Spider',spider.name,
+                                         '处理的结果的类型必须是<Request>,<BaseItem>,<dict>,<None>。返回的类型是:',
                                        {
                                            'function':'Scraper',
-                                           'request':request
-                                       },'处理的结果的类型必须是<Request>,<BaseItem>,<dict>,<None>。返回的类型是:')
-                         ,extra={'exception':typename})
+                                           'request':request,
+                                           'exception': typename
+                                       }))
 
     def _itemproc_finished(self, output, item, response, spider):
         """ItemProcessor finished for the given ``item`` and returned ``output``
@@ -316,19 +318,18 @@ class Scraper(object):
             # logging.error(ex)
             # logger.error('process item(%(item)s)过程中出现错误', {'item': item})
             logger.error(*self.lfm.error('Spider',spider.name,
+                                         '处理过程中出现错误:',
                                        {
                                            'function':'Scraper',
-                                           'request':'item'
-                                       },'处理过程中出现错误:')
-                         ,extra=
-                         {'exception':output})
+                                           'request':'item',
+                                           'exception': output
+                                       }))
         else:
             logger.debug(*self.lfm.crawled('Spider',spider.name,'处理完毕',
                                            {
                                                'function': 'Scraper',
                                                'request': 'item'
-                                           }
-                                           ))
+                                           }))
         return None
 
     def _process_item_time(self,_):

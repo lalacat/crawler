@@ -24,7 +24,6 @@ class Slot(object):
         :param scheduler:
         """
         self.lfm = logformatter
-        # logger.debug("Engine:Slot 已初始化")
         logger.debug(*self.lfm.crawled("Engine","Slot",'已初始化'))
 
         self.closing = False
@@ -115,7 +114,6 @@ class ExecutionEngine(object):
         assert self.has_capacity(),"此引擎已经在处理爬虫了，所以不能处理%s %r" %\
             spider.name
         self.engine_name = spider.name + '\'s engine'
-        self.spider = spider
         # 将_next_request注册到reactor循环圈中，便于slot中loopCall不断的调用
         #  相当于不断调用_next_request(spider)
         try:
@@ -124,6 +122,7 @@ class ExecutionEngine(object):
             scheduler = self.scheduler_cls.from_crawler(self.crawler)
             #  调用中间件，就是添加若干个inner_derfer
             start_requests = yield self.scraper.spidermw.process_start_requests(start_requests,spider)
+            self.spider = spider
             #  封装Slot对象
             slot = Slot(self.lfm,start_requests,close_if_idle,nextcall,scheduler)
             self.slot = slot
@@ -136,11 +135,14 @@ class ExecutionEngine(object):
             #  自动调用启动，每5秒一次调用
             slot.heartbeat.start(5)
         except Exception as e:
-            # logger.error(e,exc_info=True)
             logger.error(*self.lfm.error("Spider",spider.name,
-                         'Engine',e),
+                         "Open Spider过程中出现错误：",
+                                         {
+                                             'function':'Engine',
+                                             'exception':e
+                                         }),
                          exc_info = True)
-            raise Exception('来自Engine的报错')
+            raise Exception('来自Engine的报错:%s')
 
     @defer.inlineCallbacks
     def start(self):
@@ -165,7 +167,6 @@ class ExecutionEngine(object):
         self.running = False
         if self._closewait:
             self._closewait.callback(None)
-
         return True
 
     def _finish_stopping_engine(self,_):
@@ -225,9 +226,11 @@ class ExecutionEngine(object):
             except Exception as e :
                 slot.start_requests = None
                 logger.error(*self.lfm.error("Spider",spider.name,
-                      'Engine'
-                      ,e),
-             exc_info = False)
+                                     "获取start_requests过程中出现错误：",
+                                     {
+                                         'function': 'Engine',
+                                         'exception': e
+                                     }))
             #  没有发生异常执行此段代码
             else:
                 self.crawl(request, spider)
@@ -276,14 +279,12 @@ class ExecutionEngine(object):
         def log_error(_,msg):
             error_msg = _.value if isinstance(_,Failure) else _
             logger.error(*self.error('Spider',spider.name,
+                                     msg,
                                      {
                                          'function':'Engine',
-                                         'request':request
-                                     },
-                                     msg),
-                         extra={
-                             'exception':error_msg
-                         })
+                                         'request':request,
+                                         'exception': error_msg
+                                     }))
 
         d = self._download(request,spider)
 
@@ -346,20 +347,11 @@ class ExecutionEngine(object):
             if isinstance(response,Response):
                 logger.debug(*self.lfm.crawled("Spider", spider.name,
                                                '下载成功', request))
-                response.requset = request
+                response.request = request
             return response
 
         def _on_complete(_):
             #  当一个requset处理完后，就进行下一个处理
-            # if isinstance(_,(Failure,Exception)):
-            #     # logger.error(*self."%s 下载失败，失败的原因是%s" % (request.url,_))
-            #     logger.error(*self.lfm.error("Spider",spider.name,
-            #           {
-            #               'function':'Engine',
-            #               'request':request.url
-            #           },
-            #               '下载失败，失败的原因'),
-            #              extra={'exception':_})
             slot.nextcall.schedule()
             return _
 
@@ -389,7 +381,7 @@ class ExecutionEngine(object):
                                        '添加到Scheduler中成功',request))
         if not self.slot.scheduler.enqueue_request(request):
             # logger.error("Spider:%s <%s>添加到Scheduler中失败",spider.name,request)
-            logger.error(*self.lfm.crawled("Spider", spider.name,
+            logger.error(*self.lfm.error("Spider", spider.name,
                                            '添加到Scheduler中失败',request))
 
     def _spider_idle(self,spider):
@@ -407,13 +399,12 @@ class ExecutionEngine(object):
         def log_failure(_,msg):
             error_msg = _.value if isinstance(_,Failure) else _
             logger.error(*self.error('Spider', spider.name,
-                                     'Engine',msg),
-                         extra={
-                             'exception': error_msg
-                         })
+                                     msg,
+                                     {
+                                         'function':'Engine',
+                                         'exception': error_msg
+                                     }))
             return _
-
-
 
         #  关闭下载器
         dfd.addBoth(lambda _: self.downloader.close())
@@ -438,7 +429,7 @@ class ExecutionEngine(object):
                                         {
                                          'function': 'Spider',
                                          'request' : '{'+reason+'}',
-                                        'time': time.clock(),
+                                         'time': time.clock()
                                         })))
 
         #  引擎中的slot清空

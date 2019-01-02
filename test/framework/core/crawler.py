@@ -63,12 +63,11 @@ class Crawler(object):
             yield maybeDeferred(self.engine.start)
         except Exception as e:
             logger.error(*self.logformatter.error("Spider", self.spider.name,
-                                                  "Crawler",
-                                                  '出现错误:'),
-                         extra=
-                         {
-                             'exception': e,
-                         }, exc_info=True)
+                                                  '出现错误:',
+                                                {
+                                                      'function':"Crawler",
+                                                      'exception': e,
+                                                  }),exc_info=True)
             self.crawling = False
             if self.engine is not None:
                 yield self.engine.stop()
