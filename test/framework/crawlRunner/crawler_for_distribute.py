@@ -9,7 +9,7 @@ from zope.interface.verify import verifyClass
 from test.framework.core.interface import ISpiderLoader
 from test.framework.objectimport.loadobject import load_object
 
-from test.framework.crawlRunner.engine_for_distribute import ExecutionEngine
+from test.framework.core.engine import ExecutionEngine
 from test.framework.setting import overridden_or_new_settings, Setting
 from test.framework.utils.defer import defer_succeed
 
@@ -87,16 +87,14 @@ class Crawler(object):
         except Exception as e:
             # logger.error(e,exc_info = True)
             logger.error(*self.logformatter.error("Spider", self.spider.name,
-                                                  "Crawler",
-                                                  '出现错误:'),
-                         extra=
-                         {
-                             'exception': e,
-                         }, exc_info=True)
+                                                  '出现错误:',
+                                                  {
+                                                      'function':"Crawler",
+                                                      'exception': e,
+                                                  }),exc_info=True)
             self.crawling = False
             if self.engine is not None:
                 yield self.engine.stop()
-                # yield self.stop()
             yield defer_succeed('crawl stop')
 
 

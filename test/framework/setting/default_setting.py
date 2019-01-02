@@ -127,8 +127,8 @@ LOG_DEBUG_SHORT_FORMAT = '%(message)s%(extra_info)s-[%(filename)s:%(lineno)d]'
 LOG_DEBUG_LONG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s%(extra_info)s'
 
 
-LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s  %(exception)s %(time)s'
-LOG_ERROR_SHORT_FORMAT = '%(message)s %(exception)s %(time)s -[%(levelname)s-%(filename)s-line:%(lineno)d]'
+LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s %(time)s'
+LOG_ERROR_SHORT_FORMAT = '%(message)s %(time)s -[%(levelname)s-%(filename)s-line:%(lineno)d]'
 
 # 记录爬取过程中出错的URL
 LOG_FILE_ERROR_URL_FORMAT = '[%(asctime)s] [%(filename)s] [%(message)s] [%(reason)s] [%(exception)s][%(time)s]'
