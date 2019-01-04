@@ -3,7 +3,8 @@ import pymongo
 
 logger = logging.getLogger(__name__)
 
-class LJ_Sold_DB(object):
+
+class HouseInfoDB(object):
     def __init__(self,crawler):
         self.lfm = crawler.logformatter
         logger.debug(*self.lfm.crawled(

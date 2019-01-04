@@ -5,8 +5,7 @@ from test.framework.core.crawler import Crawler
 
 logger = logging.getLogger(__name__)
 
-class LJ_Sold_DB(object):
-
+class Community_INFO_DB(object):
     def __init__(self,crawler):
         self.lfm = crawler.logformatter
         logger.debug(*self.lfm.crawled(

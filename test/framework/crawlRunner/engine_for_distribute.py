@@ -380,7 +380,6 @@ class ExecutionEngine(object):
         logger.debug(*self.lfm.crawled("Spider", spider.name,
                                        '添加到Scheduler中成功',request))
         if not self.slot.scheduler.enqueue_request(request):
-            # logger.error("Spider:%s <%s>添加到Scheduler中失败",spider.name,request)
             logger.error(*self.lfm.error("Spider", spider.name,
                                            '添加到Scheduler中失败',request))
 

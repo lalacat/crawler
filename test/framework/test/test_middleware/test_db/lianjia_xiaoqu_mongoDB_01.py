@@ -26,12 +26,9 @@ class LJ_XQ_DB(object):
             self.db = self.client[self.db_name]
         except Exception as e:
             logger.error(*self.lfm.error("Pipe",self.__class__.__name__,
-                                         '',
-                          '出现错误:'),
-             extra=
-             {
-                 'exception':e,
-             })
+                                         '出现错误:',{
+                                             'exception': e,
+                                         }))
 
     @classmethod
     def from_crawler(cls,crawler):

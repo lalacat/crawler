@@ -61,7 +61,7 @@ class ParentSoldSale(Spider):
         self.total_page_number = json.loads(page_number[0])["totalPage"]
         total_xiaoqu_number = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
-        logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
+        #logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
         # for i in range(1,self.total_page_number+1):
         for i in range(1,2):
@@ -93,8 +93,7 @@ class ParentSoldSale(Spider):
             cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name+'_'+str(page_num),logformat=self.lfm)
             yield cr.start()
         except Exception as e :
-            print(e)
-        # return None
+            raise e
 
     def _get_onePage(self,all_communities):
         one_page = list()

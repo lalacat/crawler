@@ -6,10 +6,11 @@ import logging
 from lxml import etree
 from test.framework.spider import Spider
 from test.framework.https.request import Request
+from test.framework.test.test_example.mutil_sold_info.spider_mw_db_sold import SpiderMW_HouseInfoDB
 
 logger = logging.getLogger(__name__)
 
-
+SpiderMW_HouseInfoDB
 class CollectSold(Spider):
     """
     将所有小区的地址都写入数据库中
@@ -59,7 +60,8 @@ class CollectSold(Spider):
             if int(total_num) == 0:
                 return self._reload_sold(response,sold_houses)
             else:
-                self._resolve_sold(sold_houses,response.url)
+                # self._resolve_sold(sold_houses,response.url)
+                result = self._resolve_sold(sold_houses,response.url)
                 if int(total_num) > len(sold_houses):
 
                     if not re.search('pg',response.url):
@@ -121,12 +123,12 @@ class CollectSold(Spider):
                     'time':time.clock(),
                 }
             ))
-            logger.error(response.url,extra={
-                'exception':'重复下载次数已超过最大值，判断此网页没有数据',
-                'time':time.clock(),
-                'reason':'No Data',
-                'recordErrorUrl':True
-            })
+            # logger.error(response.url,extra={
+            #     'exception':'重复下载次数已超过最大值，判断此网页没有数据',
+            #     'time':time.clock(),
+            #     'reason':'No Data',
+            #     'recordErrorUrl':True
+            # })
             # print("sold：" + self.name + ': ' + response.url + ': ' + str(0) + "===" + str(len(sold_houses)))
             return None
 
@@ -158,14 +160,6 @@ class CollectSold(Spider):
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="address"]/div[@class="totalPrice"]/span/text()'))
             # print("成交价格："+sold_totalPrice)
             house_info['sold_totalPrice'] = sold_totalPrice
-            if re.search('\*+',sold_totalPrice):
-                # 记录错误呀的URL
-                logger.error(sold_house_url,extra={
-                    'reason':'价格隐藏',
-                    'exception':sold_title,
-                    'time':time.clock(),
-                    'recordErrUrl':True
-                })
 
             sold_unitPrice = \
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="flood"]/div[@class="unitPrice"]/span/text()'))
@@ -187,7 +181,23 @@ class CollectSold(Spider):
             self._xpath_filter(sold_house.xpath(base_xpath + '/div[@class="dealCycleeInfo"]/span[@class="dealCycleTxt"]/span[2]/text()'))
             # print("成交周期："+sold_dealcycle)
             house_info['sold_dealcycle'] = sold_dealcycle
-            self.result[(sold_title+'('+sold_totalPrice+')').replace('.','_')] = house_info
+            if re.search('\*+',sold_totalPrice):
+                # 记录错误呀的URL
+                # logger.error(sold_house_url,extra={
+                #     'reason':'价格隐藏',
+                #     'exception':sold_title,
+                #     'time':time.clock(),
+                #     'recordErrUrl':True
+                # })
+                logger.error(*self.lfm.error(
+                    "Spider",self.name,
+                    '价格隐藏',
+                    {
+                        'function':sold_title
+                    }
+                ))
+            else:
+                self.result[(sold_title+'('+sold_totalPrice+')').replace('.','_')] = house_info
 
     def _xpath_filter(self,xpath):
         if xpath:

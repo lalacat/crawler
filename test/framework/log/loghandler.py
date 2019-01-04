@@ -171,8 +171,6 @@ class LogToMongDB(logging.Handler):
 
     def emit(self, record):
 
-        # time_key = '%s,%6,3f' % (record.__dict__['asctime'],record.msecs)
-        # print(time_key)\
         if self.bulid_Flag:
             self.bulid_Flag = False
             self.db_coll = self.db[self.collection_name]
@@ -182,18 +180,16 @@ class LogToMongDB(logging.Handler):
         assert self._id,'没有创建基础信息'
 
         db_msg = defaultdict(list)
-        msg = self.format(record).replace('.','!')
+        msg = self.format(record).replace('.','>')
 
         extra_msg = self._get_extra_info(record)
-        key = str(self.log_num)+':['+record.levelname+']'
-        # db_msg[key] = [msg]
+        # key = str(self.log_num)+':['+record.levelname+']'
+        # # db_msg[key] = [msg]
         db_msg[msg] = [{
             'levelname':record.levelname,
             'filename':record.__dict__['filename'],
             'lineno':record.__dict__['lineno']
         }]
-
-
 
         if extra_msg:
             db_msg[msg].append(extra_msg)

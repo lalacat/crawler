@@ -74,11 +74,12 @@ HEADER_COLLECTION = [
     ['Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)']
 ]
 HTTPPROXY_AUTH_ENCODING = 'utf-8'
+
 #T
 ITEM_PIPELINES = {
     # "test.framework.pipelines.mongoDB.MongoDB":20,
     # "test.framework.test.test_middleware.test_db.lianjia_xiaoqu_mongoDB_01.LJ_XQ_DB":10,
-    # "test.framework.test.test_middleware.test_db.test_close_spider_db_03_lianjia_xiaoqu_sold.LJ_Sold_DB":10,
+    # "test.framework.test.test_middleware.test_db.mutil_sold.LJ_Sold_DB":10,
     # "test.framework.pipelines.print_result.Print_Result":10,
     # "test.framework.test.test_middleware.test_close_spider_print_01.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_close_spider_print_02_lianjia_xiaoqu.test_print.Spider_Out_print": 10,
@@ -137,9 +138,8 @@ LOG_FILE_ERROR_URL_FORMAT = '[%(asctime)s] [%(filename)s] [%(message)s] [%(reaso
 # MSG的格式
 # crawled的格式
 LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s%(function)s%(request)s] %(msg)s%(time)s'
+
 # error的格式
-# LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s]%(msg)s'
-# LOG_ERROR_REQUEST_EXTRA = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(exception)s'
 LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(exception)s'
 
 
@@ -151,7 +151,7 @@ LOG_LEVEL = "INFO"
 
 LOG_MONGODB_URL = "127.0.0.1:27017"
 LOG_MONGODB_DATABASE = "LOG"
-LOG_MONGODB_FORMAT = '[%(asctime)s]%(message)s'
+LOG_MONGODB_FORMAT = '[%(asctime)s] %(message)s'
 
 
 LOGGING_DIC = {
@@ -249,7 +249,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console_info','ErrorUrl','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['logtoMongdb','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
@@ -278,7 +278,7 @@ SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.core.scheduler.Scheduler"
 SPIDER_MIDDLEWARES = {
     # "test.framework.spider.spidermw.record_errurl.RecordSpiderErrorUrl": 10,
-
+    # 'test.framework.test.test_example.mutil_sold_info.spider_mw_db_sold.SpiderMW_HouseInfoDB':10
 }
 SPIDER_CHILD_CLASS = 'test.framework.test.test_spider.simple_spider.simple_spider_05_xiaoqu_house.SimpleSpider'
 #T

@@ -54,7 +54,6 @@ class DownloaderMiddlewareManager(MiddlewareManager):
 
         @defer.inlineCallbacks
         def process_response(response):
-            # logger.debug("Downloader Middleware: 加载process_response方法处理Request<%s>",request)
             logger.debug(*self.lfm.crawled(
                     "Middleware", self.component_name,
                     '加载process_response方法处理Request',
@@ -78,16 +77,6 @@ class DownloaderMiddlewareManager(MiddlewareManager):
         @defer.inlineCallbacks
         def process_exception(_failure):
             exception = _failure.value
-            # logger.warning(*self.lfm.error(
-            #         "Middleware", self.component_name,
-            #     {
-            #         'request':request
-            #     },
-            #         '下载过程中出现了错误，原因是：',),
-            #     extra={
-            #       'exception':exception
-            #     }
-            # )
             for method in self.methods['process_exception']:
                 try:
                     method_name = method.__class__

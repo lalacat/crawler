@@ -157,7 +157,6 @@ class CrawlerRunner(object):
             crawler = Crawler(self.spidercls, self.settings,self.lfm)
             crawler._create_spider_from_task(name,start_url)
         except Empty:
-            # logger.debug("task 分配完毕！！！！")
             logger.debug(*self.lfm.crawled(
                 "CrawlerRunner", '',
                 '"task 分配完毕')
@@ -165,7 +164,6 @@ class CrawlerRunner(object):
             self._create_task()
             crawler = None
         except Exception as e :
-            # logger.error(e)
             logger.error(*self.logformatter.error("Spider",name,
                                                   "Crawler",
                                                   '出现错误:'),
@@ -206,7 +204,6 @@ class CrawlerRunner(object):
                         self._task_schedule.put(url)
                 return
             except StopIteration:
-                # logger.debug("来自db的task载入完毕")
                 logger.debug(*self.lfm.crawled(
                     "CrawlerRunner", '',
                     '来自db的task载入完毕')

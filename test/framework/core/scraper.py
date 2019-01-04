@@ -262,8 +262,8 @@ class Scraper(object):
                                    'function': 'Scraper',
                                    'request': request
                                }))
+        # spider.parse返回的是yield的时候，解开生成器在这里完成
         if isinstance(output, Request):
-            # logger.info("处理的output%(request)s的类型是<Request>，将添加到下载序列中！！添加时间是：%(time)f",{"request":output,"time":time.clock()})
             logger.info(*self.lfm.crawled('Spider',spider.name,
                                                'Output的类型是<Request>,将添加到下载队列中,加入时间:',
                                                {
