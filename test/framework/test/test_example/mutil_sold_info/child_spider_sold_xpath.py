@@ -6,11 +6,10 @@ import logging
 from lxml import etree
 from test.framework.spider import Spider
 from test.framework.https.request import Request
-from test.framework.test.test_example.mutil_sold_info.spider_mw_db_sold import SpiderMW_HouseInfoDB
+from test.framework.test.test_example.mutil_sold_info.close_spider_print_sold import Spider_Out_print
 
 logger = logging.getLogger(__name__)
 
-SpiderMW_HouseInfoDB
 class CollectSold(Spider):
     """
     将所有小区的地址都写入数据库中
@@ -21,11 +20,14 @@ class CollectSold(Spider):
         self._start_urls = []
         self.total_number_community = 0
         self.result = dict()
+        self.serect_price = dict()
         self.result_len = 0
 
         self.sold_db = False
         self.change_header = True
         self.change_proxy = True
+        self.output = False
+
 
     @property
     def name(self):
@@ -60,8 +62,8 @@ class CollectSold(Spider):
             if int(total_num) == 0:
                 return self._reload_sold(response,sold_houses)
             else:
-                # self._resolve_sold(sold_houses,response.url)
-                result = self._resolve_sold(sold_houses,response.url)
+                self._resolve_sold(sold_houses,response.url)
+                # result = self._resolve_sold(sold_houses,response.url)
                 if int(total_num) > len(sold_houses):
 
                     if not re.search('pg',response.url):
@@ -74,7 +76,7 @@ class CollectSold(Spider):
                             yield Request(url, callback=self._parse_sold)
                     else:
                         pg = re.findall('pg\d+',response.url)[0]
-                        print("sold：" + self.name + '_' + pg + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
+                        # print("sold：" + self.name + '_' + pg + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
                         return None
         except Exception as e:
             logger.error(*self.lfm.error(
@@ -123,13 +125,6 @@ class CollectSold(Spider):
                     'time':time.clock(),
                 }
             ))
-            # logger.error(response.url,extra={
-            #     'exception':'重复下载次数已超过最大值，判断此网页没有数据',
-            #     'time':time.clock(),
-            #     'reason':'No Data',
-            #     'recordErrorUrl':True
-            # })
-            # print("sold：" + self.name + ': ' + response.url + ': ' + str(0) + "===" + str(len(sold_houses)))
             return None
 
     def _resolve_sold(self,sold_houses,url):
@@ -196,6 +191,7 @@ class CollectSold(Spider):
                         'function':sold_title
                     }
                 ))
+                self.serect_price[(sold_title + '(' + sold_totalPrice + ')').replace('.', '_')] = house_info
             else:
                 self.result[(sold_title+'('+sold_totalPrice+')').replace('.','_')] = house_info
 

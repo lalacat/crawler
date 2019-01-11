@@ -88,6 +88,7 @@ ITEM_PIPELINES = {
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_06_shfe.Spider_Out_print": 10,
+    'test.framework.test.test_example.mutil_sold_info.close_spider_print_sold.Spider_Out_print':10
 
 }
 #J
@@ -278,7 +279,6 @@ SPIDER_MANAGER_CLASS = "test.framework.objectimport.spiderloader.SpiderLoader"
 SCHEDULER = "test.framework.core.scheduler.Scheduler"
 SPIDER_MIDDLEWARES = {
     # "test.framework.spider.spidermw.record_errurl.RecordSpiderErrorUrl": 10,
-    # 'test.framework.test.test_example.mutil_sold_info.spider_mw_db_sold.SpiderMW_HouseInfoDB':10
 }
 SPIDER_CHILD_CLASS = 'test.framework.test.test_spider.simple_spider.simple_spider_05_xiaoqu_house.SimpleSpider'
 #T
