@@ -76,11 +76,11 @@ class DownloaderMiddlewareManager(MiddlewareManager):
 
         @defer.inlineCallbacks
         def process_exception(_failure):
-            exception = _failure.value
+            # exception = _failure.value
             for method in self.methods['process_exception']:
                 try:
                     method_name = method.__class__
-                    response = yield method(request=request, exception=exception,
+                    response = yield method(request=request, exception=_failure,
                                             spider=spider)
                     assert response is None or isinstance(response, (Response, Request)), \
                         'Middleware %s.process_exception must return None, Response or Request, got %s' % \

@@ -359,7 +359,7 @@ class _ResponseReader(Protocol):
                                              ))
             else:
                 # logger.warning('<%s> 成功下载' % self._request.url)
-                logger.warning(*self.lfm.crawled('Request', self._request,
+                logger.info(*self.lfm.crawled('Request', self._request,
                                                  '数据下载完整'
                                              ))
             self._finished.callback((self._transferdata,body,None))

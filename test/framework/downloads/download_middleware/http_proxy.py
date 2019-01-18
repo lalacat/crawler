@@ -33,16 +33,19 @@ class AddHttpProxy(object):
     def _get_proxy(self,proxy):
         if len(proxy) == 2:
             proxy += (None,)
-        hostname, hostport, creds = proxy
-        proxy_url = urlunparse((hostname, str(hostport), '', '', '', ''))
-        if creds:
-            creds = self._basic_auth_header(creds)
+        try:
+            hostname, hostport, creds = proxy
+            proxy_url = urlunparse((hostname, str(hostport), '', '', '', ''))
+            if creds:
+                creds = self._basic_auth_header(creds)
+        except Exception as e :
+            print(e)
         return creds,proxy_url
 
     def process_request(self,request,spider):
         # proxy配置格式tuple
         # (hostname,port,crdes)
-        proxy = request.meta.get('proxy')
+        proxy = request.meta.get('proxy_config')
         if proxy:
             creds,proxy_url = self._get_proxy(proxy)
             request.meta['proxy'] = proxy_url

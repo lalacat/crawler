@@ -90,7 +90,8 @@ class ParentSoldSale(Spider):
         # print(pprint.pformat(total_dict))
 
         try:
-            cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name+'_'+str(page_num),logformat=self.lfm)
+            # cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name+'_'+str(page_num),logformat=self.lfm)
+            cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name,logformat=self.lfm)
             yield cr.start()
         except Exception as e :
             raise e

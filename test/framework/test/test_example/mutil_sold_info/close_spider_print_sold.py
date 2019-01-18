@@ -13,10 +13,8 @@ class Spider_Out_print(object):
         try:
             # print("%s 理论获取小区数为%d个"%(spider.name,int(spider.result["total_xiaoqu_number"][0])))
             if hasattr(spider,'output'):
-                print(spider.name+':')
-                print(pprint.pformat(spider.result))
-                print(pprint.pformat(spider.serect_price))
-
+                if spider.output:
+                    print(pprint.pformat(spider.result))
         except Exception as e :
             print("Spider_Out_print",e)
 

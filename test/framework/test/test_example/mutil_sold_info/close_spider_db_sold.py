@@ -36,10 +36,10 @@ class HouseInfoDB(object):
 
     def close_spider(self,spider):
         try:
-            if hasattr(spider,'father_name'):
-                self.collection_name = spider.father_name
-            else:
-                return None
+            # if hasattr(spider,'father_name'):
+            #     self.collection_name = spider.father_name
+            # else:
+            #     return None
             if not hasattr(spider, "sold_db"):
                 logger.debug(*self.lfm.crawled(
                     "Spider", spider.name,

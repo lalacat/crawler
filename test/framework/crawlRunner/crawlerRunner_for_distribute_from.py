@@ -47,7 +47,7 @@ class Slot(object):
     def _maybe_closing(self):
         if self.closing and not self.inprogress:
             if self.nextcall:
-                logger.warning("CrawlerRunner的LoopCall已关闭")
+                logger.debug("CrawlerRunner的LoopCall已关闭")
                 self.nextcall.cancel()
                 if self.heartbeat.running:
                     self.heartbeat.stop()

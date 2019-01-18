@@ -100,6 +100,8 @@ class Downloader(object):
         self.ip_concurrency = self.settings.getint('CONCURRENT_REQUESTS_PER_IP')
         # 随机延迟下载时间 默认是True
         self.randomize_delay = self.settings.getbool('RANDOMIZE_DOWNLOAD_DELAY')
+
+        # TODO 优化中间件
         # 初始化下载器中间件
         self.middleware = DownloaderMiddlewareManager.from_crawler(crawler)
         # ask.LoopingCall安装了一个60s的定时心跳函数_slot_gc,这个函数用于对slots中的对象进行定期的回收。
@@ -161,7 +163,7 @@ class Downloader(object):
     def _enqueue_request(self, request, spider):
         #  key就是hostname
         # logger.info("Spider:%s <%s> 添加进入下载队列时间:[%6.3f]..."%(spider.name,request,time.clock()))
-        logger.warning(*self.lfm.crawled('Spider', self.spider.name, "添加进入下载队列时间:",
+        logger.info(*self.lfm.crawled('Spider', self.spider.name, "添加进入下载队列时间:",
                                               {
                                                   'time':time.clock(),
                                                   'request':request

@@ -69,13 +69,19 @@ class Scraper(object):
         logger.debug(*self.lfm.crawled("Spider", crawler.spider.name,
                                        '已初始化', 'Scraper'))
         self.slot = None
+
+        # TODO 优化中间件
         self.spidermw = SpiderMiddlewareManager.from_crawler(crawler)
         #  itemproc_cls = load_object(crawler.settings['ITEM_PROCESSOR'])
+
+        # TODO优化中间件
         self.itemproc = ItemPipelineManager.from_crawler(crawler)
 
         #  单次最多能处理最大的item的个数
         self.concurrent_items = crawler.settings.getint('CONCURRENT_ITEMS')
         self.crawler = crawler
+
+        self.timeout_times = dict()
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
@@ -134,7 +140,7 @@ class Scraper(object):
                                             }), exc_info=True)
 
         dfd.addBoth(finish_scraping)
-        dfd.addErrback(log_error)
+        # dfd.addErrback(log_error)
         self._scrape_next(spider, slot)
         return dfd
 
@@ -177,35 +183,69 @@ class Scraper(object):
         # 接受来自Spider中的异常，也可能是下载的异常没有处理掉
         # 也能收到handle_spider_output中，spider返回结果迭代过程中出现的异常
         exc = _failure.value
+
         end_time = time.clock()
-        if self.lfm.level is not 'DEBUG':
-            logger.error(*self.lfm.error('Spider',self.spider.name,
-                                         '来自Spider或者Download模块的异常: ',
+
+        if isinstance(exc,TimeoutError):
+            logger.debug(*self.lfm.error('Spider', self.spider.name,
+                                         '来自Download模块的异常: ',
                                          {
-                                             'function':'Scraper',
-                                             'request':request,
+                                             'function': 'Scraper',
+                                             'request': request,
                                              'exception': exc,
                                          }),
                          extra={
-                            'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)
-                        })
+                             'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
+                         })
+            if not self.timeout_times.get(str(request)):
+                self.timeout_times[str(request)] = 1
+
+            if self.timeout_times[str(request)] < 4:
+                logger.error(*self.lfm.error(
+                    'Spider',self.spider.name,
+                    '因下载超时，第%d次添加到下载队列中' % self.timeout_times[str(request)],
+                {
+                    'function': 'Scraper',
+                    'request': request,
+                }))
+                request.meta['timeout_times'] = self.timeout_times[str(request)]
+                self.crawler.engine.crawl(request=request, spider=spider)
+                self.timeout_times[str(request)] += 1
+                return None
+
+            if self.timeout_times[str(request)] == 4:
+                logger.error(*self.lfm.crawled(
+                    'Spider', self.spider.name,
+                    '因下载超时，重新下载的次数超过最大重复下载次数%d,不再下载' % 4,
+                    {
+                        'function': 'Scraper',
+                        'request': request,
+                    }))
         else:
-            logger.error(*self.lfm.error('Spider',self.spider.name,
-                                         '来自Spider或者Download模块的异常，详细内容为:',
-                                         {
-                                             'function':'Scraper',
-                                             'request':request,
-                                             'exception': _failure,
-                                         }),
-                         extra={
-                            'time':'错误时间为：{:6.3f}s'.format(end_time-self.start_time)
-                        },exc_info = True)
-        # logger.error(request.url,extra ={
-        #     'reason':'no data',
-        #     'exception':exc,
-        #     'time':time.clock(),
-        #     'recordErrorUrl':True
-        # })
+            if self.lfm.level is not 'DEBUG':
+                logger.error(*self.lfm.error('Spider',self.spider.name,
+                                             '来自Spider或者Download模块的异常: ',
+                                             {
+                                                 'function':'Scraper',
+                                                 'request':request,
+                                                 'exception': exc,
+                                             }),
+                             extra={
+                                'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)
+                            },exc_info = True)
+            else:
+                logger.error(*self.lfm.error('Spider',self.spider.name,
+                                             '来自Spider或者Download模块的异常，详细内容为:',
+                                             {
+                                                 'function':'Scraper',
+                                                 'request':request,
+                                                 'exception': _failure,
+                                             }),
+                             extra={
+                                'time':'错误时间为：{:6.3f}s'.format(end_time-self.start_time)
+                            },exc_info = True)
+
+
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")
         return None
@@ -223,7 +263,7 @@ class Scraper(object):
         :return:
         """
         if not result:
-            logger.warning(*self.lfm.crawled('Spider',spider.name,
+            logger.info(*self.lfm.crawled('Spider',spider.name,
                                              '返回的结果为<None>,不经过自定义{process_item}处理',
                                              '_parse(callback)'
                                              ))
@@ -234,7 +274,7 @@ class Scraper(object):
             return defer_succeed(result)
         if not isinstance(result,Iterable):
             # logger.warning("%s._parse或者request.callback处理的结果不是<Iterable>，而是%s类型的数据,不能通过pipe处理！！"%(spider.name,type(result)))
-            logger.warning(*self.lfm.crawled('Spider', spider.name,
+            logger.info(*self.lfm.crawled('Spider', spider.name,
                                              '_parse(callback)',
                                              '处理的结果是{1}类型,不是<Iterable>,不能经过自定义<pipe>处理'.format(type(result))))
             return defer_succeed(result)

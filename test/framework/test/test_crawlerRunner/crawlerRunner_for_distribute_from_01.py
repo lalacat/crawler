@@ -131,7 +131,7 @@ class CrawlerRunner(object):
 
             self._crawlers.discard(crawler.spider.name)
             self._active.discard(d1)
-            logger.warning(*self.lfm.crawled(
+            logger.info(*self.lfm.crawled(
                 "CrawlerRunner", self.name,
                 '从队列中清除掉{0}'.format(crawler.spider.name))
                          )

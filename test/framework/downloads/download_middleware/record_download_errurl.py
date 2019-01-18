@@ -21,14 +21,15 @@ class RecordDownloadErrorUrl(object):
 
     def process_exception(self,request,exception,spider):
         proxy = request.meta.get('proxy',None)
-        logger.warning(*self.lfm.crawled(
+
+        # logger.error(exception)
+        _failure = exception.value
+        logger.error(*self.lfm.error(
             "Request",request,
-            exception,
+            _failure,
             {
-                'function':'proxy<%s>' %proxy
+                'function':proxy
             }
         ))
-        return request
-
         return None
 

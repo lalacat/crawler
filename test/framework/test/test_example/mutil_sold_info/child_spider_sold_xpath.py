@@ -1,4 +1,5 @@
 import json
+import pprint
 import time
 import re
 import logging
@@ -18,10 +19,9 @@ class CollectSold(Spider):
     def __init__(self):
         self.name = ""
         self._start_urls = []
-        self.total_number_community = 0
         self.result = dict()
         self.serect_price = dict()
-        self.result_len = 0
+        self.result_items = 0
 
         self.sold_db = False
         self.change_header = True
@@ -63,9 +63,8 @@ class CollectSold(Spider):
                 return self._reload_sold(response,sold_houses)
             else:
                 self._resolve_sold(sold_houses,response.url)
-                # result = self._resolve_sold(sold_houses,response.url)
                 if int(total_num) > len(sold_houses):
-
+                    self.result_items += len(sold_houses)
                     if not re.search('pg',response.url):
                         print("sold：" + self.name + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
                         page_number = selector.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
@@ -76,8 +75,7 @@ class CollectSold(Spider):
                             yield Request(url, callback=self._parse_sold)
                     else:
                         pg = re.findall('pg\d+',response.url)[0]
-                        # print("sold：" + self.name + '_' + pg + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
-                        return None
+                        print("sold：" + self.name + '_' + pg + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
         except Exception as e:
             logger.error(*self.lfm.error(
                 'Spider', self.name,
@@ -91,7 +89,22 @@ class CollectSold(Spider):
                     'time':time.clock()
                 }
                 )
-            return None
+
+        if len(self.serect_price) > 0 :
+            while(len(self.serect_price) != 0 ):
+                item = self.serect_price.popitem()
+                url = item[1]['sold_house_url']
+                yield Request(url, callback=self._get_secret_price,meta={'title':item[0]})
+        return None
+
+    def _get_secret_price(self,response):
+        selector = etree.HTML(response.body)
+        sold_totalPrice = selector.xpath('/html/body/section[1]/div[2]/div[2]/div[1]/span/i/text()')[0]
+        sold_unitPrice = selector.xpath('/html/body/section[1]/div[2]/div[2]/div[1]/b/text()')[0]
+        title = response.request.meta['title']
+        self.result[title]['sold_totalPrice'] = sold_totalPrice
+        self.result[title]['sold_unitPrice'] = sold_unitPrice
+        return None
 
     def _reload_sold(self,response,sold_houses):
         if response.request.meta.get('download_times'):
@@ -184,22 +197,26 @@ class CollectSold(Spider):
                 #     'time':time.clock(),
                 #     'recordErrUrl':True
                 # })
-                logger.error(*self.lfm.error(
-                    "Spider",self.name,
-                    '价格隐藏',
-                    {
-                        'function':sold_title
-                    }
-                ))
+                # logger.error(*self.lfm.error(
+                #     "Spider",self.name,
+                #     '价格隐藏',
+                #     {
+                #         'function':sold_title
+                #     }
+                # ))
                 self.serect_price[(sold_title + '(' + sold_totalPrice + ')').replace('.', '_')] = house_info
-            else:
-                self.result[(sold_title+'('+sold_totalPrice+')').replace('.','_')] = house_info
+
+            self.result[(sold_title+'('+sold_totalPrice+')').replace('.','_')] = house_info
+
+
+
 
     def _xpath_filter(self,xpath):
         if xpath:
             return xpath[0]
         else:
             return ' '
+
 
 
 

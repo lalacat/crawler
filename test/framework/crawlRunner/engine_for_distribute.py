@@ -65,7 +65,7 @@ class Slot(object):
         if self.closing and not self.inprogress:
             if self.nextcall:
                 # logger.warning("%s 的LoopCall已关闭"%name)
-                logger.warning(*self.lfm.crawled("Engine", 'Slot', 'LoopCall已关闭', name))
+                logger.info(*self.lfm.crawled("Engine", 'Slot', 'LoopCall已关闭', name))
                 self.nextcall.cancel()
                 if self.heartbeat.running:
                     self.heartbeat.stop()
@@ -347,7 +347,7 @@ class ExecutionEngine(object):
             if isinstance(response,Response):
                 logger.debug(*self.lfm.crawled("Spider", spider.name,
                                                '下载成功', request))
-                response.request = request
+                # response.request = request
             return response
 
         def _on_complete(_):

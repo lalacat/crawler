@@ -52,6 +52,7 @@ class ConsoleErrorHandler(logging.StreamHandler):
             stream.write(self.terminator)
             self.flush()
         except Exception:
+            print('ConsoleErrorHandler')
             self.handleError(record)
 
 
@@ -180,7 +181,7 @@ class LogToMongDB(logging.Handler):
         assert self._id,'没有创建基础信息'
 
         db_msg = defaultdict(list)
-        msg = self.format(record).replace('.','>')
+        msg = self.format(record).replace('.','_')
 
         extra_msg = self._get_extra_info(record)
         # key = str(self.log_num)+':['+record.levelname+']'

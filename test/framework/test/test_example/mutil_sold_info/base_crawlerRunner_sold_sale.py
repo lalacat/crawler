@@ -42,7 +42,7 @@ queryArgs = [
 
 searchRes = db_coll.find({"total_zone_name":"pudong"},{'_id':False})
 pudong = searchRes.next()
-# print(len(pudong))
+# print(pudong)
 all_zone =[]
 for query in queryArgs:
     search = db_coll.find(query,{'_id':False})
@@ -74,14 +74,15 @@ town_urls = [
 ]
 town_urls_dict= {
     'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
-#     'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-#     'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
-#     'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-#     'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-#     'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-#     'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-#     'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
+    # "dongwaitan":'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
+    # 'huangxinggongyuan':'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
+    # 'kongjianglu':'https://sh.lianjia.com/xiaoqu/kongjianglu/',
+    # 'wujiaochang':'https://sh.lianjia.com/xiaoqu/wujiaochang/',
+    # 'xinjiangwancheng':'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
+    # 'zhoujiazuilu':'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
+    # 'zhongyuan1':'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
 }
+
 
 s = Setting()
 cr = CrawlerRunner(town_urls_dict,s,ParentSoldSale)

@@ -27,6 +27,6 @@ class ChangeProxy(object):
             if spider.change_proxy:
                 if random.choice(self._proxy_flag):
                     proxy_config = random.choice(self._proxies)
-                    request.meta['proxy'] = proxy_config
+                    request.meta['proxy_config'] = proxy_config
 
         return None

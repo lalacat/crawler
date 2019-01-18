@@ -293,7 +293,7 @@ class DownloadAgent(object):
         # header = dict()
         if status == 301 or status == 302:
             # logger.critical("%s 网页重定向，重新下载"%url)
-            logger.warning(*self.lfm.crawled("Request",
+            logger.info(*self.lfm.crawled("Request",
                                        request,
                           '网页重定向，重新下载'))
             request.meta["download_redirect"] = True
@@ -311,6 +311,13 @@ class DownloadAgent(object):
                 logger.error(*self.lfm.error("Response", request,
                                                 'header为None'))
             response = Response(url=url,status=status,headers=headers,body=body,flags=flags,request=request)
+
+            timeout_times = request.meta.get('timeout_times', None)
+            if timeout_times:
+                logger.error(*self.lfm.crawled(
+                    "Request", self.request,
+                    '第%d次超时下载，下载成功' %timeout_times
+                ))
 
         return response
 
@@ -422,7 +429,7 @@ class _ResponseReader(Protocol):
                                                  ))
             else:
                 # logger.warning('<%s> 成功下载' % self._request.url)
-                logger.warning(*self.lfm.crawled('Request', self._request,
+                logger.info(*self.lfm.crawled('Request', self._request,
                                                  '数据下载完整'
                                              ))
             self._finished.callback((self._transferdata,body,None))

@@ -10,7 +10,7 @@ CONCURRENT_ITEMS = 100 #  控制同时处理的爬取到的item的数据数目
 DOWNLOADER = "test.framework.downloads.Downloader"
 # 默认下载器
 DOWNLOAD_HANDLER = "test.framework.downloads.download_agent_proxy.HTTPDownloadHandler"
-DOWNLOAD_TIMEOUT = 5      # 3mins
+DOWNLOAD_TIMEOUT = 10    # 3mins
 
 DOWNLOAD_MAXSIZE = 1024*1024*1024   # 1024m 下载网页大小的最大值
 DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
@@ -88,7 +88,10 @@ ITEM_PIPELINES = {
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_06_shfe.Spider_Out_print": 10,
-    'test.framework.test.test_example.mutil_sold_info.close_spider_print_sold.Spider_Out_print':10
+
+
+    # 'test.framework.test.test_example.mutil_sold_info.close_spider_print_sold.Spider_Out_print':10,
+    # 'test.framework.test.test_example.mutil_sold_info.close_spider_db_sold.HouseInfoDB': 20
 
 }
 #J
@@ -130,7 +133,7 @@ LOG_DEBUG_LONG_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lin
 
 
 LOG_ERROR_FORMAT = '[%(levelname)s] [%(asctime)s]-[%(filename)s][line:%(lineno)d]: %(message)s %(time)s'
-LOG_ERROR_SHORT_FORMAT = '%(message)s %(time)s -[%(levelname)s-%(filename)s-line:%(lineno)d]'
+LOG_ERROR_SHORT_FORMAT = '%(message)s %(time)s-[%(levelname)s-%(filename)s-line:%(lineno)d]'
 
 # 记录爬取过程中出错的URL
 LOG_FILE_ERROR_URL_FORMAT = '[%(asctime)s] [%(filename)s] [%(message)s] [%(reason)s] [%(exception)s][%(time)s]'
@@ -141,7 +144,7 @@ LOG_FILE_ERROR_URL_FORMAT = '[%(asctime)s] [%(filename)s] [%(message)s] [%(reaso
 LOG_CRAWLED_MSG = 'Crawled:[%(module)s%(name)s%(function)s%(request)s] %(msg)s%(time)s'
 
 # error的格式
-LOG_ERROR_MSG = 'Error:[%(module)s%(name)s %(function)s %(request)s] %(msg)s%(exception)s'
+LOG_ERROR_MSG = 'Error:[%(module)s%(name)s%(function)s%(request)s] %(msg)s%(exception)s'
 
 
 LOG_FILE_PATH = 'C:\\Users\\scott\\PycharmProjects\\crawler\\log_record\\'
@@ -250,7 +253,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['logtoMongdb','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },
@@ -262,7 +265,7 @@ LOGGING_DIC = {
 # MONGODB_URL = "149.28.192.96:27017"
 MONGODB_URL = "127.0.0.1:27017"
 MONGODB_NAME = "LianJia"
-MONGODB_NAME_SOLD = 'Sold'
+MONGODB_NAME_SOLD = 'PuDong_Sold'
 #N
 #O
 #P
