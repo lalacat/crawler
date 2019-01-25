@@ -1,9 +1,11 @@
+import pprint
+
 import pymongo
 
 from twisted.internet import reactor
 
 from test.framework.setting import Setting
-from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import CrawlerRunner
+from test.framework.core.crawlerRunner import CrawlerRunner
 
 # mongodb服务的地址和端口号
 from test.framework.test.test_example.mutil_sold_info.father_spider_sale_sold import ParentSoldSale
@@ -42,7 +44,7 @@ queryArgs = [
 
 searchRes = db_coll.find({"total_zone_name":"pudong"},{'_id':False})
 pudong = searchRes.next()
-# print(pudong)
+# print(pprint.pformat(pudong))
 all_zone =[]
 for query in queryArgs:
     search = db_coll.find(query,{'_id':False})
@@ -58,20 +60,45 @@ for query in queryArgs:
 
 
 zone_name = "yangpu"
-town_urls = [
-    # 'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
-    {'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',
-    'dongwaitan':'https://sh.lianjia.com/xiaoqu/dongwaitan/'
-     }
-    #'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
-    #'https://sh.lianjia.com/xiaoqu/huangxinggongyuan/',#159 159
-    #'https://sh.lianjia.com/xiaoqu/kongjianglu/',
-    #'https://sh.lianjia.com/xiaoqu/wujiaochang/',
-    #'https://sh.lianjia.com/xiaoqu/xinjiangwancheng/',
-    #'https://sh.lianjia.com/xiaoqu/zhoujiazuilu/',
-    #'https://sh.lianjia.com/xiaoqu/zhongyuan1/'
-
-]
+town_urls = {
+     # 'beicai': 'https://sh.lianjia.com/xiaoqu/beicai/',
+     # 'biyun': 'https://sh.lianjia.com/xiaoqu/biyun/',
+     # 'caolu': 'https://sh.lianjia.com/xiaoqu/caolu/',
+     'chuansha': 'https://sh.lianjia.com/xiaoqu/chuansha/',
+     'datuanzhen': 'https://sh.lianjia.com/xiaoqu/datuanzhen/',
+     'gaodong': 'https://sh.lianjia.com/xiaoqu/gaodong/',
+     'gaohang': 'https://sh.lianjia.com/xiaoqu/gaohang/',
+     'geqing': 'https://sh.lianjia.com/xiaoqu/geqing/',
+     'hangtou': 'https://sh.lianjia.com/xiaoqu/hangtou/',
+     'huamu': 'https://sh.lianjia.com/xiaoqu/huamu/',
+     'huinan': 'https://sh.lianjia.com/xiaoqu/huinan/',
+     'jinqiao': 'https://sh.lianjia.com/xiaoqu/jinqiao/',
+     'jinyang': 'https://sh.lianjia.com/xiaoqu/jinyang/',
+     'kangqiao': 'https://sh.lianjia.com/xiaoqu/kangqiao/',
+     'laogangzhen': 'https://sh.lianjia.com/xiaoqu/laogangzhen/',
+     'lianyang': 'https://sh.lianjia.com/xiaoqu/lianyang/',
+     'lingangxincheng': 'https://sh.lianjia.com/xiaoqu/lingangxincheng/',
+     'lujiazui': 'https://sh.lianjia.com/xiaoqu/lujiazui/',
+     'nanmatou': 'https://sh.lianjia.com/xiaoqu/nanmatou/',
+     'nichengzhen': 'https://sh.lianjia.com/xiaoqu/nichengzhen/',
+     'sanlin': 'https://sh.lianjia.com/xiaoqu/sanlin/',
+     'shibo': 'https://sh.lianjia.com/xiaoqu/shibo/',
+     'shuyuanzhen': 'https://sh.lianjia.com/xiaoqu/shuyuanzhen/',
+     'tangqiao': 'https://sh.lianjia.com/xiaoqu/tangqiao/',
+     'tangzhen': 'https://sh.lianjia.com/xiaoqu/tangzhen/',
+     'waigaoqiao': 'https://sh.lianjia.com/xiaoqu/waigaoqiao/',
+     'wanxiangzhen': 'https://sh.lianjia.com/xiaoqu/wanxiangzhen/',
+     'weifang': 'https://sh.lianjia.com/xiaoqu/weifang/',
+     'xinchang': 'https://sh.lianjia.com/xiaoqu/xinchang/',
+     'xuanqiao': 'https://sh.lianjia.com/xiaoqu/xuanqiao/',
+     'yangdong': 'https://sh.lianjia.com/xiaoqu/yangdong/',
+     'yangjing': 'https://sh.lianjia.com/xiaoqu/yangjing/',
+     'yuanshen': 'https://sh.lianjia.com/xiaoqu/yuanshen/',
+     'yuqiao1': 'https://sh.lianjia.com/xiaoqu/yuqiao1/',
+     'zhangjiang': 'https://sh.lianjia.com/xiaoqu/zhangjiang/',
+     'zhoupu': 'https://sh.lianjia.com/xiaoqu/zhoupu/',
+     'zhuqiao': 'https://sh.lianjia.com/xiaoqu/zhuqiao/'
+    }
 town_urls_dict= {
     'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
     # "dongwaitan":'https://sh.lianjia.com/xiaoqu/dongwaitan/',# 144 141
@@ -85,7 +112,7 @@ town_urls_dict= {
 
 
 s = Setting()
-cr = CrawlerRunner(town_urls_dict,s,ParentSoldSale)
+cr = CrawlerRunner(town_urls,s,ParentSoldSale)
 d = cr.start()
 d.addBoth(lambda _:reactor.stop())
 # reactor.callLater(2,cr.stop)

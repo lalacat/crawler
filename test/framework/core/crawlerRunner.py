@@ -7,8 +7,8 @@ from queue import Empty
 from twisted.internet import task, defer, reactor
 from twisted.internet.defer import DeferredList, inlineCallbacks
 
+from test.framework.core.crawler import Crawler
 from test.framework.objectimport.loadobject import load_object
-from test.framework.crawlRunner.crawler_for_distribute import Crawler
 from test.framework.setting import Setting
 from test.framework.utils.buildins import iter_dict
 from test.framework.utils.reactor import CallLaterOnce
@@ -61,11 +61,11 @@ class Slot(object):
 
 class CrawlerRunner(object):
 
-    def __init__(self,tasks,settings=None,spidercls=None,name=None,logformat=None):
+    def __init__(self,tasks,settings=None,spidercls=None,name=None,logformat=None,middlewares=None):
         if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
-
+        self.middlewares = middlewares
         if logformat:
             self.lfm = logformat
         else:
@@ -87,10 +87,14 @@ class CrawlerRunner(object):
         # 装载的是defer的集合
         self._active = set()
         # 子爬虫的数量
-        self.MAX_CHILD_NUM = 9
+        if self.name:
+            self.MAX_CHILD_NUM = 3
+        else:
+            self.MAX_CHILD_NUM = 1
         # 子爬虫的名称
         # self.SPIDER_NAME_CHOICE = self.settings['SPIDER_NAME_CHOICE']
         self.SPIDER_NAME_CHOICE = False
+
         # 缓冲的地址最大数量
         self.MAX_SCHEDULE_NUM = 10
         if spidercls:
@@ -155,7 +159,8 @@ class CrawlerRunner(object):
                 "CrawlerRunner", self.name,
                 '当前爬取的网页',start_url)
                          )
-            crawler = Crawler(self.spidercls, self.settings,self.lfm,self.name)
+            crawler = Crawler(self.spidercls, self.settings,self.lfm,self,self.middlewares)
+            # crawler = Crawler(self.spidercls, self.settings,self.lfm,self,None)
             crawler.create_spider_from_task(name,start_url)
             return crawler
         except Empty:
@@ -211,14 +216,6 @@ class CrawlerRunner(object):
             self._tasks = None
             self._push_task_finish = True
         except ValueError as e:
-            # logger.error(*self.lfm.error("CrawlerRunner", "_create_task",
-            #                              "",
-            #                              '出现错误:', ),
-            #              extra=
-            #              {
-            #                  'exception': e,
-            #              })
-            # print(e.args)
             raise ValueError(e.args[0])
 
     @inlineCallbacks
@@ -227,12 +224,10 @@ class CrawlerRunner(object):
             self.init_task()
         except Exception as e:
             logger.error(*self.lfm.error("CrawlerRunner", "_create_task",
-                                         "",
-                                         '出现错误:', ),
-                         extra=
-                         {
-                             'exception': e,
-                         })
+                                         '出现错误:',
+                                         {
+                                            'exception':e
+                                         }))
         finally:
             self._closewait = defer.Deferred()
             self.delay_stop = reactor.callLater(1,self.stop,'cancel')
@@ -242,8 +237,8 @@ class CrawlerRunner(object):
         assert not self.running,"task载入已启动"
         try:
             self.running = True
-            logger.critical(*self.lfm.crawled('CrawlerRunner',self.name,'开始时间:',
-                                              {'time':time.clock()}))
+            logger.critical(*self.lfm.crawled('CrawlerRunner',self.name,'开始'))
+                                              # {'time':time.strftime('%m/%d/%Y %H:%M:%S', time.localtime())}))
 
             # 将task导入到队列中
             self._tasks = make_generator(self.tasks)
@@ -392,12 +387,6 @@ def make_generator(tasks):
     try:
         it = iter(tasks)
     except Exception as e:
-        # logger.error(*self.lfm.error("CrawlerRunner", '',
-        #                              'tasks不能被迭代',
-        #                              '_make_generator'),
-        #              extra={
-        #                  'exception': e
-        #              })
         raise TypeError('tasks不能被迭代')
     while True:
         try:

@@ -1,4 +1,5 @@
 import json
+import pprint
 import re
 import logging
 
@@ -8,7 +9,7 @@ from twisted.internet import defer
 
 from test.framework.spider import Spider
 from test.framework.https.request import Request
-from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import CrawlerRunner
+from test.framework.core.crawlerRunner import CrawlerRunner
 from test.framework.test.test_example.mutil_sold_info.child_spider_sold_xpath import CollectSold
 
 logger = logging.getLogger(__name__)
@@ -63,8 +64,8 @@ class ParentSoldSale(Spider):
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
         #logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
-        # for i in range(1,self.total_page_number+1):
-        for i in range(1,2):
+        for i in range(1,self.total_page_number+1):
+        # for i in range(1,2):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
@@ -74,7 +75,6 @@ class ParentSoldSale(Spider):
         page_num = response.request.meta["page_num"]
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
         self.result[str(page_num)]=self._get_onePage(all_communities)
-        # self.result_len += len(self.result[str(page_num)])
         for result in self.result[str(page_num)]:
             community_url = result["community_url"]
             name = result['community_name']
@@ -88,10 +88,10 @@ class ParentSoldSale(Spider):
 
         # total_dict = dict(self.sale_url,**self.sold_url)
         # print(pprint.pformat(total_dict))
-
+        # return None
         try:
             # cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name+'_'+str(page_num),logformat=self.lfm)
-            cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name,logformat=self.lfm)
+            cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name,logformat=self.lfm,middlewares=self.crawler.middlewares)
             yield cr.start()
         except Exception as e :
             raise e

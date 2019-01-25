@@ -1,6 +1,5 @@
 import queue
 
-from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import FilterTask
 from collections import Iterable
 
 import pymongo

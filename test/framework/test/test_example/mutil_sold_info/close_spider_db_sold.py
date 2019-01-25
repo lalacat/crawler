@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 class HouseInfoDB(object):
     def __init__(self,crawler):
         self.lfm = crawler.logformatter
-        logger.debug(*self.lfm.crawled(
+        logger.info(*self.lfm.crawled(
             'Pipe',self.__class__.__name__,
             '已初始化'
         ))
@@ -36,10 +36,7 @@ class HouseInfoDB(object):
 
     def close_spider(self,spider):
         try:
-            # if hasattr(spider,'father_name'):
-            #     self.collection_name = spider.father_name
-            # else:
-            #     return None
+
             if not hasattr(spider, "sold_db"):
                 logger.debug(*self.lfm.crawled(
                     "Spider", spider.name,
@@ -48,7 +45,11 @@ class HouseInfoDB(object):
                 return None
             else:
                 if spider.sold_db:
-                    logger.debug(*self.lfm.crawled(
+                    if hasattr(spider,'father_name'):
+                        self.collection_name = spider.father_name
+                    else:
+                        return None
+                    logger.info(*self.lfm.crawled(
                         "Spider", spider.name,
                         '正在添加进入数据库'))
                     item = dict()

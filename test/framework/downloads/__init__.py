@@ -101,9 +101,13 @@ class Downloader(object):
         # 随机延迟下载时间 默认是True
         self.randomize_delay = self.settings.getbool('RANDOMIZE_DOWNLOAD_DELAY')
 
-        # TODO 优化中间件
         # 初始化下载器中间件
-        self.middleware = DownloaderMiddlewareManager.from_crawler(crawler)
+        if crawler.middlewares.get('DownloaderMiddlewareManager'):
+            self.middleware = crawler.middlewares['DownloaderMiddlewareManager']
+        else:
+            self.middleware = DownloaderMiddlewareManager.from_crawler(crawler)
+            crawler.middlewares['DownloaderMiddlewareManager'] = self.middleware
+
         # ask.LoopingCall安装了一个60s的定时心跳函数_slot_gc,这个函数用于对slots中的对象进行定期的回收。
         self._slot_gc_loop = task.LoopingCall(self._slot_gc)
         self._slot_gc_loop.start(60)

@@ -65,7 +65,7 @@ class Slot(object):
         if self.closing and not self.inprogress:
             if self.nextcall:
                 # logger.warning("%s 的LoopCall已关闭"%name)
-                logger.warning(*self.lfm.crawled("Engine", 'Slot', 'LoopCall已关闭', name))
+                logger.info(*self.lfm.crawled("Engine", 'Slot', 'LoopCall已关闭', name))
                 self.nextcall.cancel()
                 if self.heartbeat.running:
                     self.heartbeat.stop()
@@ -347,7 +347,7 @@ class ExecutionEngine(object):
             if isinstance(response,Response):
                 logger.debug(*self.lfm.crawled("Spider", spider.name,
                                                '下载成功', request))
-                response.request = request
+                # response.request = request
             return response
 
         def _on_complete(_):
@@ -380,7 +380,6 @@ class ExecutionEngine(object):
         logger.debug(*self.lfm.crawled("Spider", spider.name,
                                        '添加到Scheduler中成功',request))
         if not self.slot.scheduler.enqueue_request(request):
-            # logger.error("Spider:%s <%s>添加到Scheduler中失败",spider.name,request)
             logger.error(*self.lfm.error("Spider", spider.name,
                                            '添加到Scheduler中失败',request))
 

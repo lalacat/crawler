@@ -162,7 +162,7 @@ class LogToMongDB(logging.Handler):
         self.bulid_Flag = True
 
 
-        self.log_num = 0
+        self.log_num = 50000
         try:
             self.client = pymongo.MongoClient(self.MongDB_URl)
             self.db = self.client[self.MongDB_DATABASE]
@@ -200,6 +200,11 @@ class LogToMongDB(logging.Handler):
         self.db_coll.update(
             {'_id':ObjectId(self._id)},
             {'$set':db_msg})
+
+        length = len(self.db_coll.find({'_id':ObjectId(self._id)}).next())
+        if length > self.log_num:
+            self.bulid_Flag = True
+
 
     def _get_extra_info(self,record):
         extra_msg = {}

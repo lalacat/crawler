@@ -86,8 +86,8 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                         'Middleware %s.process_exception must return None, Response or Request, got %s' % \
                         (method_name, type(response))
                 except Exception:
-                    raise TypeError("DownloadMW process_exception need 3 required positional arguments: 'request', 'exception', and 'spider' " )
-
+                    # raise TypeError("DownloadMW process_exception need 3 required positional arguments: 'request', 'exception', and 'spider' " )
+                    raise Exception
                 if response:
                     defer.returnValue(response)
             defer.returnValue(_failure)

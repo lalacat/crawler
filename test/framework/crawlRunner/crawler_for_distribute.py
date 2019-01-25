@@ -85,7 +85,6 @@ class Crawler(object):
             '''
             yield maybeDeferred(self.engine.start)
         except Exception as e:
-            # logger.error(e,exc_info = True)
             logger.error(*self.logformatter.error("Spider", self.spider.name,
                                                   '出现错误:',
                                                   {
@@ -96,7 +95,6 @@ class Crawler(object):
             if self.engine is not None:
                 yield self.engine.stop()
             yield defer_succeed('crawl stop')
-
 
     """
     用户封装调度器以及引擎

@@ -20,7 +20,7 @@ class Crawler(object):
     # 将编写的爬虫类包装成可可以进行工作的爬虫，
     # 装载爬虫，导入爬虫的网页
     # 将爬虫导入到引擎中
-    def __init__(self, spidercls=None, settings=None):
+    def __init__(self, spidercls=None, settings=None,logformat=None,crawlerRunner=None,middlewares=None):
         self.crawling = False
         self.spider = None
         self.engine = None
@@ -28,14 +28,34 @@ class Crawler(object):
         # 导入的是爬虫对应的模块，不是名称
         self.spidercls = spidercls
         self.settings = settings.copy()
+        self.crawlerRunner = crawlerRunner
+        if crawlerRunner:
+            self.father_name = crawlerRunner.name
+        else:
+            self.father_name = None
 
         # 获取log的格式
-        lf_cls = load_object(self.settings['LOG_FORMATTER_CLASS'])
-        self.logformatter = lf_cls.from_crawler(self)
+        if not logformat:
+            lf_cls = load_object(self.settings['LOG_FORMATTER_CLASS'])
+            self.logformatter = lf_cls.from_crawler(self)
+        else:
+            self.logformatter = logformat
         logger.debug(*self.logformatter.crawled(
-            "Spider", 'None',
-             '已初始化！！！',"Crawler"))
+            "Crawler", 'None',
+             '已初始化！！！'))
 
+        self.middlewares = middlewares if middlewares is not None else dict()
+        if self.middlewares:
+            if not isinstance(middlewares,dict):
+                    logger.warning(*self.logformatter.crawled(
+                        'Crawler','',
+                        '继承的中间件格式不对'
+                    ))
+            else:
+                logger.info(*self.logformatter.crawled(
+                    'Crawler', '',
+                    '继承中间件'
+                ))
         self.spidercls.update_settings(self.settings)
         d = dict(overridden_or_new_settings(self.settings))
         if d:
@@ -50,8 +70,8 @@ class Crawler(object):
         assert not self.crawling, "已经开始爬虫了.."
         self.crawling = True
         try:
-            # self.spider = self._spider
-            self.spider = self._create_spider(*args, **kwargs)
+            if not self.spider:
+                self.spider = self._create_spider(*args, **kwargs)
             self.engine = self._create_engine()
             start_requests = iter(self.spider.start_requests())
             yield self.engine.open_spider(self.spider, start_requests)
@@ -90,14 +110,21 @@ class Crawler(object):
         logger.warning(*self.logformatter.crawled('Spider', self.spidercls.name, "已创建"))
         return self.spidercls.from_crawler(self, *args, **kwargs)
 
+    def create_spider_from_task(self,spider_name,spider_start_urls):
+        logger.warning(*self.logformatter.crawled('Spider',spider_name,"已创建"))
+        self.spider = self.spidercls.from_task(self,spider_name,spider_start_urls,self.father_name)
+
     @inlineCallbacks
     def stop(self):
         if self.crawling:
             self.crawling = False
+            if self.middlewares:
+                if self.crawlerRunner and self.crawlerRunner.middlewares is None:
+                    self.crawlerRunner.middlewares = self.middlewares
             yield maybeDeferred(self.engine.stop)
 
     def __str__(self):
-        return "%s" % (self.spider.name)
+        return "Crawler中的Spider:%s" %(self.spider.name)
 
     __repr__ = __str__
 
@@ -116,6 +143,7 @@ class CrawlerRunner(object):
         if isinstance(settings, dict) or settings is None:
             settings = Setting(settings)
         self.settings = settings
+
         logger.debug(type(self.settings))
         self.spider_loder = _get_spider_loader(settings)
         # 装载的是Crawler的集合

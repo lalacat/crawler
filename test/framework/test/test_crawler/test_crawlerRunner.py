@@ -7,7 +7,7 @@ from twisted.internet.defer import DeferredList, inlineCallbacks
 
 from test.framework.crawlRunner.crawler_for_distribute import Crawler
 from test.framework.setting import Setting
-from framework.test import SimpleSpider
+from test.framework.test import SimpleSpider
 import logging
 
 from test.framework.utils.reactor import CallLaterOnce

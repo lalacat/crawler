@@ -3,7 +3,9 @@ import time
 from collections import deque, Iterable
 
 from twisted.internet import defer
+from twisted.internet.error import ConnectionLost
 from twisted.python.failure import Failure
+from twisted.web._newclient import ResponseNeverReceived
 
 from test.framework.https.request import Request
 from test.framework.https.response import Response
@@ -70,13 +72,19 @@ class Scraper(object):
                                        '已初始化', 'Scraper'))
         self.slot = None
 
-        # TODO 优化中间件
-        self.spidermw = SpiderMiddlewareManager.from_crawler(crawler)
+        if crawler.middlewares.get('SpiderMiddlewareManager'):
+            self.spidermw = crawler.middlewares['SpiderMiddlewareManager']
+        else:
+            self.spidermw = SpiderMiddlewareManager.from_crawler(crawler)
+            crawler.middlewares['SpiderMiddlewareManager'] = self.spidermw
+
         #  itemproc_cls = load_object(crawler.settings['ITEM_PROCESSOR'])
 
-        # TODO优化中间件
-        self.itemproc = ItemPipelineManager.from_crawler(crawler)
-
+        if crawler.middlewares.get('ItemPipelineManager'):
+            self.itemproc = crawler.middlewares['ItemPipelineManager']
+        else:
+            self.itemproc = ItemPipelineManager.from_crawler(crawler)
+            crawler.middlewares['ItemPipelineManager'] = self.itemproc
         #  单次最多能处理最大的item的个数
         self.concurrent_items = crawler.settings.getint('CONCURRENT_ITEMS')
         self.crawler = crawler
@@ -187,16 +195,16 @@ class Scraper(object):
         end_time = time.clock()
 
         if isinstance(exc,TimeoutError):
-            logger.debug(*self.lfm.error('Spider', self.spider.name,
-                                         '来自Download模块的异常: ',
-                                         {
-                                             'function': 'Scraper',
-                                             'request': request,
-                                             'exception': exc,
-                                         }),
-                         extra={
-                             'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
-                         })
+            # logger.debug(*self.lfm.error('Spider', self.spider.name,
+            #                              '来自Download模块的异常: ',
+            #                              {
+            #                                  'function': 'Scraper',
+            #                                  'request': request,
+            #                                  'exception': exc,
+            #                              }),
+            #              extra={
+            #                  'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
+            #              })
             if not self.timeout_times.get(str(request)):
                 self.timeout_times[str(request)] = 1
 
@@ -221,10 +229,22 @@ class Scraper(object):
                         'function': 'Scraper',
                         'request': request,
                     }))
+        elif isinstance(exc,ConnectionLost) or isinstance(exc,ResponseNeverReceived):
+            logger.error(*self.lfm.error('Spider', self.spider.name,
+                                         '来自Download模块的异常: ',
+                                         {
+                                             'function': 'Scraper',
+                                             'request': request,
+                                             'exception': exc,
+                                         }),
+                         extra={
+                             'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
+                         }, exc_info=False)
+
         else:
             if self.lfm.level is not 'DEBUG':
                 logger.error(*self.lfm.error('Spider',self.spider.name,
-                                             '来自Spider或者Download模块的异常: ',
+                                             '来自Spider模块的异常: ',
                                              {
                                                  'function':'Scraper',
                                                  'request':request,
@@ -232,7 +252,9 @@ class Scraper(object):
                                              }),
                              extra={
                                 'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)
-                            },exc_info = True)
+                            },exc_info = False)
+                # if isinstance(_failure,Failure):
+                #     logger.error(_failure,exc_info = True)
             else:
                 logger.error(*self.lfm.error('Spider',self.spider.name,
                                              '来自Spider或者Download模块的异常，详细内容为:',
@@ -244,7 +266,6 @@ class Scraper(object):
                              extra={
                                 'time':'错误时间为：{:6.3f}s'.format(end_time-self.start_time)
                             },exc_info = True)
-
 
         if isinstance(exc,CloseSpider):
             self.crawler.engine.close_spider(spider,exc or "cancelled")

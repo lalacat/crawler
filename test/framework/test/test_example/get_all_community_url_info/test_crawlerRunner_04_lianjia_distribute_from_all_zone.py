@@ -3,7 +3,7 @@ import pymongo
 from twisted.internet import reactor
 
 from test.framework.setting import Setting
-from test.framework.test.test_crawlerRunner.crawlerRunner_for_distribute_from_01 import CrawlerRunner
+from test.framework.core.crawlerRunner import CrawlerRunner
 
 # mongodb服务的地址和端口号
 from test.framework.test.test_example.get_all_community_url_info.simple_spider_05_all_xiaoqu_house_db import SimpleSpider_05
