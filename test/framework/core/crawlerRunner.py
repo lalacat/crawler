@@ -237,7 +237,7 @@ class CrawlerRunner(object):
         assert not self.running,"task载入已启动"
         try:
             self.running = True
-            logger.critical(*self.lfm.crawled('CrawlerRunner',self.name,'开始'))
+            logger.critical(*self.lfm.crawled('CrawlerRunner',self.name,'开始：%s' %time.strftime('%m/%d/%Y %H:%M:%S', time.localtime())))
                                               # {'time':time.strftime('%m/%d/%Y %H:%M:%S', time.localtime())}))
 
             # 将task导入到队列中

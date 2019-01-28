@@ -7,6 +7,8 @@ from test.framework.https.response import Response
 from test.framework.utils.defer import mustbe_deferred
 from twisted.internet import defer
 
+from test.framework.utils.exception import MiddleWareError
+
 logger = logging.getLogger(__name__)
 
 
@@ -85,9 +87,9 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                     assert response is None or isinstance(response, (Response, Request)), \
                         'Middleware %s.process_exception must return None, Response or Request, got %s' % \
                         (method_name, type(response))
-                except Exception:
+                except Exception as e :
                     # raise TypeError("DownloadMW process_exception need 3 required positional arguments: 'request', 'exception', and 'spider' " )
-                    raise Exception
+                    raise MiddleWareError('DownloadMW process_exception : %s' %str(e.value))
                 if response:
                     defer.returnValue(response)
             defer.returnValue(_failure)

@@ -1,7 +1,8 @@
+import OpenSSL
 from twisted.internet import defer
 from twisted.internet import task
 from twisted.internet import reactor
-from twisted.internet.error import ConnectionLost
+from twisted.internet.error import ConnectionLost, ConnectionDone
 from twisted.python import failure
 import time,random
 from twisted.internet.interfaces import IReactorTime
@@ -19,7 +20,13 @@ def job(text,id):
     def test_03():
         raise ConnectionLost('test_03')
 
-    return task.deferLater(reactor, 2, test_03)
+    def test_04():
+        raise ConnectionDone('test_04')
+
+    def test_05():
+        raise  OpenSSL.SSL.Error('test_05')
+
+    return task.deferLater(reactor, 2, test_05)
 
 
 def outer_fun(content):
@@ -45,6 +52,16 @@ def err_fun(exception):
         print(failure)
         print(temp)
     elif isinstance(failure,ConnectionLost):
+        # if isinstance(failure,BaseException):
+        #     print(failure.args[0])
+        print(failure)
+        print(temp)
+    elif isinstance(failure, ConnectionDone):
+        # if isinstance(failure,BaseException):
+        #     print(failure.args[0])
+        print(failure)
+        print(temp)
+    elif isinstance(failure, OpenSSL.SSL.Error):
         # if isinstance(failure,BaseException):
         #     print(failure.args[0])
         print(failure)

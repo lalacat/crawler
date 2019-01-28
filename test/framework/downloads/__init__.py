@@ -13,6 +13,7 @@ from test.framework.utils.httpobj import urlparse_cached
 
 logger = logging.getLogger(__name__)
 
+
 class Slot(object):
     """
     Downloader slot
