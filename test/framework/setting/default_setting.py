@@ -2,7 +2,7 @@
 #B
 
 #C
-CONCURRENT_REQUESTS = 50 # 设置的并发数(最大下载数)
+CONCURRENT_REQUESTS = 10 # 设置的并发数(最大下载数)
 CONCURRENT_REQUESTS_PER_IP = 0  # ip并发度:
 CONCURRENT_REQUESTS_PER_DOMAIN = 8  # 设置HTTPConnectionPool最大保持连接个数
 CONCURRENT_ITEMS = 100 #  控制同时处理的爬取到的item的数据数目
@@ -17,7 +17,7 @@ DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
 
 DOWNLOAD_FAIL_ON_DATALOSS = True
 
-DOWNLOAD_DELAY = 2
+DOWNLOAD_DELAY = 5
 DOWNLOADER_MIDDLEWARE = {
     "test.framework.downloads.download_middleware.user_agent.ChangeRequestUserAgent":10,
    #  如果使用chang proxy 必须放在add http proxy 这个类前面执行，否则会报错
@@ -253,7 +253,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['logtoMongdb','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },

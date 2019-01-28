@@ -88,7 +88,7 @@ class CrawlerRunner(object):
         self._active = set()
         # 子爬虫的数量
         if self.name:
-            self.MAX_CHILD_NUM = 3
+            self.MAX_CHILD_NUM = 1
         else:
             self.MAX_CHILD_NUM = 1
         # 子爬虫的名称
@@ -106,6 +106,7 @@ class CrawlerRunner(object):
 
         #  task完成标志位
         # self.filter_task = FilterTask(self.SPIDER_NAME_CHOICE)
+        # 导入队列中任务个数的最大值
         self.filter_task = 4
         self._push_task_finish = False
         self._pull_task_finish = False
@@ -160,7 +161,6 @@ class CrawlerRunner(object):
                 '当前爬取的网页',start_url)
                          )
             crawler = Crawler(self.spidercls, self.settings,self.lfm,self,self.middlewares)
-            # crawler = Crawler(self.spidercls, self.settings,self.lfm,self,None)
             crawler.create_spider_from_task(name,start_url)
             return crawler
         except Empty:

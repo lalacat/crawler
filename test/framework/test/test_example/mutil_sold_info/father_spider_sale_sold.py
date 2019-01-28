@@ -64,8 +64,8 @@ class ParentSoldSale(Spider):
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
         #logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
-        for i in range(1,self.total_page_number+1):
-        # for i in range(1,2):
+        # for i in range(1,self.total_page_number+1):
+        for i in range(1,2):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 

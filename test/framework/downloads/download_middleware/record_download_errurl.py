@@ -83,7 +83,7 @@ class RecordDownloadErrorUrl(object):
                     name:db_msg[name]
                 }})
         except Exception as e:
-            raise Exception('RecordDownloadErrorUrl %s' %str(e.value))
+            raise Exception('RecordDownloadErrorUrl %s' %str(e))
         self.spider_names[spider.name] += 1
         return None
 

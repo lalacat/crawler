@@ -1,7 +1,8 @@
+import time
+
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, maybeDeferred, DeferredList
 import logging
-from test.framework.log.log import LogFormat
 
 from zope.interface.exceptions import DoesNotImplement
 from zope.interface.verify import verifyClass
@@ -44,6 +45,7 @@ class Crawler(object):
             "Crawler", 'None',
              '已初始化！！！'))
 
+        self.build_time = time .clock()
         self.middlewares = middlewares if middlewares is not None else dict()
         if self.middlewares:
             if not isinstance(middlewares,dict):

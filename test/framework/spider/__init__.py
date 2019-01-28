@@ -57,6 +57,7 @@ class Spider(object_ref):
         spider._set_start_urls(spider_start_urls)
         spider._set_logformat(crawler.logformatter)
         spider._set_father_name(father_name)
+        spider._set_build_time(crawler.build_time)
         return spider
 
     def _set_crawler(self,crawler):
@@ -74,6 +75,9 @@ class Spider(object_ref):
     def _set_father_name(self,father_name):
         if father_name:
             self.father_name = father_name
+
+    def _set_build_time(self,time):
+        self.build_time = time
 
     def __str__(self):
         return '<%s %s>'%(self.name,self.start_urls)

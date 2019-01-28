@@ -199,11 +199,19 @@ class Downloader(object):
             return
 
         # Delay queue processing if a download_delay is configured
+        # if hasattr(spider,'build_time'):
+        #     now = time.clock() - spider.build_time
+        # else:
         now = time.clock()
-        delay = slot.download_delay()  # 获取slot对象的延迟时间
+        # logger.error('%s 的 now: %6.3f'%(spider.name,now))
+        # delay = slot.download_delay()  # 获取slot对象的延迟时间
+        delay = 0  # 获取slot对象的延迟时间
+
         if delay:
             #  delay在默认情况下为0
             penalty = delay + slot.lastseen - now  # 距离上次运行还需要延迟则latercall
+            # logger.error('%s 的 penalty:%6.3f' % (spider.name,now))
+
             if penalty > 0:
                 slot.latercall = reactor.callLater(penalty, self._process_queue, spider, slot)
                 return
@@ -223,8 +231,8 @@ class Downloader(object):
 
     def _download(self,slot,request, spider):
         # logger.debug("Spider:%s <%s> 正在下载...",spider.name,request)
-        logger.debug(*self.lfm.crawled("Spider", spider.name,
-                                       '正在下载', request))
+        logger.error(*self.lfm.crawled("Spider", spider.name,
+                                       '正在下载 %6.3f'%time.clock(), request))
         try:
             dfd = mustbe_deferred(self.handler.download_request,request,spider)
         except Exception:

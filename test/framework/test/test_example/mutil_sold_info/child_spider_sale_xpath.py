@@ -22,7 +22,7 @@ class CollectSold(Spider):
         self.result = dict()
         self.result_len = 0
 
-        self.sold_db = True
+        self.sold_db = False
         self.change_header = True
         self.change_proxy = True
 
