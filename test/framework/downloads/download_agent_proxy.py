@@ -20,8 +20,6 @@ from test.framework.https.response import Response
 logger = logging.getLogger(__name__)
 
 
-
-
 class HTTPDownloadHandler(object):
 
     def __init__(self,logformatter,settings):
@@ -60,11 +58,11 @@ class HTTPDownloadHandler(object):
             request
         ))
         """返回一个http download 的 defer"""
-        self.spider = spider
+        # self.spider = spider
         agent = DownloadAgent(contextFactory=self._contextFactory,connectTimeout=self._default_download_timeout,pool=self._pool,
                               maxsize=getattr(spider,'download_maxsize',self._default_maxsize),
                               warnsize=getattr(spider,'download_warnsize',self._default_warnsize),
-                              fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm,settings=self.settings
+                              fail_on_dataloss=self._fail_on_dataloss,logformatter = self.lfm,settings=self.settings,spider=spider
                               )
         return agent.download_request(request)
 
@@ -100,7 +98,7 @@ class DownloadAgent(object):
     _ProxyAgent = ProxyAgent
 
     def __init__(self,contextFactory=None, connectTimeout=10, bindAddress=None,
-                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False,logformatter=None,settings=None):
+                 pool=None,maxsize=0,warnsize=0,fail_on_dataloss=False,logformatter=None,settings=None,spider=None):
         self.lfm = logformatter
         logger.debug(*self.lfm.crawled(
             'HTTPDownloadHandler',
@@ -117,6 +115,7 @@ class DownloadAgent(object):
         self._fail_on_dataloss = fail_on_dataloss
         self._redirect = False
         self.auth_encoding = settings.get('HTTPPROXY_AUTH_ENCODING')
+        self.spider = spider
 
     def _getAgent(self,request,timeout):
         proxy = request.meta.get('proxy')
@@ -128,9 +127,9 @@ class DownloadAgent(object):
             proxyPort = int(proxyPort) if isinstance(proxyPort,bytes) else proxyPort
             proxyHost = proxyHost.decode(self.auth_encoding)
             logger.info(*self.lfm.crawled(
-                           'Request',request,
-                           '使用代理',
-                           '%s:%s' %(proxyHost,str(proxyPort))
+                           'Spider',self.spider.name,
+                           '使用代理:%s:%s'%(proxyHost,str(proxyPort),
+                           request)
                            ))
             if scheme == b'https':
                 proxyConfig = (proxyHost,proxyPort,creds_02)
@@ -158,11 +157,10 @@ class DownloadAgent(object):
         redirect = request.meta.get('download_redirect') or self._redirect
         self.request = request
         try:
-            logger.debug(*self.lfm.crawled(
-                        'Request',request,
-                        '执行download_request,超时时间:',
-                        {'time': timeout})
-                        )
+            delay_time = request.meta.get('delay_time')
+            logger.error(*self.lfm.crawled("Spider", self.spider.name,
+                                           '正在下载,延迟了%6.3f' % delay_time,request))
+
             agent = self._getAgent(request, timeout)
             if redirect:
                 logger.debug(*self.lfm.crawled(
@@ -215,11 +213,9 @@ class DownloadAgent(object):
     def _cb_latency(self,result,request, start_time):
         """记录延迟时间"""
         request.meta['download_latency'] = time.clock() - start_time
-        #logger.debug("记录延迟时间 %d " %request.meta['download_latency'])
         return result
 
     def _cb_timeout(self,result,url,timeout):
-        # logger.debug("进入下载超时处理方法")
         logger.debug(*self.lfm.crawled(
                     'Request',
                     self.request,

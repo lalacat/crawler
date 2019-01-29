@@ -88,7 +88,7 @@ class CrawlerRunner(object):
         self._active = set()
         # 子爬虫的数量
         if self.name:
-            self.MAX_CHILD_NUM = 1
+            self.MAX_CHILD_NUM = 3
         else:
             self.MAX_CHILD_NUM = 1
         # 子爬虫的名称
@@ -96,7 +96,7 @@ class CrawlerRunner(object):
         self.SPIDER_NAME_CHOICE = False
 
         # 缓冲的地址最大数量
-        self.MAX_SCHEDULE_NUM = 10
+        # self.MAX_SCHEDULE_NUM = 10
         if spidercls:
             # 子爬虫的类
             self.spidercls = spidercls

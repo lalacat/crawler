@@ -57,15 +57,17 @@ class ParentSoldSale(Spider):
 
     def _parse_getAllCommunity(self,response):
         seletor = etree.HTML(response.body)
+
         #  获取下属城镇的小区总页数
         page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
         self.total_page_number = json.loads(page_number[0])["totalPage"]
         total_xiaoqu_number = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
+
         #logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
-        # for i in range(1,self.total_page_number+1):
-        for i in range(1,2):
+        # for i in range(2,self.total_page_number+1):
+        for i in range(2,3):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
@@ -87,10 +89,10 @@ class ParentSoldSale(Spider):
             self.sold_url['sold_'+name] = sold_url
 
         # total_dict = dict(self.sale_url,**self.sold_url)
-        # print(pprint.pformat(total_dict))
+        # # print(pprint.pformat(total_dict))
+        # print(len(total_dict))
         # return None
         try:
-            # cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name+'_'+str(page_num),logformat=self.lfm)
             cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name,logformat=self.lfm,middlewares=self.crawler.middlewares)
             yield cr.start()
         except Exception as e :

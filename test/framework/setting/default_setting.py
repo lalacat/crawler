@@ -17,7 +17,7 @@ DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
 
 DOWNLOAD_FAIL_ON_DATALOSS = True
 
-DOWNLOAD_DELAY = 5
+DOWNLOAD_DELAY = 0
 DOWNLOADER_MIDDLEWARE = {
     "test.framework.downloads.download_middleware.user_agent.ChangeRequestUserAgent":10,
    #  如果使用chang proxy 必须放在add http proxy 这个类前面执行，否则会报错
@@ -253,7 +253,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['console_info','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['logtoMongdb','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },

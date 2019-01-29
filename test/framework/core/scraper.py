@@ -79,8 +79,6 @@ class Scraper(object):
             self.spidermw = SpiderMiddlewareManager.from_crawler(crawler)
             crawler.middlewares['SpiderMiddlewareManager'] = self.spidermw
 
-        #  itemproc_cls = load_object(crawler.settings['ITEM_PROCESSOR'])
-
         if crawler.middlewares.get('ItemPipelineManager'):
             self.itemproc = crawler.middlewares['ItemPipelineManager']
         else:
@@ -122,7 +120,6 @@ class Scraper(object):
 
     def enqueue_scrape(self, response, request, spider):
         self.start_time = time.clock()
-        # logger.info("%s.%s的response加入scrapy队列,加入时间为：%7.6f"%(spider.name,request,self.start_time))
         logger.info(*self.lfm.crawled("Spider", spider.name,
                                            'response加入队列时间',
                                            {
@@ -139,17 +136,7 @@ class Scraper(object):
             self._scrape_next(spider, slot)
             return _
 
-        def log_error(_):
-            logger.error(*self.lfm.error("Spider", self.spider.name,
-                                         '下载结果的处理过程中出现错误:',
-                                            {
-                                                'function': 'Scraper',
-                                                'request': request,
-                                                'exception': _.getErrorMessage()
-                                            }), exc_info=True)
-
         dfd.addBoth(finish_scraping)
-        # dfd.addErrback(log_error)
         self._scrape_next(spider, slot)
         return dfd
 
@@ -241,12 +228,12 @@ class Scraper(object):
                          extra={
                              'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
                          }, exc_info=False)
-        elif isinstance(exc,ResponseNeverReceived):
+        elif isinstance(exc,OpenSSL.SSL.Error):
             logger.error(*self.lfm.error('Spider', self.spider.name,
-                                         '来自Download模块的<ResponseNeverReceived>异常: ',
+                                         '来自Download模块的<OpenSSL>异常: ',
                                          {
                                              'function': 'Scraper',
-                                             'request': request,
+                                             'request': request.meta['proxy'],
                                              'exception': str(exc),
                                          }),
                          extra={
@@ -263,12 +250,12 @@ class Scraper(object):
                          extra={
                              'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
                          }, exc_info=False)
-        elif isinstance(exc,OpenSSL.SSL.Error):
+        elif isinstance(exc,ResponseNeverReceived):
             logger.error(*self.lfm.error('Spider', self.spider.name,
-                                         '来自Download模块的<OpenSSL>异常: ',
+                                         '来自Download模块的<ResponseNeverReceived>异常: ',
                                          {
                                              'function': 'Scraper',
-                                             'request': request.meta['proxy'],
+                                             'request': request,
                                              'exception': str(exc),
                                          }),
                          extra={

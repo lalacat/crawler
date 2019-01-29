@@ -28,7 +28,6 @@ class Scheduler(object):
         return
 
     def next_request(self):
-        # logger.debug("Spider:%s 的Scheduler中取下一个Request",self.spider.name)
         logger.debug(*self.lfm.crawled("Spider",self.spider.name,
                                        '取下一个Request', 'Scheduler'))
         # 如果block为False，如果有空间中有可用数据，取出队列，否则立即抛出Empty异常

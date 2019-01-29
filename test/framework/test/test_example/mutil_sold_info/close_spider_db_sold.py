@@ -85,7 +85,4 @@ class HouseInfoDB(object):
             return 'update'
         elif exist.count() == 0:
             return 'insert'
-        # else:
-        #     print('Nothing')
-        #     'Nothing'
 

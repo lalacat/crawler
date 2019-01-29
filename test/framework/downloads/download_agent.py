@@ -27,7 +27,6 @@ class HTTPDownloadHandler(object):
     def __init__(self,logformatter,settings):
         # 管理连接的，作用request完成后，connections不会自动关闭，而是保持在缓存中，再次被利用
         self.lfm = logformatter
-        #logger.debug(*self.lfm.crawled)
         logger.debug(*self.lfm.crawled(
             'Downloader',
             'HTTPDownloadHandler',
@@ -48,15 +47,7 @@ class HTTPDownloadHandler(object):
     def from_crawler(cls,crawler):
         return cls(crawler.logformatter,crawler.settings)
 
-
     def download_request(self,request,spider):
-        # logger.debug("Spider:%s <%s> 执行download_request..."%(spider.name,request))
-        logger.debug(*self.lfm.crawled(
-            'Spider',
-            spider.name,
-            '执行download_request',
-            request
-        ))
         """返回一个http download 的 defer"""
         self.spider = spider
         agent = DownloadAgent(contextFactory=self._contextFactory,pool=self._pool,
@@ -120,11 +111,9 @@ class DownloadAgent(object):
 
     def download_request(self,request):
         timeout = request.meta.get('download_timeout') or self._connectTimeout
-        logger.debug(*self.lfm.crawled(
-            'Request', request,
-            '执行download_request,延迟时间:',
-            {'time':timeout})
-                     )
+        delay_time = request.meta.get('delay_time')
+        logger.error(*self.lfm.crawled("Request", request,
+                                       '正在下载,延迟了%6.3f' %delay_time, ))
         agent = self._getAgent(timeout)
         #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
         #  urldefrag去掉fragment

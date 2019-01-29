@@ -34,6 +34,7 @@ class Slot(object):
         self.transferring = set()
         self.lastseen = 0
         self.latercall = None
+        self.delay_time = 0
 
     def free_transfer_slots(self):
         return self.concurrency - len(self.transferring)
@@ -167,7 +168,6 @@ class Downloader(object):
     #  处理requset
     def _enqueue_request(self, request, spider):
         #  key就是hostname
-        # logger.info("Spider:%s <%s> 添加进入下载队列时间:[%6.3f]..."%(spider.name,request,time.clock()))
         logger.info(*self.lfm.crawled('Spider', self.spider.name, "添加进入下载队列时间:",
                                               {
                                                   'time':time.clock(),
@@ -198,21 +198,15 @@ class Downloader(object):
         if slot.latercall and slot.latercall.active(): # 如果一个latercall正在运行则直接返回
             return
 
-        # Delay queue processing if a download_delay is configured
-        # if hasattr(spider,'build_time'):
-        #     now = time.clock() - spider.build_time
-        # else:
         now = time.clock()
-        # logger.error('%s 的 now: %6.3f'%(spider.name,now))
-        # delay = slot.download_delay()  # 获取slot对象的延迟时间
-        delay = 0  # 获取slot对象的延迟时间
-
+        delay = slot.download_delay()  # 获取slot对象的延迟时间
         if delay:
             #  delay在默认情况下为0
             penalty = delay + slot.lastseen - now  # 距离上次运行还需要延迟则latercall
             # logger.error('%s 的 penalty:%6.3f' % (spider.name,now))
 
             if penalty > 0:
+                slot.delay_time = delay
                 slot.latercall = reactor.callLater(penalty, self._process_queue, spider, slot)
                 return
 
@@ -222,17 +216,17 @@ class Downloader(object):
             # 则下载，如果需要延迟则继续调用'_process_queue'
             slot.lastseen = now
             request, deferred = slot.queue.popleft()
-            dfd = self._download(slot, request, spider)
+            request.meta['delay_time'] =slot.delay_time
+            dfd = self._download(slot, request, spider,slot.delay_time)
             dfd.chainDeferred(deferred)
-            # prevent burst if inter-request delays were configured
             if delay:
                 self._process_queue(spider, slot)
                 break
 
-    def _download(self,slot,request, spider):
+    def _download(self,slot,request, spider,delay_time):
         # logger.debug("Spider:%s <%s> 正在下载...",spider.name,request)
-        logger.error(*self.lfm.crawled("Spider", spider.name,
-                                       '正在下载 %6.3f'%time.clock(), request))
+        # logger.error(*self.lfm.crawled("Spider", spider.name,
+        #                                '正在下载,延迟了%6.3f'%delay_time, request))
         try:
             dfd = mustbe_deferred(self.handler.download_request,request,spider)
         except Exception:
