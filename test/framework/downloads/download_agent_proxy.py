@@ -128,8 +128,8 @@ class DownloadAgent(object):
             proxyHost = proxyHost.decode(self.auth_encoding)
             logger.info(*self.lfm.crawled(
                            'Spider',self.spider.name,
-                           '使用代理:%s:%s'%(proxyHost,str(proxyPort),
-                           request)
+                           '使用代理:%s:%s'%(proxyHost,str(proxyPort)),
+                           request
                            ))
             if scheme == b'https':
                 proxyConfig = (proxyHost,proxyPort,creds_02)
@@ -158,17 +158,23 @@ class DownloadAgent(object):
         self.request = request
         try:
             delay_time = request.meta.get('delay_time')
-            logger.error(*self.lfm.crawled("Spider", self.spider.name,
-                                           '正在下载,延迟了%6.3f' % delay_time,request))
-
             agent = self._getAgent(request, timeout)
             if redirect:
-                logger.debug(*self.lfm.crawled(
-                    'Request', request,
-                    '网站重定向',
-                    "Get Agent")
-                     )
+                logger.error(*self.lfm.crawled(
+                    "Spider", self.spider.name,
+                    '重定向下载,延迟了%6.3f,时间为:' % delay_time,
+                    {
+                        'request': request,
+                        'time': time.clock()
+                    }))
                 agent = self._getRedirectAgent(agent)
+            else:
+                logger.error(*self.lfm.crawled("Spider", self.spider.name,
+                                               '正在下载,延迟了%6.3f,时间为:' % delay_time,
+                                               {
+                                                   'request':request,
+                                                    'time':time.clock()
+                                               }))
             #  url格式如下：protocol :// hostname[:port] / path / [;parameters][?query]#fragment
             #  urldefrag去掉fragment
             url = urldefrag(request.url)[0]

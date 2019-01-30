@@ -17,7 +17,7 @@ DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
 
 DOWNLOAD_FAIL_ON_DATALOSS = True
 
-DOWNLOAD_DELAY = 0
+DOWNLOAD_DELAY = 1
 DOWNLOADER_MIDDLEWARE = {
     "test.framework.downloads.download_middleware.user_agent.ChangeRequestUserAgent":10,
    #  如果使用chang proxy 必须放在add http proxy 这个类前面执行，否则会报错

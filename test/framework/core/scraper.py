@@ -410,7 +410,7 @@ class Scraper(object):
                                            {
                                                'function': 'Scraper',
                                                'request': 'item'
-                                           }))
+                                           }),exc_info=True)
         return None
 
     def _process_item_time(self,_):

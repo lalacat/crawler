@@ -69,8 +69,8 @@ class RecordDownloadErrorUrl(object):
                     '<ConnectionLost>错误'
                 ))
             else :
-                logger.error(type(_failure))
-                raise TypeError('获取的Exception的类型没有包含')
+                logger.error(type(_failure),exc_info=True)
+                raise TypeError('获取的Exception的类型没有包含 %s' %type(_failure))
 
             db_msg[name] = {
                 'url': request.url,
