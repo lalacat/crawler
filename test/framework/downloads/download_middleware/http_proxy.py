@@ -51,6 +51,5 @@ class AddHttpProxy(object):
             request.meta['proxy'] = proxy_url
             if creds and not request.headers.getRawHeaders('Proxy-Authorization'):
                 request.headers.setRawHeaders('Proxy-Authorization',[creds])
-            return
-        else:
-            return
+
+        return  None

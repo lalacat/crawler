@@ -66,8 +66,8 @@ class ParentSoldSale(Spider):
 
         #logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
-        for i in range(2,self.total_page_number+1):
-        # for i in range(2,3):
+        # for i in range(2,self.total_page_number+1):
+        for i in range(2,4):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
@@ -92,6 +92,9 @@ class ParentSoldSale(Spider):
         # # print(pprint.pformat(total_dict))
         # print(len(total_dict))
         # return None
+        # self.sold_url = {
+        #     'Task_sold_金湾佳园':'https://sh.lianjia.com/chengjiao/c5011000018848/'
+        # }
         try:
             cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name,logformat=self.lfm,middlewares=self.crawler.middlewares)
             yield cr.start()

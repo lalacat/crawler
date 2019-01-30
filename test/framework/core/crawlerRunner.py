@@ -86,6 +86,7 @@ class CrawlerRunner(object):
         self._crawlers = set()
         # 装载的是defer的集合
         self._active = set()
+        self._active_finish = False
         # 子爬虫的数量
         if self.name:
             self.MAX_CHILD_NUM = 3
@@ -276,7 +277,13 @@ class CrawlerRunner(object):
         flag = not self._pull_task_finish and len(self._active) < self.MAX_CHILD_NUM
         return flag
 
+    @inlineCallbacks
     def next_task_from_schedule(self):
+
+        if self._active_finish:
+            logger.error(self._crawlers)
+            return None
+
         logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
                                        '调用next_task_from_schedule'))
         if self.pause:
@@ -288,9 +295,16 @@ class CrawlerRunner(object):
         while self.needs_backout():
             self.crawl(self.spidercls)
 
-        if self._active:
+        def change_falg(_):
+            print("change_falg")
+            self._active_finish = False
+            return None
+
+        while self._active:
+            self._active_finish = True
             d = DeferredList(self._active)
-            return d
+            d.addBoth(change_falg)
+            yield d
 
         if self.runner_is_idle():
             self.stop()

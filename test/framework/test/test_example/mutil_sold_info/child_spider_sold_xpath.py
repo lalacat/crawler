@@ -23,7 +23,7 @@ class CollectSold(Spider):
         self.serect_price = dict()
         self.result_items = 0
 
-        self.sold_db = True
+        self.sold_db = False
         self.change_header = True
         self.change_proxy = True
         self.output = False

@@ -198,15 +198,15 @@ class ExecutionEngine(object):
         :return:
         """
         # logger.debug("Spdier:%s 调用[_next_request]...",spider.name)
-        logger.info(*self.lfm.crawled("Spider", spider.name,
-                                       '调用[_next_request]', 'Engine'))
+
         slot = self.slot
         if not slot:
             return
 
         if self.paused:
             return
-
+        logger.info(*self.lfm.crawled("Spider", spider.name,
+                                       '调用[_next_request],还剩下:{:d}个任务'.format(len(slot.inprogress)), 'Engine'))
         # 是否等待，因为在opeb_spider中通过nextcall中的LoopCall不断的调用
         # _next_requset必须设置flag来保障，每次调用的时候只有前一次的处理结束
         # 后才能继续执行新的任务

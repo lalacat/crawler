@@ -159,7 +159,16 @@ class DownloadAgent(object):
         try:
             delay_time = request.meta.get('delay_time')
             agent = self._getAgent(request, timeout)
-            if redirect:
+            proxy = request.meta.get('proxy_config')
+
+            if proxy:
+                logger.error(*self.lfm.crawled("Spider", self.spider.name,
+                                               '正在通过代理<%s:%d>下载,延迟了%6.3f,时间为:' % (proxy[0],proxy[1],delay_time),
+                                               {
+                                                   'request':request,
+                                                    'time':time.clock()
+                                               }))
+            elif redirect:
                 logger.error(*self.lfm.crawled(
                     "Spider", self.spider.name,
                     '重定向下载,延迟了%6.3f,时间为:' % delay_time,
