@@ -7,7 +7,6 @@ import logging
 from lxml import etree
 from test.framework.spider import Spider
 from test.framework.https.request import Request
-from test.framework.test.test_example.mutil_sold_info.close_spider_print_sold import Spider_Out_print
 
 logger = logging.getLogger(__name__)
 

@@ -53,7 +53,11 @@ class RecordDownloadErrorUrl(object):
             else:
                 self.spider_names[spider.name] = 1
                 name = spider.name + "_" + str(1)
-            _failure = exception.value
+            if hasattr(exception,'value'):
+
+                _failure = exception.value
+            else:
+                _failure= exception
             if isinstance(_failure, TimeoutError):
                 download_times = request.meta.get('timeout_times')
                 if download_times != 4:

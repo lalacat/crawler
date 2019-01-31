@@ -143,12 +143,11 @@ class CrawlerRunner(object):
                          )
             return result
 
-        def _next_slot(_):
-            self.slot.nextcall.schedule()
-            return _
+        # def _next_slot(_):
+        #     return _
 
         d.addBoth(_done,d)
-        d.addBoth(_next_slot)
+        # d.addBoth(_next_slot)
         self._active.add(d)
 
     def _load_starturl_from_schedule(self):
@@ -282,7 +281,9 @@ class CrawlerRunner(object):
 
         if self._active_finish:
             logger.error(self._crawlers)
-            return None
+            if 'Task_chuansha' in self._crawlers:
+                print('')
+            return
 
         logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
                                        '调用next_task_from_schedule'))
@@ -298,10 +299,13 @@ class CrawlerRunner(object):
         def change_falg(_):
             print("change_falg")
             self._active_finish = False
+            self.slot.nextcall.schedule()
+
             return None
 
-        while self._active:
+        if self._active:
             self._active_finish = True
+            logger.error('即将激活的任务：%s'%self._crawlers)
             d = DeferredList(self._active)
             d.addBoth(change_falg)
             yield d
@@ -407,3 +411,8 @@ def make_generator(tasks):
             yield it.__next__()
         except StopIteration:
             break
+
+
+
+# a = {'1','2','3'}
+# logger.error('列表%s' %a)

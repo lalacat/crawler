@@ -89,7 +89,7 @@ class DownloaderMiddlewareManager(MiddlewareManager):
                         (method_name, type(response))
                 except Exception as e :
                     # raise TypeError("DownloadMW process_exception need 3 required positional arguments: 'request', 'exception', and 'spider' " )
-                    raise MiddleWareError('DownloadMW process_exception : %s' %str(e.value))
+                    raise MiddleWareError('DownloadMW process_exception : %s' %e)
                 if response:
                     defer.returnValue(response)
             defer.returnValue(_failure)

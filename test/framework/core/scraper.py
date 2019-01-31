@@ -272,7 +272,7 @@ class Scraper(object):
                                              }),
                              extra={
                                 'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)
-                            },exc_info = False)
+                            },exc_info = True)
                 # if isinstance(_failure,Failure):
                 #     logger.error(_failure,exc_info = True)
             else:

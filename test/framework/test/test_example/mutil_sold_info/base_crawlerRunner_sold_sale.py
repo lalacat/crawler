@@ -4,6 +4,7 @@ import pymongo
 
 from twisted.internet import reactor
 
+from test.framework.core.crawler import Crawler
 from test.framework.setting import Setting
 from test.framework.core.crawlerRunner import CrawlerRunner
 
@@ -112,8 +113,13 @@ town_urls_dict= {
 
 
 s = Setting()
-cr = CrawlerRunner(town_urls,s,ParentSoldSale)
-d = cr.start()
+# cr = CrawlerRunner(town_urls,s,ParentSoldSale)
+# d = cr.start()
+crawler = Crawler(ParentSoldSale, s)
+crawler.create_spider_from_task('chuansha', ['https://sh.lianjia.com/xiaoqu/chuansha/'])
+d= crawler.crawl()
+
+
 d.addBoth(lambda _:reactor.stop())
 # reactor.callLater(2,cr.stop)
 reactor.run()

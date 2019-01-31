@@ -30,6 +30,7 @@ class ParentSoldSale(Spider):
         self.sale_url = dict()
         self.sold_url = dict()
 
+        self.output = True
     @property
     def name(self):
         return self._name
@@ -71,7 +72,6 @@ class ParentSoldSale(Spider):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
-    @defer.inlineCallbacks
     def _parse_getCommunityInfo(self,response):
         seletor = etree.HTML(response.body)
         page_num = response.request.meta["page_num"]
@@ -95,11 +95,16 @@ class ParentSoldSale(Spider):
         # self.sold_url = {
         #     'Task_sold_金湾佳园':'https://sh.lianjia.com/chengjiao/c5011000018848/'
         # }
-        try:
-            cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name,logformat=self.lfm,middlewares=self.crawler.middlewares)
-            yield cr.start()
-        except Exception as e :
-            raise e
+        return None
+
+    # @defer.inlineCallbacks
+    # def _start_child_Craweler(self):
+    #     try:
+    #         logger.error(pprint.pformat(self.sold_url))
+    #         cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name,logformat=self.lfm,middlewares=self.crawler.middlewares)
+    #         yield cr.start()
+    #     except Exception as e :
+    #         raise e
 
     def _get_onePage(self,all_communities):
         one_page = list()
@@ -142,6 +147,7 @@ class ParentSoldSale(Spider):
             one_page.append(result)
 
         return one_page
+
 
 
 

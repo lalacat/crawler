@@ -90,7 +90,7 @@ ITEM_PIPELINES = {
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_06_shfe.Spider_Out_print": 10,
 
 
-    # 'test.framework.test.test_example.mutil_sold_info.close_spider_print_sold.Spider_Out_print':10,
+    'test.framework.test.test_example.mutil_sold_info.close_spider_print_sold.Spider_Out_print':10,
     'test.framework.test.test_example.mutil_sold_info.close_spider_db_sold.HouseInfoDB': 20
 
 }
