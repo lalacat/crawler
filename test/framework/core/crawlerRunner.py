@@ -89,7 +89,7 @@ class CrawlerRunner(object):
         self._active_finish = False
         # 子爬虫的数量
         if self.name:
-            self.MAX_CHILD_NUM = 3
+            self.MAX_CHILD_NUM = 4
         else:
             self.MAX_CHILD_NUM = 1
         # 子爬虫的名称
@@ -280,13 +280,14 @@ class CrawlerRunner(object):
     def next_task_from_schedule(self):
 
         if self._active_finish:
-            logger.error(self._crawlers)
-            if 'Task_chuansha' in self._crawlers:
-                print('')
+            logger.error(*self.lfm.crawled('CrawlerRunner', self.name,
+                                           '正在执行的任务有：%s'%self._crawlers))
+            # if 'Task_chuansha' in self._crawlers:
+            #     print('')
             return
 
-        logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
-                                       '调用next_task_from_schedule'))
+        # logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
+        #                                '调用next_task_from_schedule'))
         if self.pause:
             return
 
@@ -297,7 +298,6 @@ class CrawlerRunner(object):
             self.crawl(self.spidercls)
 
         def change_falg(_):
-            print("change_falg")
             self._active_finish = False
             self.slot.nextcall.schedule()
 
@@ -305,7 +305,7 @@ class CrawlerRunner(object):
 
         if self._active:
             self._active_finish = True
-            logger.error('即将激活的任务：%s'%self._crawlers)
+            logger.warning('即将激活的任务：%s'%self._crawlers)
             d = DeferredList(self._active)
             d.addBoth(change_falg)
             yield d

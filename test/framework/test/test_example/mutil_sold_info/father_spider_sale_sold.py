@@ -5,12 +5,10 @@ import logging
 
 from collections import defaultdict
 from lxml import etree
-from twisted.internet import defer
 
 from test.framework.spider import Spider
 from test.framework.https.request import Request
-from test.framework.core.crawlerRunner import CrawlerRunner
-from test.framework.test.test_example.mutil_sold_info.child_spider_sold_xpath import CollectSold
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +65,8 @@ class ParentSoldSale(Spider):
 
         #logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
 
-        # for i in range(2,self.total_page_number+1):
-        for i in range(2,4):
+        for i in range(2,self.total_page_number+1):
+        # for i in range(2,4):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
@@ -88,23 +86,7 @@ class ParentSoldSale(Spider):
             self.sale_url['sale_'+name] = sale_url
             self.sold_url['sold_'+name] = sold_url
 
-        # total_dict = dict(self.sale_url,**self.sold_url)
-        # # print(pprint.pformat(total_dict))
-        # print(len(total_dict))
-        # return None
-        # self.sold_url = {
-        #     'Task_sold_金湾佳园':'https://sh.lianjia.com/chengjiao/c5011000018848/'
-        # }
         return None
-
-    # @defer.inlineCallbacks
-    # def _start_child_Craweler(self):
-    #     try:
-    #         logger.error(pprint.pformat(self.sold_url))
-    #         cr = CrawlerRunner(self.sold_url,self.settings,CollectSold,name=self.name,logformat=self.lfm,middlewares=self.crawler.middlewares)
-    #         yield cr.start()
-    #     except Exception as e :
-    #         raise e
 
     def _get_onePage(self,all_communities):
         one_page = list()

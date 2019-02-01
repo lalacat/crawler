@@ -65,10 +65,10 @@ town_urls = {
      # 'beicai': 'https://sh.lianjia.com/xiaoqu/beicai/',
      # 'biyun': 'https://sh.lianjia.com/xiaoqu/biyun/',
      # 'caolu': 'https://sh.lianjia.com/xiaoqu/caolu/',
-     'chuansha': 'https://sh.lianjia.com/xiaoqu/chuansha/',
-     # 'datuanzhen': 'https://sh.lianjia.com/xiaoqu/datuanzhen/',
-     # 'gaodong': 'https://sh.lianjia.com/xiaoqu/gaodong/',
-     # 'gaohang': 'https://sh.lianjia.com/xiaoqu/gaohang/',
+     # 'chuansha': 'https://sh.lianjia.com/xiaoqu/chuansha/',
+     'datuanzhen': 'https://sh.lianjia.com/xiaoqu/datuanzhen/',
+     'gaodong': 'https://sh.lianjia.com/xiaoqu/gaodong/',
+     'gaohang': 'https://sh.lianjia.com/xiaoqu/gaohang/',
      # 'geqing': 'https://sh.lianjia.com/xiaoqu/geqing/',
      # 'hangtou': 'https://sh.lianjia.com/xiaoqu/hangtou/',
      # 'huamu': 'https://sh.lianjia.com/xiaoqu/huamu/',
@@ -113,12 +113,11 @@ town_urls_dict= {
 
 
 s = Setting()
-# cr = CrawlerRunner(town_urls,s,ParentSoldSale)
-# d = cr.start()
-crawler = Crawler(ParentSoldSale, s)
-crawler.create_spider_from_task('chuansha', ['https://sh.lianjia.com/xiaoqu/chuansha/'])
-d= crawler.crawl()
-
+cr = CrawlerRunner(town_urls,s,ParentSoldSale)
+d = cr.start()
+# crawler = Crawler(ParentSoldSale, s)
+# crawler.create_spider_from_task('chuansha', ['https://sh.lianjia.com/xiaoqu/chuansha/'])
+# d= crawler.crawl()
 
 d.addBoth(lambda _:reactor.stop())
 # reactor.callLater(2,cr.stop)

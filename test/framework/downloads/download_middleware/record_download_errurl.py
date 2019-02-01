@@ -73,7 +73,7 @@ class RecordDownloadErrorUrl(object):
                     '<ConnectionLost>错误'
                 ))
             else :
-                logger.error(type(_failure),exc_info=True)
+                # logger.error(type(_failure),exc_info=True)
                 raise TypeError('获取的Exception的类型没有包含 %s' %type(_failure))
 
             db_msg[name] = {
@@ -87,7 +87,7 @@ class RecordDownloadErrorUrl(object):
                     name:db_msg[name]
                 }})
         except Exception as e:
-            raise Exception('RecordDownloadErrorUrl %s' %str(e))
+            raise Exception('RecordDownloadErrorUrl %s' %e)
         self.spider_names[spider.name] += 1
         return None
 

@@ -20,9 +20,8 @@ class Spider_Out_print(object):
             # print("%s 理论获取小区数为%d个"%(spider.name,int(spider.result["total_xiaoqu_number"][0])))
             if hasattr(spider,'output'):
                 if spider.output:
-                    # print(pprint.pformat(spider.result))
                     if hasattr(spider,'sold_url'):
-                        print((pprint.pformat(spider.sold_url)))
+                        # print((pprint.pformat(spider.sold_url)))
                         cr = CrawlerRunner(spider.sold_url, spider.settings, CollectSold, name=spider.name,
                                            logformat=spider.lfm, middlewares=spider.crawler.middlewares)
                         yield cr.start()

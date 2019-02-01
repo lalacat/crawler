@@ -10,6 +10,7 @@ from test.framework.https.request import Request
 
 logger = logging.getLogger(__name__)
 
+
 class CollectSold(Spider):
     """
     将所有小区的地址都写入数据库中
@@ -22,7 +23,7 @@ class CollectSold(Spider):
         self.serect_price = dict()
         self.result_items = 0
 
-        self.sold_db = False
+        self.sold_db = True
         self.change_header = True
         self.change_proxy = True
         self.output = False
