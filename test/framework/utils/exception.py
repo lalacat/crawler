@@ -8,5 +8,5 @@ class CloseSpider(Exception):
 
 class MiddleWareError(Exception):
     def __init__(self, reason='error'):
-        super(CloseSpider, self).__init__()
+        super(MiddleWareError, self).__init__()
         self.reason = reason

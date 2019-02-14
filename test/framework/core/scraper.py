@@ -4,7 +4,7 @@ from collections import deque, Iterable
 
 import OpenSSL
 from twisted.internet import defer
-from twisted.internet.error import ConnectionLost, ConnectionDone
+from twisted.internet.error import ConnectionLost, ConnectionDone, TCPTimedOutError
 from twisted.python.failure import Failure
 from twisted.web._newclient import ResponseNeverReceived
 
@@ -183,16 +183,7 @@ class Scraper(object):
         end_time = time.clock()
 
         if isinstance(exc,TimeoutError):
-            # logger.debug(*self.lfm.error('Spider', self.spider.name,
-            #                              '来自Download模块的异常: ',
-            #                              {
-            #                                  'function': 'Scraper',
-            #                                  'request': request,
-            #                                  'exception': exc,
-            #                              }),
-            #              extra={
-            #                  'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
-            #              })
+
             if not self.timeout_times.get(str(request)):
                 self.timeout_times[str(request)] = 1
 
@@ -261,6 +252,17 @@ class Scraper(object):
                          extra={
                              'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
                          }, exc_info=False)
+        elif isinstance(exc, TCPTimedOutError):
+            logger.error(*self.lfm.error('Spider', self.spider.name,
+                                         '来自Download模块的<ResponseNeverReceived>异常: ',
+                                         {
+                                             'function': 'Scraper',
+                                             'request': request,
+                                             'exception': str(exc),
+                                         }),
+                         extra={
+                             'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
+                         }, exc_info=False)
         else:
             if self.lfm.level is not 'DEBUG':
                 logger.error(*self.lfm.error('Spider',self.spider.name,
@@ -268,7 +270,7 @@ class Scraper(object):
                                              {
                                                  'function':'Scraper',
                                                  'request':request,
-                                                 'exception': exc,
+                                                 'exception': _failure,
                                              }),
                              extra={
                                 'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)

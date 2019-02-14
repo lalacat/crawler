@@ -1,5 +1,4 @@
 import json
-import pprint
 import re
 import logging
 
@@ -27,8 +26,8 @@ class ParentSoldSale(Spider):
         self.result_len = 0
         self.sale_url = dict()
         self.sold_url = dict()
-
         self.output = True
+
     @property
     def name(self):
         return self._name
@@ -63,10 +62,7 @@ class ParentSoldSale(Spider):
         total_xiaoqu_number = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
 
-        #logger.critical("%s的总页数是%d" % (self.name, self.total_page_number))
-
         for i in range(2,self.total_page_number+1):
-        # for i in range(2,4):
             url = self._start_urls[0] + '/pg' + str(i)
             yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 

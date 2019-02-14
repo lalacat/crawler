@@ -3,7 +3,7 @@ import time
 from collections import defaultdict
 
 import pymongo
-from twisted.internet.error import ConnectionLost
+from twisted.internet.error import ConnectionLost, TCPTimedOutError
 
 from twisted.python.failure import Failure
 from twisted.web._newclient import ResponseNeverReceived
@@ -65,16 +65,30 @@ class RecordDownloadErrorUrl(object):
             elif isinstance(_failure,ResponseNeverReceived):
                 logger.error(*self.lfm.error(
                     'Request',request.url,
-                    '<ResponseNeverReceived>错误'
+                    '<ResponseNeverReceived>错误',
+                    {
+                        'request':request.meta.get('proxy_config',None)
+                    }
                 ))
             elif isinstance(_failure,ConnectionLost):
                 logger.error(*self.lfm.error(
                     'Request', request.url,
-                    '<ConnectionLost>错误'
+                    '<ConnectionLost>错误',
+                    {
+                        'request': request.meta.get('proxy_config', None)
+                    }
+                ))
+            elif isinstance(_failure,TCPTimedOutError):
+                logger.error(*self.lfm.error(
+                    'Request', request.url,
+                    '<TCPTimedOutError>错误',
+                    {
+                        'request': request.meta.get('proxy_config', None)
+                    }
                 ))
             else :
                 # logger.error(type(_failure),exc_info=True)
-                raise TypeError('获取的Exception的类型没有包含 %s' %type(_failure))
+                raise TypeError('<RecordDownloadErrorUrl>获取的Exception的类型没有包含 %s' %type(_failure))
 
             db_msg[name] = {
                 'url': request.url,

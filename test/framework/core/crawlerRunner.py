@@ -91,7 +91,7 @@ class CrawlerRunner(object):
         if self.name:
             self.MAX_CHILD_NUM = 4
         else:
-            self.MAX_CHILD_NUM = 1
+            self.MAX_CHILD_NUM = 4
         # 子爬虫的名称
         # self.SPIDER_NAME_CHOICE = self.settings['SPIDER_NAME_CHOICE']
         self.SPIDER_NAME_CHOICE = False
@@ -108,7 +108,7 @@ class CrawlerRunner(object):
         #  task完成标志位
         # self.filter_task = FilterTask(self.SPIDER_NAME_CHOICE)
         # 导入队列中任务个数的最大值
-        self.filter_task = 4
+        self.filter_task = 10
         self._push_task_finish = False
         self._pull_task_finish = False
         self._next_task = None
@@ -282,12 +282,8 @@ class CrawlerRunner(object):
         if self._active_finish:
             logger.error(*self.lfm.crawled('CrawlerRunner', self.name,
                                            '正在执行的任务有：%s'%self._crawlers))
-            # if 'Task_chuansha' in self._crawlers:
-            #     print('')
             return
 
-        # logger.debug(*self.lfm.crawled('CrawlerRunner', self.name,
-        #                                '调用next_task_from_schedule'))
         if self.pause:
             return
 

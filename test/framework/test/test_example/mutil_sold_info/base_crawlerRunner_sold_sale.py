@@ -66,9 +66,9 @@ town_urls = {
      # 'biyun': 'https://sh.lianjia.com/xiaoqu/biyun/',
      # 'caolu': 'https://sh.lianjia.com/xiaoqu/caolu/',
      # 'chuansha': 'https://sh.lianjia.com/xiaoqu/chuansha/',
-     'datuanzhen': 'https://sh.lianjia.com/xiaoqu/datuanzhen/',
-     'gaodong': 'https://sh.lianjia.com/xiaoqu/gaodong/',
-     'gaohang': 'https://sh.lianjia.com/xiaoqu/gaohang/',
+     # 'datuanzhen': 'https://sh.lianjia.com/xiaoqu/datuanzhen/',
+     # 'gaodong': 'https://sh.lianjia.com/xiaoqu/gaodong/',
+     # 'gaohang': 'https://sh.lianjia.com/xiaoqu/gaohang/',
      # 'geqing': 'https://sh.lianjia.com/xiaoqu/geqing/',
      # 'hangtou': 'https://sh.lianjia.com/xiaoqu/hangtou/',
      # 'huamu': 'https://sh.lianjia.com/xiaoqu/huamu/',
@@ -83,22 +83,22 @@ town_urls = {
      # 'nanmatou': 'https://sh.lianjia.com/xiaoqu/nanmatou/',
      # 'nichengzhen': 'https://sh.lianjia.com/xiaoqu/nichengzhen/',
      # 'sanlin': 'https://sh.lianjia.com/xiaoqu/sanlin/',
-     # 'shibo': 'https://sh.lianjia.com/xiaoqu/shibo/',
-     # 'shuyuanzhen': 'https://sh.lianjia.com/xiaoqu/shuyuanzhen/',
-     # 'tangqiao': 'https://sh.lianjia.com/xiaoqu/tangqiao/',
-     # 'tangzhen': 'https://sh.lianjia.com/xiaoqu/tangzhen/',
-     # 'waigaoqiao': 'https://sh.lianjia.com/xiaoqu/waigaoqiao/',
-     # 'wanxiangzhen': 'https://sh.lianjia.com/xiaoqu/wanxiangzhen/',
-     # 'weifang': 'https://sh.lianjia.com/xiaoqu/weifang/',
-     # 'xinchang': 'https://sh.lianjia.com/xiaoqu/xinchang/',
-     # 'xuanqiao': 'https://sh.lianjia.com/xiaoqu/xuanqiao/',
-     # 'yangdong': 'https://sh.lianjia.com/xiaoqu/yangdong/',
-     # 'yangjing': 'https://sh.lianjia.com/xiaoqu/yangjing/',
-     # 'yuanshen': 'https://sh.lianjia.com/xiaoqu/yuanshen/',
-     # 'yuqiao1': 'https://sh.lianjia.com/xiaoqu/yuqiao1/',
-     # 'zhangjiang': 'https://sh.lianjia.com/xiaoqu/zhangjiang/',
-     # 'zhoupu': 'https://sh.lianjia.com/xiaoqu/zhoupu/',
-     # 'zhuqiao': 'https://sh.lianjia.com/xiaoqu/zhuqiao/'
+     'shibo': 'https://sh.lianjia.com/xiaoqu/shibo/',
+     'shuyuanzhen': 'https://sh.lianjia.com/xiaoqu/shuyuanzhen/',
+     'tangqiao': 'https://sh.lianjia.com/xiaoqu/tangqiao/',
+     'tangzhen': 'https://sh.lianjia.com/xiaoqu/tangzhen/',
+     'waigaoqiao': 'https://sh.lianjia.com/xiaoqu/waigaoqiao/',
+     'wanxiangzhen': 'https://sh.lianjia.com/xiaoqu/wanxiangzhen/',
+     'weifang': 'https://sh.lianjia.com/xiaoqu/weifang/',
+     'xinchang': 'https://sh.lianjia.com/xiaoqu/xinchang/',
+     'xuanqiao': 'https://sh.lianjia.com/xiaoqu/xuanqiao/',
+     'yangdong': 'https://sh.lianjia.com/xiaoqu/yangdong/',
+     'yangjing': 'https://sh.lianjia.com/xiaoqu/yangjing/',
+     'yuanshen': 'https://sh.lianjia.com/xiaoqu/yuanshen/',
+     'yuqiao1': 'https://sh.lianjia.com/xiaoqu/yuqiao1/',
+     'zhangjiang': 'https://sh.lianjia.com/xiaoqu/zhangjiang/',
+     'zhoupu': 'https://sh.lianjia.com/xiaoqu/zhoupu/',
+     'zhuqiao': 'https://sh.lianjia.com/xiaoqu/zhuqiao/'
     }
 town_urls_dict= {
     'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
@@ -115,11 +115,6 @@ town_urls_dict= {
 s = Setting()
 cr = CrawlerRunner(town_urls,s,ParentSoldSale)
 d = cr.start()
-# crawler = Crawler(ParentSoldSale, s)
-# crawler.create_spider_from_task('chuansha', ['https://sh.lianjia.com/xiaoqu/chuansha/'])
-# d= crawler.crawl()
-
 d.addBoth(lambda _:reactor.stop())
-# reactor.callLater(2,cr.stop)
 reactor.run()
 
