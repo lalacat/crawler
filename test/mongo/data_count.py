@@ -21,6 +21,7 @@ db = client[DATABASE]
 # searchRes = db_coll.find(queryArgs,projectionFields)
 
 all_collection = db.list_collection_names()
+print(len(all_collection))
 count = 0
 for coll in all_collection:
     if coll != 'ErrUrl':
