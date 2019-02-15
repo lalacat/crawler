@@ -92,29 +92,6 @@ class LogFormat(object):
             'msg': self.settings['LOG_ERROR_MSG'],
             'args': base_info
         }
-        # if isinstance(extra,str) :
-        #     return {
-        #         'msg': self.settings['LOG_ERROR_MSG'],
-        #         'args': {
-        #             'module': module,
-        #             'name': module_name,
-        #             'msg': error_msg,
-        #             'function': error_fun
-        #         }
-        #     }
-        # elif isinstance(error_fun,dict):
-        #     return {
-        #         'msg': self.settings['LOG_ERROR_REQUEST_EXTRA'],
-        #         'args': {
-        #             'module': module,
-        #             'name': module_name,
-        #             'msg': error_msg,
-        #             'function': error_fun['function'],
-        #             'request' : error_fun['request']
-        #         }
-        #     }
-        # else:
-        #     raise AttributeError("log输出参数错误")
 
     def _update_loggingdict(self):
         for name, logset in self.settings['LOGGING_DIC'].items():

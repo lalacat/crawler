@@ -1,5 +1,4 @@
 import json
-import pprint
 import time
 import re
 import logging
@@ -27,7 +26,6 @@ class CollectSold(Spider):
         self.change_header = True
         self.change_proxy = True
         self.output = False
-
 
     @property
     def name(self):
@@ -58,35 +56,44 @@ class CollectSold(Spider):
         try:
             sold_houses = self._xpath_filter(selector.xpath("//ul[@class='listContent']")).xpath('./li')
             total_num = selector.xpath('//div[@class="total fl"]/span/text()')[0]
-
+            print("sold：" + self.name + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
+            # page_number = selector.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
+            # if page_number:
+            #     total_page_number = json.loads(page_number[0])["totalPage"]
+            #     print(total_page_number)
+            # else:
+            #     print(page_number)
             if int(total_num) == 0:
                 return self._reload_sold(response,sold_houses)
             else:
                 self._resolve_sold(sold_houses,response.url)
                 if int(total_num) > len(sold_houses):
-                    self.result_items += len(sold_houses)
+                    # self.result_items += len(sold_houses)
                     if not re.search('pg',response.url):
                         print("sold：" + self.name + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
                         page_number = selector.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
-                        total_page_number = json.loads(page_number[0])["totalPage"]
-                        base_name = response.url.split('/')[-2]
-                        for pg in range(2,total_page_number+1):
-                            url = response.url.replace(base_name,'pg'+str(pg)+base_name)
-                            yield Request(url, callback=self._parse_sold)
+                        if page_number :
+                            total_page_number = json.loads(page_number[0])["totalPage"]
+                            base_name = response.url.split('/')[-2]
+                            for pg in range(2,total_page_number+1):
+                                url = response.url.replace(base_name,'pg'+str(pg)+base_name)
+                                yield Request(url, callback=self._parse_sold)
+                        else:
+                            return self._reload_sold(response, sold_houses)
                     else:
                         pg = re.findall('pg\d+',response.url)[0]
                         print("sold：" + self.name + '_' + pg + ': ' + response.url + ': ' + str(total_num) + "===" + str(len(sold_houses)))
         except Exception as e:
             logger.error(*self.lfm.error(
                 'Spider', self.name,
-                '解析房子信息时出现错误',
+                '解析房子信息时出现错误:',
                 {
                     'request':response.request,
-                    'function':'total_num={0} sold_houses={1}'.format(int(total_num),len(sold_houses))
+                    'function':'total_num={0} sold_houses={1}'.format(int(total_num),len(sold_houses)),
+                    'exception': e
                 }),
                 extra={
-                    'exception':e,
-                    'time':time.clock()
+                    'time':',时间为：%6.3f' %time.clock()
                 }
                 )
 
@@ -109,7 +116,7 @@ class CollectSold(Spider):
     def _reload_sold(self,response,sold_houses):
         if response.request.meta.get('download_times'):
             download_times = response.request.meta['download_times']
-            logger.critical(*self.lfm.crawled(
+            logger.error(*self.lfm.crawled(
                 'Spider', self.name,
                 '({0})再次下载,时间为：'.format(response.request.headers.getRawHeaders('User-Agent')[0]),
                 {
@@ -129,7 +136,7 @@ class CollectSold(Spider):
                 'last_header': response.request.headers
             })
         else:
-            logger.critical(*self.lfm.crawled(
+            logger.error(*self.lfm.crawled(
                 'Spider', self.name,
                 '重复下载次数已超过最大值，判断此网页没有数据,时间为：',
                 {
@@ -190,32 +197,17 @@ class CollectSold(Spider):
             # print("成交周期："+sold_dealcycle)
             house_info['sold_dealcycle'] = sold_dealcycle
             if re.search('\*+',sold_totalPrice):
-                # 记录错误呀的URL
-                # logger.error(sold_house_url,extra={
-                #     'reason':'价格隐藏',
-                #     'exception':sold_title,
-                #     'time':time.clock(),
-                #     'recordErrUrl':True
-                # })
-                # logger.error(*self.lfm.error(
-                #     "Spider",self.name,
-                #     '价格隐藏',
-                #     {
-                #         'function':sold_title
-                #     }
-                # ))
                 self.serect_price[(sold_title + '(' + sold_totalPrice + ')').replace('.', '_')] = house_info
 
             self.result[(sold_title+'('+sold_totalPrice+')').replace('.','_')] = house_info
-
-
-
 
     def _xpath_filter(self,xpath):
         if xpath:
             return xpath[0]
         else:
             return ' '
+
+    # def _check_from_db(self):
 
 
 

@@ -6,7 +6,7 @@ from test.framework.core.crawlerRunner import CrawlerRunner
 from test.framework.test.test_example.mutil_sold_info.child_spider_sold_xpath import CollectSold
 
 
-class Spider_Out_print(object):
+class Enable_Child_Spider(object):
     def __init__(self,settings):
         self.settings = settings
 
@@ -21,7 +21,6 @@ class Spider_Out_print(object):
             if hasattr(spider,'output'):
                 if spider.output:
                     if hasattr(spider,'sold_url'):
-                        # print((pprint.pformat(spider.sold_url)))
                         cr = CrawlerRunner(spider.sold_url, spider.settings, CollectSold, name=spider.name,
                                            logformat=spider.lfm, middlewares=spider.crawler.middlewares)
                         yield cr.start()

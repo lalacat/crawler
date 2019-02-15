@@ -1,3 +1,5 @@
+import pprint
+
 import pymongo
 
 
@@ -25,13 +27,16 @@ print(len(all_collection))
 count = 0
 for coll in all_collection:
     if coll != 'ErrUrl':
+    # if coll == 'Task_sanlin':
         db_coll = db[coll]
         child_num = 0
         all_zone = db_coll.find()
         while True:
             try:
                 next_task = all_zone.next()
-                n  = len(next_task)-2
+                n = len(next_task)-2
+                # if n != 0 :
+                #     print(pprint.pformat(next_task))
                 child_num += n
             except StopIteration:
                 break

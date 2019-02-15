@@ -9,6 +9,7 @@ from test.framework.setting import Setting
 from test.framework.core.crawlerRunner import CrawlerRunner
 
 # mongodb服务的地址和端口号
+from test.framework.test.test_example.mutil_sold_info.child_spider_sold_xpath import CollectSold
 from test.framework.test.test_example.mutil_sold_info.father_spider_sale_sold import ParentSoldSale
 
 mongo_url = "127.0.0.1:27017"
@@ -83,22 +84,22 @@ town_urls = {
      # 'nanmatou': 'https://sh.lianjia.com/xiaoqu/nanmatou/',
      # 'nichengzhen': 'https://sh.lianjia.com/xiaoqu/nichengzhen/',
      # 'sanlin': 'https://sh.lianjia.com/xiaoqu/sanlin/',
-     'shibo': 'https://sh.lianjia.com/xiaoqu/shibo/',
-     'shuyuanzhen': 'https://sh.lianjia.com/xiaoqu/shuyuanzhen/',
-     'tangqiao': 'https://sh.lianjia.com/xiaoqu/tangqiao/',
+     # 'shibo': 'https://sh.lianjia.com/xiaoqu/shibo/',
+     # 'shuyuanzhen': 'https://sh.lianjia.com/xiaoqu/shuyuanzhen/',
+     # 'tangqiao': 'https://sh.lianjia.com/xiaoqu/tangqiao/',
      'tangzhen': 'https://sh.lianjia.com/xiaoqu/tangzhen/',
-     'waigaoqiao': 'https://sh.lianjia.com/xiaoqu/waigaoqiao/',
-     'wanxiangzhen': 'https://sh.lianjia.com/xiaoqu/wanxiangzhen/',
-     'weifang': 'https://sh.lianjia.com/xiaoqu/weifang/',
-     'xinchang': 'https://sh.lianjia.com/xiaoqu/xinchang/',
-     'xuanqiao': 'https://sh.lianjia.com/xiaoqu/xuanqiao/',
-     'yangdong': 'https://sh.lianjia.com/xiaoqu/yangdong/',
-     'yangjing': 'https://sh.lianjia.com/xiaoqu/yangjing/',
-     'yuanshen': 'https://sh.lianjia.com/xiaoqu/yuanshen/',
-     'yuqiao1': 'https://sh.lianjia.com/xiaoqu/yuqiao1/',
-     'zhangjiang': 'https://sh.lianjia.com/xiaoqu/zhangjiang/',
+     # 'waigaoqiao': 'https://sh.lianjia.com/xiaoqu/waigaoqiao/',
+     # 'wanxiangzhen': 'https://sh.lianjia.com/xiaoqu/wanxiangzhen/',
+     # 'weifang': 'https://sh.lianjia.com/xiaoqu/weifang/',
+     # 'xinchang': 'https://sh.lianjia.com/xiaoqu/xinchang/',
+     # 'xuanqiao': 'https://sh.lianjia.com/xiaoqu/xuanqiao/',
+     # 'yangdong': 'https://sh.lianjia.com/xiaoqu/yangdong/',
+     # 'yangjing': 'https://sh.lianjia.com/xiaoqu/yangjing/',
+     # 'yuanshen': 'https://sh.lianjia.com/xiaoqu/yuanshen/',
+     # 'yuqiao1': 'https://sh.lianjia.com/xiaoqu/yuqiao1/',
+     # 'zhangjiang': 'https://sh.lianjia.com/xiaoqu/zhangjiang/',
      'zhoupu': 'https://sh.lianjia.com/xiaoqu/zhoupu/',
-     'zhuqiao': 'https://sh.lianjia.com/xiaoqu/zhuqiao/'
+     # 'zhuqiao': 'https://sh.lianjia.com/xiaoqu/zhuqiao/'
     }
 town_urls_dict= {
     'anshan':'https://sh.lianjia.com/xiaoqu/anshan/',# 157 156
@@ -111,9 +112,14 @@ town_urls_dict= {
     # 'zhongyuan1':'https://sh.lianjia.com/xiaoqu/zhongyuan1/',
 }
 
+child_urls = {
+    'Task_sold_杨思路602号':'https://sh.lianjia.com/chengjiao/c5011000020052/',
+    'Task_sold_三新路5弄': 'https://sh.lianjia.com/chengjiao/c5011000018712/'
+}
 
 s = Setting()
 cr = CrawlerRunner(town_urls,s,ParentSoldSale)
+# cr = CrawlerRunner(child_urls, s, CollectSold)
 d = cr.start()
 d.addBoth(lambda _:reactor.stop())
 reactor.run()

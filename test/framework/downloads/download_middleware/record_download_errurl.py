@@ -1,7 +1,5 @@
 import logging
 import time
-from collections import defaultdict
-
 import pymongo
 from twisted.internet.error import ConnectionLost, TCPTimedOutError
 
@@ -41,12 +39,14 @@ class RecordDownloadErrorUrl(object):
         return cls(crawler)
 
     def process_exception(self,request,exception,spider):
+        insert_db_flag = True
         try:
             if self.bulid_Flag:
                 self.bulid_Flag = False
                 self.db_coll = self.db[self.collection_name]
                 self.db_coll.insert(self.base_date)
                 self._id = self.db_coll.find(self.base_date).next()['_id']
+
             db_msg = dict()
             if self.spider_names.get(spider.name):
                 name = spider.name+'_'+str(self.spider_names[spider.name])
@@ -62,6 +62,13 @@ class RecordDownloadErrorUrl(object):
                 download_times = request.meta.get('timeout_times')
                 if download_times != 4:
                     return None
+                logger.error(*self.lfm.error(
+                    'Request', request.url,
+                    '<TimeoutError>错误',
+                    {
+                        'request': request.meta.get('proxy_config', None)
+                    }
+                ))
             elif isinstance(_failure,ResponseNeverReceived):
                 logger.error(*self.lfm.error(
                     'Request',request.url,
@@ -79,6 +86,9 @@ class RecordDownloadErrorUrl(object):
                     }
                 ))
             elif isinstance(_failure,TCPTimedOutError):
+                tcp_timeout_times = request.meta.get('tcp_timeout_times')
+                if tcp_timeout_times != 4:
+                    return None
                 logger.error(*self.lfm.error(
                     'Request', request.url,
                     '<TCPTimedOutError>错误',
@@ -90,16 +100,23 @@ class RecordDownloadErrorUrl(object):
                 # logger.error(type(_failure),exc_info=True)
                 raise TypeError('<RecordDownloadErrorUrl>获取的Exception的类型没有包含 %s' %type(_failure))
 
-            db_msg[name] = {
-                'url': request.url,
-                'exception': str(_failure)
-            }
-            from bson import ObjectId
-            self.db_coll.update(
-                {'_id': ObjectId(self._id)},
-                {'$set': {
-                    name:db_msg[name]
-                }})
+            if insert_db_flag:
+                if hasattr(spider, 'father_name'):
+                    father_name = spider.father_name
+                else:
+                    father_name = ''
+                db_msg[name] = {
+                    'url': request.url,
+                    'exception': str(_failure),
+                    'father_name':father_name,
+                    'spider_name':spider.name
+                }
+                from bson import ObjectId
+                self.db_coll.update(
+                    {'_id': ObjectId(self._id)},
+                    {'$set': {
+                        name:db_msg[name]
+                    }})
         except Exception as e:
             raise Exception('RecordDownloadErrorUrl %s' %e)
         self.spider_names[spider.name] += 1

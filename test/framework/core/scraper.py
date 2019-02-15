@@ -72,6 +72,10 @@ class Scraper(object):
         logger.debug(*self.lfm.crawled("Spider", crawler.spider.name,
                                        '已初始化', 'Scraper'))
         self.slot = None
+        self.settings = crawler.settings
+
+        self.DOWNLOAD_TCP_TIMEOUT_MAX_TIMES = self.settings['DOWNLOAD_TCP_TIMEOUT_TIMES']
+        self.DOWNLOAD_TIMEOUT_MAX_TIMES = self.settings['DOWNLOAD_TIMEOUT_MAX_TIMES']
 
         if crawler.middlewares.get('SpiderMiddlewareManager'):
             self.spidermw = crawler.middlewares['SpiderMiddlewareManager']
@@ -89,6 +93,9 @@ class Scraper(object):
         self.crawler = crawler
 
         self.timeout_times = dict()
+        self.tcp_timeout_times = dict()
+
+
 
     @defer.inlineCallbacks
     def open_spider(self,spider):
@@ -183,11 +190,10 @@ class Scraper(object):
         end_time = time.clock()
 
         if isinstance(exc,TimeoutError):
-
             if not self.timeout_times.get(str(request)):
                 self.timeout_times[str(request)] = 1
 
-            if self.timeout_times[str(request)] < 4:
+            if self.timeout_times[str(request)] < self.DOWNLOAD_TIMEOUT_MAX_TIMES:
                 logger.error(*self.lfm.error(
                     'Spider',self.spider.name,
                     '因下载超时，第%d次添加到下载队列中' % self.timeout_times[str(request)],
@@ -200,10 +206,45 @@ class Scraper(object):
                 self.timeout_times[str(request)] += 1
                 return None
 
-            if self.timeout_times[str(request)] == 4:
+            if self.timeout_times[str(request)] == self.DOWNLOAD_TIMEOUT_MAX_TIMES:
                 logger.error(*self.lfm.crawled(
                     'Spider', self.spider.name,
-                    '因下载超时，重新下载的次数超过最大重复下载次数%d,不再下载' % 4,
+                    '因下载超时，重新下载的次数超过最大重复下载次数%d,不再下载' % self.DOWNLOAD_TIMEOUT_MAX_TIMES,
+                    {
+                        'function': 'Scraper',
+                        'request': request,
+                    }))
+        elif isinstance(exc, TCPTimedOutError):
+            if not self.tcp_timeout_times.get(str(request)):
+                logger.error(*self.lfm.error('Spider', self.spider.name,
+                                             '来自Download模块的<TCPTimedOutError>异常: ',
+                                             {
+                                                 'function': 'Scraper',
+                                                 'request': request,
+                                                 'exception': str(exc),
+                                             }),
+                             extra={
+                                 'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
+                             }, exc_info=False)
+                self.tcp_timeout_times[str(request)] = 1
+
+            if self.tcp_timeout_times[str(request)] < self.DOWNLOAD_TCP_TIMEOUT_MAX_TIMES:
+                logger.error(*self.lfm.error(
+                    'Spider',self.spider.name,
+                    '因tcp连接超时，第%d次添加到下载队列中' % self.tcp_timeout_times[str(request)],
+                {
+                    'function': 'Scraper',
+                    'request': request,
+                }))
+                request.meta['tcp_timeout_times'] = self.tcp_timeout_times[str(request)]
+                self.crawler.engine.crawl(request=request, spider=spider)
+                self.tcp_timeout_times[str(request)] += 1
+                return None
+
+            if self.tcp_timeout_times[str(request)] == self.DOWNLOAD_TCP_TIMEOUT_MAX_TIMES:
+                logger.error(*self.lfm.crawled(
+                    'Spider', self.spider.name,
+                    '因tcp连接超时，重新下载的次数超过最大重复下载次数%d,不再下载' % self.DOWNLOAD_TCP_TIMEOUT_MAX_TIMES,
                     {
                         'function': 'Scraper',
                         'request': request,
@@ -252,17 +293,7 @@ class Scraper(object):
                          extra={
                              'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
                          }, exc_info=False)
-        elif isinstance(exc, TCPTimedOutError):
-            logger.error(*self.lfm.error('Spider', self.spider.name,
-                                         '来自Download模块的<ResponseNeverReceived>异常: ',
-                                         {
-                                             'function': 'Scraper',
-                                             'request': request,
-                                             'exception': str(exc),
-                                         }),
-                         extra={
-                             'time': '(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time - self.start_time)
-                         }, exc_info=False)
+
         else:
             if self.lfm.level is not 'DEBUG':
                 logger.error(*self.lfm.error('Spider',self.spider.name,
@@ -275,8 +306,7 @@ class Scraper(object):
                              extra={
                                 'time':'(详情在debug模式下查看)，错误时间为：{:6.3f}s'.format(end_time-self.start_time)
                             },exc_info = True)
-                # if isinstance(_failure,Failure):
-                #     logger.error(_failure,exc_info = True)
+
             else:
                 logger.error(*self.lfm.error('Spider',self.spider.name,
                                              '来自Spider或者Download模块的异常，详细内容为:',

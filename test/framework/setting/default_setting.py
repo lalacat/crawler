@@ -17,7 +17,7 @@ DOWNLOAD_WARNSIZE = 32*1024*1024    # 32m 下载网页大小的警戒值
 
 DOWNLOAD_FAIL_ON_DATALOSS = True
 
-DOWNLOAD_DELAY = 1
+DOWNLOAD_DELAY = 0
 DOWNLOADER_MIDDLEWARE = {
     "test.framework.downloads.download_middleware.user_agent.ChangeRequestUserAgent":10,
    #  如果使用chang proxy 必须放在add http proxy 这个类前面执行，否则会报错
@@ -26,7 +26,8 @@ DOWNLOADER_MIDDLEWARE = {
    "test.framework.downloads.download_middleware.record_download_errurl.RecordDownloadErrorUrl": 40,
 
 }
-
+DOWNLOAD_TCP_TIMEOUT_MAX_TIMES = 6
+DOWNLOAD_TIMEOUT_MAX_TIMES =4
 
 #E
 #F
@@ -90,7 +91,7 @@ ITEM_PIPELINES = {
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_06_shfe.Spider_Out_print": 10,
 
 
-    'test.framework.test.test_example.mutil_sold_info.close_spider_print_sold.Spider_Out_print':10,
+    'test.framework.test.test_example.mutil_sold_info.close_spider_enable_sold.Enable_Child_Spider':10,
     'test.framework.test.test_example.mutil_sold_info.close_spider_db_sold.HouseInfoDB': 20
 
 }

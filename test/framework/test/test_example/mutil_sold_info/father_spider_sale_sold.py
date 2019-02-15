@@ -55,20 +55,21 @@ class ParentSoldSale(Spider):
 
     def _parse_getAllCommunity(self,response):
         seletor = etree.HTML(response.body)
-
+        self._parse_getCommunityInfo(response)
         #  获取下属城镇的小区总页数
         page_number = seletor.xpath("//div[@class='page-box house-lst-page-box']/@page-data")
         self.total_page_number = json.loads(page_number[0])["totalPage"]
         total_xiaoqu_number = seletor.xpath("/html/body/div[4]/div[1]/div[2]/h2/span/text()")[0]
         self.result["total_xiaoqu_number"] = [total_xiaoqu_number]
 
-        for i in range(2,self.total_page_number+1):
-            url = self._start_urls[0] + '/pg' + str(i)
-            yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
+        # for i in range(2,self.total_page_number+1):
+        # # for i in range(2,3):
+        #     url = self._start_urls[0] + '/pg' + str(i)
+        #     yield Request(url, callback=self._parse_getCommunityInfo,meta={"page_num":i})
 
     def _parse_getCommunityInfo(self,response):
         seletor = etree.HTML(response.body)
-        page_num = response.request.meta["page_num"]
+        page_num = response.request.meta.get("page_num",1)
         all_communities = seletor.xpath('/html/body/div[4]/div[1]/ul/li')
         self.result[str(page_num)]=self._get_onePage(all_communities)
         for result in self.result[str(page_num)]:
