@@ -74,7 +74,7 @@ class Scraper(object):
         self.slot = None
         self.settings = crawler.settings
 
-        self.DOWNLOAD_TCP_TIMEOUT_MAX_TIMES = self.settings['DOWNLOAD_TCP_TIMEOUT_TIMES']
+        self.DOWNLOAD_TCP_TIMEOUT_MAX_TIMES = self.settings['DOWNLOAD_TCP_TIMEOUT_MAX_TIMES']
         self.DOWNLOAD_TIMEOUT_MAX_TIMES = self.settings['DOWNLOAD_TIMEOUT_MAX_TIMES']
 
         if crawler.middlewares.get('SpiderMiddlewareManager'):
