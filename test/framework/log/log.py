@@ -7,10 +7,6 @@ import time
 import warnings
 logger = logging.getLogger(__name__)
 
-
-
-
-
 class LogFormat(object):
     # log配置字典
 

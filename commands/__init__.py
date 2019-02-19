@@ -8,8 +8,6 @@ class BaseCommand(object):
     def __init__(self,setting = None):
         self.setting = setting
 
-
-
     def short_desc(self):
         pass
 
@@ -19,7 +17,6 @@ class BaseCommand(object):
     #给出程序版本的回调函数
     def _print_vision(self,option,opt_str,value,parser):
         print("This vision is 0.0.0")
-
 
     def add_options(self,parser):
         """
