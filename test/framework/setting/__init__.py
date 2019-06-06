@@ -263,10 +263,4 @@ def overridden_or_new_settings(settings):
                 yield name, value
         else :
             yield name, value
-    '''
-        for name, defvalue in iter_default_settings():
-        print(name,defvalue)
-        value = settings[name]
-        if not isinstance(defvalue, dict) and value != defvalue:
-            yield name, value
-    '''
+
