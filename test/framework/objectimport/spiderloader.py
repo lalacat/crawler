@@ -20,9 +20,6 @@ class SpiderLoader(object):
         self.warn_only = True
         self._load_all_spiders()
 
-
-
-
     def import_spider(self,path):
 
         #导入爬虫包
