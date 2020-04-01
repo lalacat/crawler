@@ -87,12 +87,13 @@ ITEM_PIPELINES = {
     # "test.framework.test.test_middleware.test_close_spider_print_03_lianjia_xiaoqu_db.test_print.Spider_Out_print": 10,
     # "test.framework.test.test_middleware.test_itempipe_collection_info.Collection_print": 20,
     # "test.framework.test.test_middleware.test_print.test_close_spider_print_04_lianjia_xiaoqu_house.Spider_Out_print": 10,
-    # "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
-    # "test.framework.test.test_middleware.test_print.test_close_spider_print_06_shfe.Spider_Out_print": 10,
+    "test.framework.test.test_middleware.test_print.test_close_spider_print_05_cffex.Spider_Out_print": 10,
+    # "test.framework.test.test_middleware.test_print.test_close_spider_csv_07_shfe.Spider_Out_CSV": 10,
 
 
-    'test.framework.test.test_example.mutil_sold_info.close_spider_enable_sold.Enable_Child_Spider':10,
-    'test.framework.test.test_example.mutil_sold_info.close_spider_db_sold.HouseInfoDB': 20
+    # 'test.framework.test.test_example.mutil_sold_info.close_spider_enable_sold.Enable_Child_Spider':10,
+    # 'test.framework.test.test_example.mutil_sold_info.close_spider_db_sold.HouseInfoDB': 20
+
 
 }
 #J
@@ -151,7 +152,7 @@ LOG_ERROR_MSG = 'Error:[%(module)s%(name)s%(function)s%(request)s] %(msg)s%(exce
 LOG_FILE_PATH = 'C:\\Users\\scott\\PycharmProjects\\crawler\\log_record\\'
 LOG_FILE_NAME  = LOG_FILE_PATH+'default_log_name.log'
 LOG_FILE_ERROR_URL = 'default_error_url.log'
-LOG_LEVEL = "INFO"
+LOG_LEVEL = "DEBUG"
 
 
 LOG_MONGODB_URL = "127.0.0.1:27017"
@@ -254,7 +255,7 @@ LOGGING_DIC = {
     'loggers': {
         #  logging.getLogger(__name__)拿到的logger配置
         '': {
-            'handlers': ['logtoMongdb','console_error'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
+            'handlers': ['console_info'],  # 这里把上面定义的两个handler都加上，即log数据既写入文件又打印到屏幕
             'level': LOG_LEVEL,
             'propagate': True,  # 向上（更高level的logger）传递
         },

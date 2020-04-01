@@ -11,9 +11,7 @@ from test.framework.setting import Setting
 logger = logging.getLogger(__name__)
 
 class Cffex_Rank(Spider):
-    """
-    将所有小区的地址都写入数据库中
-    """
+
     name = "cffex"
 
     deal_sorts = {
@@ -66,7 +64,7 @@ class Cffex_Rank(Spider):
         # company = seletor.findall('data ')
         # print(len(company))
         for item in seletor.iter('data'):
-            if item.find('shortname').text == '华泰期货':
+            if item.find('shortname').text == '中信期货':
                 # for j in i.iter():
                 #     print(j)
                 data_list = item.xpath('@*')
